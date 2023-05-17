@@ -1,0 +1,19 @@
+{
+  "signature": {
+    "add": {
+      "location": "testLocation",
+      "appendSignature": true,
+      "certificationLevel": "none",
+      "contact": "testContact",
+      "fieldName": "testName",
+      "keyName": "testKey",
+      "keyPassword": "testPwd",
+      "reason": "testReason",
+      "appearance": {
+        "page": 1,
+        "name": "testName",
+        "identifier": "testIdentifier"
+      }
+    }
+  }
+}

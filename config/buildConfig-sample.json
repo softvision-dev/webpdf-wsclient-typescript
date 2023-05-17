@@ -1,0 +1,7 @@
+{
+	"api": "local npm repository api url",
+	"repository": "npm repository name",
+	"username": "user",
+	"password": "password",
+	"publish": "local or public"
+}

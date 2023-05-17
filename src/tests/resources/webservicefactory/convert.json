@@ -1,0 +1,21 @@
+{
+  "converter": {
+    "embedFonts": true,
+    "pages": "1",
+    "reduceResolution": true,
+    "maxRecursion": 2,
+    "jpegQuality": 3,
+    "fileExtension": "zip",
+    "dpi": 4,
+    "compression": false,
+    "accessPassword": "testPwd",
+    "pdfa": {
+      "convert": {
+        "level": "1a",
+        "errorReport": "message",
+        "imageQuality": 1,
+        "successReport": "zip"
+      }
+    }
+  }
+}

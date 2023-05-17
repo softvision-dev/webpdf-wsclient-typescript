@@ -1,0 +1,16 @@
+{
+  "barcode": {
+    "add": {
+      "qrcode": [
+        {
+          "errorCorrection": "m",
+          "value": "webPDFTest",
+          "pages": "1",
+          "rotation": 90,
+          "charset": "utf-8",
+          "margin": 1
+        }
+      ]
+    }
+  }
+}

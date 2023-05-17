@@ -1,0 +1,30 @@
+{{^isPrimitiveType}}
+    {{#isListContainer}}
+this.{{name}} = {{^items.isObject}}data.{{baseName}}{{/items.isObject}}{{#items.isObject}}(data.{{baseName}} || []).map(
+    {{#items}}{{datatypeWithEnum}}{{/items}}.fromJson
+){{/items.isObject}};
+    {{/isListContainer}}
+    {{^isListContainer}}
+        {{#isObject}}
+this.{{name}} = {{^isEnum}}{{{datatypeWithEnum}}}.fromJson(data{{^required}}?{{/required}}.{{baseName}}){{/isEnum}}{{#isEnum}}data?.{{baseName}}{{/isEnum}};
+        {{/isObject}}
+        {{^isObject}}
+            {{#vendorExtensions.x-webpdf-codegen.defaultValue}}
+let {{baseName}}Default: any = {{{vendorExtensions.x-webpdf-codegen.defaultValue}}};
+this.{{name}} = typeof data{{^required}}?{{/required}}.{{baseName}} !== "undefined" ? data{{^required}}?{{/required}}.{{baseName}} : {{#defaultValue}}{{baseName}}Default{{/defaultValue}};
+            {{/vendorExtensions.x-webpdf-codegen.defaultValue}}
+            {{^vendorExtensions.x-webpdf-codegen.defaultValue}}
+this.{{name}} = data{{^required}}?{{/required}}.{{baseName}};
+            {{/vendorExtensions.x-webpdf-codegen.defaultValue}}
+        {{/isObject}}
+    {{/isListContainer}}
+{{/isPrimitiveType}}
+{{#isPrimitiveType}}
+    {{#vendorExtensions.x-webpdf-codegen.defaultValue}}
+let {{baseName}}Default: any = {{{vendorExtensions.x-webpdf-codegen.defaultValue}}};
+this.{{name}} = typeof data{{^required}}?{{/required}}.{{baseName}} !== "undefined" ? data{{^required}}?{{/required}}.{{baseName}} : {{baseName}}Default;
+    {{/vendorExtensions.x-webpdf-codegen.defaultValue}}
+    {{^vendorExtensions.x-webpdf-codegen.defaultValue}}
+this.{{name}} = data{{^required}}?{{/required}}.{{baseName}};
+    {{/vendorExtensions.x-webpdf-codegen.defaultValue}}
+{{/isPrimitiveType}}

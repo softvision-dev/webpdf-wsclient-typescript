@@ -1,0 +1,26 @@
+{
+  "toolbox": [
+    {
+      "delete": {
+        "pages": "1"
+      }
+    },
+    {
+      "rotate": {
+        "pages": "*",
+        "degrees": 90,
+        "pageGroup": "even",
+        "pageOrientation": "any"
+      }
+    },
+    {
+      "watermark": {
+        "pages": "2",
+        "angle": 180,
+        "text": {
+          "text": "testText"
+        }
+      }
+    }
+  ]
+}

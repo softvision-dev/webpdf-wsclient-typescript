@@ -1,0 +1,50 @@
+{
+  "server": {
+    "local": {
+      "url": "http://localhost",
+      "httpPort": "8080",
+      "httpsPort": "8443",
+      "path": "/webPDF",
+      "user": "admin",
+      "password": "admin"
+    },
+    "public": {
+      "url": "https://portal.webpdf.de",
+      "httpPort": "80",
+      "httpsPort": "443",
+      "path": "/webPDF"
+    }
+  },
+  "integrationTests": {
+    "enabled": false,
+    "oAuth": {
+      "azureClient": {
+        "enabled": false,
+        "authority": "Insert the URI of the Azure authorization provider here.",
+        "clientId": "Insert the ID of the client - that requires authorization - here.",
+        "clientSecret": "Insert the secret - known to that client - here.",
+        "scope": "Insert the scopes - the client is requesting access to - here."
+      },
+      "auth0Client": {
+        "enabled": false,
+        "authority": "Insert the URI of the Auth0 authorization provider here.",
+        "clientId": "Insert the ID of the client - that requires authorization - here.",
+        "clientSecret": "Insert the secret - known to that client - here.",
+        "audience": "Insert the audience - the client is claiming to be part of - here."
+      }
+    },
+    "proxy": {
+      "enabled": false
+    },
+    "tls": {
+      "enabled": false
+    },
+    "ldap": {
+      "enabled": false
+    },
+    "license": {
+      "licensee": "Insert the licensee here",
+      "key": "Insert the license key here"
+    }
+  }
+}

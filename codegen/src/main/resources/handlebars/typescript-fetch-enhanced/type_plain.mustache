@@ -1,0 +1,22 @@
+import {
+{{#vendorExtensions.x-webpdf-codegen}}
+    {{#each imports}}
+    {{.}},
+    {{/each}}
+} from "{{relativeIndexLocation}}";
+{{/vendorExtensions.x-webpdf-codegen}}
+{{#isObject}}
+{{>type_plain_interface}}
+{{>type_plain_class}}
+{{#vars}}
+    {{#isEnum}}
+        {{^vendorExtensions.x-webpdf-codegen.isExtractedEnum}}
+
+{{>type_enum}}
+        {{/vendorExtensions.x-webpdf-codegen.isExtractedEnum}}
+    {{/isEnum}}
+{{/vars}}
+{{/isObject}}
+{{^isObject}}
+export type {{vendorExtensions.x-webpdf-codegen.typeClassName}} = undefined;
+{{/isObject}}

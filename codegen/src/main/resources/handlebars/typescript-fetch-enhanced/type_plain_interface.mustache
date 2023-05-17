@@ -1,0 +1,13 @@
+
+export interface {{vendorExtensions.x-webpdf-codegen.typeClassName}}Interface {{#if vendorExtensions.x-webpdf-codegen.extends}}extends {{vendorExtensions.x-webpdf-codegen.extends}}Interface{{/if}}{{^vendorExtensions.x-webpdf-codegen.extends}}{{#vendorExtensions.x-webpdf-codegen.parentClassName}}extends {{{vendorExtensions.x-webpdf-codegen.parentClassName}}}Interface {{/vendorExtensions.x-webpdf-codegen.parentClassName}}{{/vendorExtensions.x-webpdf-codegen.extends}} {
+
+{{#vars}}
+    {{#description}}
+    /**
+    * {{{description}}}
+    */
+    {{/description}}
+    {{#readOnly}}readonly {{/readOnly}}{{name}}{{^required}}?{{/required}}: {{{datatypeWithEnum}}};
+{{/vars}}
+
+}

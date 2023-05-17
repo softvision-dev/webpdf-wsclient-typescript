@@ -1,0 +1,118 @@
+{
+  "packages": [
+    {
+      "prefix": "Admin_",
+      "location": "admin/",
+      "preservePrefix": [
+        "Admin_WebserviceStatus"
+      ]
+    },
+    {
+      "prefix": "ApplicationConfig_",
+      "location": "admin/config/application/",
+      "preservePrefix": [
+        "ApplicationConfig_Keystore",
+        "ApplicationConfig_Proxy",
+        "ApplicationConfig_OfficeBridge",
+        "ApplicationConfig_SharePointBridge",
+        "ApplicationConfig_PortalSettings",
+        "ApplicationConfig_PortalUserInterface"
+      ]
+    },
+    {
+      "prefix": "ServerConfig_",
+      "location": "admin/config/server/",
+      "preservePrefix": [
+        "ServerConfig_Keystore",
+        "ServerConfig_Proxy",
+        "ServerConfig_LocalAuth",
+        "ServerConfig_UserStorage"
+      ]
+    },
+    {
+      "prefix": "UserConfig_",
+      "location": "admin/config/user/",
+      "preservePrefix": [
+        "UserConfig_UserInterface"
+      ]
+    },
+    {
+      "prefix": "Auth_",
+      "location": "auth/",
+      "preservePrefix": [
+        "Auth_Provider"
+      ]
+    },
+    {
+      "prefix": "Certificate_",
+      "location": "auth/certificate/",
+      "preservePrefix": [
+        "Certificate_Entry"
+      ]
+    },
+    {
+      "prefix": "Document_",
+      "location": "document/",
+      "preservePrefix": [
+        "Document_Password",
+        "Document_Recipient",
+        "Document_File"
+      ]
+    },
+    {
+      "prefix": "KeyStore_",
+      "location": "auth/keystore/",
+      "preservePrefix": [
+        "KeyStore_Entry",
+        "KeyStore_Password"
+      ]
+    },
+    {
+      "prefix": "Metadata_",
+      "location": "metadata/",
+      "preservePrefix": [
+        "Metadata_Password",
+        "Metadata_HeaderFooter",
+        "Metadata_Pdfa",
+        "Metadata_Rectangle",
+        "Metadata_Signature",
+        "Metadata_Transition",
+        "Metadata_ViewerPreferences",
+        "Metadata_Information",
+        "Metadata_BorderStyle",
+        "Metadata_FormsFormat",
+        "Metadata_TransitionDirection",
+        "Metadata_Magnification",
+        "Metadata_ReplyState",
+        "Metadata_TextDirection",
+        "Metadata_DrawMode",
+        "Metadata_TransitionStyle",
+        "Metadata_Duplex",
+        "Metadata_PrintScale",
+        "Metadata_PrintTraySelection",
+        "Metadata_PageLayout",
+        "Metadata_NonFullScreenPageMode",
+        "Metadata_InitialView"
+      ]
+    },
+    {
+      "prefix": "OAuth_",
+      "location": "auth/oauth/",
+      "preservePrefix": [
+        "OAuth_Provider"
+      ]
+    },
+    {
+      "prefix": "Operation_",
+      "location": "operation/"
+    },
+    {
+      "prefix": "Portal_",
+      "location": "portal/",
+      "preservePrefix": [
+        "Portal_Settings",
+        "Portal_UserInterface"
+      ]
+    }
+  ]
+}

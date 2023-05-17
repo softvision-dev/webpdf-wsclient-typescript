@@ -1,0 +1,109 @@
+
+export class {{vendorExtensions.x-webpdf-codegen.typeClassName}}{{#if vendorExtensions.x-webpdf-codegen.extends}} extends {{vendorExtensions.x-webpdf-codegen.extends}}{{/if}}{{^vendorExtensions.x-webpdf-codegen.extends}}{{#vendorExtensions.x-webpdf-codegen.parentClassName}} extends {{{vendorExtensions.x-webpdf-codegen.parentClassName}}}{{/vendorExtensions.x-webpdf-codegen.parentClassName}}{{/vendorExtensions.x-webpdf-codegen.extends}} implements {{vendorExtensions.x-webpdf-codegen.typeClassName}}Interface, Parameter {
+{{#vars}}
+    {{#description}}
+    /**
+    * {{{description}}}
+    */
+    {{/description}}
+    {{#readOnly}}readonly {{/readOnly}}{{name}}{{^required}}?{{/required}}: {{{datatypeWithEnum}}};
+{{/vars}}
+
+    constructor(data: any) {
+{{#if vendorExtensions.x-webpdf-codegen.extends}}
+        super(data);
+
+{{/if}}
+{{#vendorExtensions.x-webpdf-codegen.parentClassName}}
+        super(data);
+
+{{/vendorExtensions.x-webpdf-codegen.parentClassName}}
+{{#vars}}
+        {{>type_plain_constructor}}
+{{/vars}}
+    }
+
+{{#vars}}
+    {{#vendorExtensions.x-webpdf-codegen.defaultValue}}
+    public static get{{nameInCamelCase}}Default(): {{{datatypeWithEnum}}} {
+        return {{{vendorExtensions.x-webpdf-codegen.defaultValue}}}{{#isEnum}} as {{{datatypeWithEnum}}}{{/isEnum}}{{#vendorExtensions.x-webpdf-codegen.isEnumReference}} as {{{datatypeWithEnum}}}{{/vendorExtensions.x-webpdf-codegen.isEnumReference}};
+    }
+
+    {{/vendorExtensions.x-webpdf-codegen.defaultValue}}
+    public static get{{nameInCamelCase}}Description(): string {
+        return "{{#vendorExtensions.x-webpdf-codegen.description}}{{{vendorExtensions.x-webpdf-codegen.description}}}{{/vendorExtensions.x-webpdf-codegen.description}}";
+    }
+
+    {{#isNumeric}}
+        {{#minimum}}
+    public static get{{nameInCamelCase}}Min(): number {
+        return {{minimum}};
+    }
+
+        {{/minimum}}
+        {{#maximum}}
+    public static get{{nameInCamelCase}}Max(): number {
+        return {{maximum}};
+    }
+
+        {{/maximum}}
+    {{/isNumeric}}
+{{/vars}}
+    public static fromJson(data: any): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
+        if (data === undefined || data === null) {
+            return data;
+        }
+
+{{#discriminator}}
+        switch(data.{{propertyName}}) {
+        {{#each mapping}}
+            case '{{@key}}':
+                return {{this}}.fromJson(data);
+        {{/each}}
+        }
+
+{{/discriminator}}
+{{#vendorExtensions.x-webpdf-codegen}}{{#each extendedBy}}
+        if (typeof data.{{@key}} !== "undefined") {
+            return {{this}}.fromJson(data);
+        }
+
+{{/each}}{{/vendorExtensions.x-webpdf-codegen}}
+        return new {{vendorExtensions.x-webpdf-codegen.typeClassName}}(data);
+    }
+
+    public toJson(): any {
+        return {
+{{#if vendorExtensions.x-webpdf-codegen.extends}}
+            ...(super.toJson()),
+{{else}}
+    {{#vendorExtensions.x-webpdf-codegen.parentClassName}}
+            ...(super.toJson()),
+    {{/vendorExtensions.x-webpdf-codegen.parentClassName}}
+{{/if}}
+{{#vars}}
+    {{^isPrimitiveType}}
+        {{#isListContainer}}
+            '{{baseName}}': {{#items.isObject}}this.{{name}}?.map((data) => data.toJson()){{/items.isObject}}{{^items.isObject}}this.{{name}}{{/items.isObject}},
+        {{/isListContainer}}
+        {{^isListContainer}}
+            {{#isObject}}
+            '{{baseName}}': this.{{name}}?.toJson(),
+            {{/isObject}}
+            {{^isObject}}
+            '{{baseName}}': this.{{name}},
+            {{/isObject}}
+        {{/isListContainer}}
+    {{/isPrimitiveType}}
+    {{#isPrimitiveType}}
+            '{{baseName}}': this.{{name}},
+    {{/isPrimitiveType}}
+{{/vars}}
+        };
+    }
+
+    public clone(): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
+        return {{vendorExtensions.x-webpdf-codegen.typeClassName}}.fromJson(this.toJson());
+    }
+
+}

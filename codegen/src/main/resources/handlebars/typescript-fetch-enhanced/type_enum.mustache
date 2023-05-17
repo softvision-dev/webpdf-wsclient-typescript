@@ -1,0 +1,16 @@
+export enum {{#vendorExtensions.x-webpdf-codegen.typeClassName}}{{vendorExtensions.x-webpdf-codegen.typeClassName}}{{/vendorExtensions.x-webpdf-codegen.typeClassName}}{{^vendorExtensions.x-webpdf-codegen.typeClassName}}{{enumName}}{{/vendorExtensions.x-webpdf-codegen.typeClassName}} {
+
+{{^vendorExtensions.x-webpdf-codegen.enumDefinition}}
+    {{#allowableValues}}
+        {{#enumVars}}
+    {{{name}}} = {{{value}}}{{^@last}},{{/@last}}
+        {{/enumVars}}
+    {{/allowableValues}}
+{{/vendorExtensions.x-webpdf-codegen.enumDefinition}}
+{{#vendorExtensions.x-webpdf-codegen.enumDefinition}}
+    {{#each enumValues}}
+    {{{@key}}} = {{{this}}}{{^@last}},{{/@last}}
+    {{/each}}
+{{/vendorExtensions.x-webpdf-codegen.enumDefinition}}
+
+}

@@ -1,0 +1,12 @@
+{{#models}}
+	{{#model}}
+		{{^isEnum}}
+{{>type_plain}}
+        {{/isEnum}}
+		{{#isEnum}}
+            {{^vendorExtensions.x-webpdf-codegen.isExtractedEnum}}
+{{>type_enum}}
+            {{/vendorExtensions.x-webpdf-codegen.isExtractedEnum}}
+		{{/isEnum}}
+	{{/model}}
+{{/models}}

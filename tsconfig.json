@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "CommonJS",
+		"declaration": true,
+		"removeComments": true,
+		"esModuleInterop": true,
+		"downlevelIteration": true,
+		"rootDirs": [
+			"src/main/typescript"
+		],
+		"outDir": "./lib",
+		"lib": [
+			"DOM",
+			"ES2020"
+		],
+		"strict": true
+	},
+	"include": [
+		"src/main/typescript/**/*"
+	]
+}

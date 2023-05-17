@@ -1,0 +1,66 @@
+{
+	"name": "@softvision/webpdf-wsclient-typescript",
+	"version": "9.0.0-beta.0",
+	"description": "A simplified and optimized API client library for the webPDF server",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"author": "SoftVision Development GmbH",
+	"license": "Apache-2.0",
+	"homepage": "https://github.com/softvision-dev",
+	"keywords": [
+		"TypeScript",
+		"javascript",
+		"SoftVision",
+		"api",
+		"client",
+		"pdf",
+		"webservice",
+		"rest-api",
+		"pdf-converter",
+		"pdf-generation",
+		"pdf-manipulation",
+		"webPDF",
+		"webPDF-server",
+		"webPDF-wsclient",
+		"pdf-portal"
+	],
+	"scripts": {
+		"compile": "tsc",
+		"clean": "node clean.js",
+		"build": "node build.js",
+		"deploy": "node deploy.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/softvision-dev/webpdf-wsclient-typescript"
+	},
+	"dependencies": {
+		"axios": "^1.4.0",
+		"typescript": "^4.5.2"
+	},
+	"devDependencies": {
+		"@types/node": "^18.15.10",
+		"@types/chai": "^4.3.4",
+		"@types/mocha": "^10.0.1",
+		"@types/auth0": "^3.3.1",
+		"@azure/msal-node": "^1.17.0",
+		"ts-node": "^10.9.1",
+		"chai": "^4.3.7",
+		"mocha": "^10.2.0",
+		"tmp": "^0.2.1",
+		"form-data": "^4.0.0",
+		"child_process": "^1.0.2",
+		"download": "^8.0.0",
+		"decompress": "^4.2.1",
+		"decompress-targz": "^4.1.1",
+		"node-fetch": "^2.6.9",
+		"auth0": "^3.3.0"
+	},
+	"files": [
+		"lib/**/*"
+	],
+	"jshintConfig": {
+		"esversion": 9,
+		"node": true
+	}
+}
