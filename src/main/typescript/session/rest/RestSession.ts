@@ -43,7 +43,7 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
 	 * @return The uploaded {@link T_REST_DOCUMENT}.
 	 * @throws ResultException Shall be thrown, should the upload have failed.
 	 */
-	uploadDocument(data: Blob, fileName: string, options: {
+	uploadDocument(data: Blob, fileName: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<T_REST_DOCUMENT>;

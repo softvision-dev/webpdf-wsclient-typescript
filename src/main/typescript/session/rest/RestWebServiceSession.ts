@@ -48,7 +48,7 @@ export class RestWebServiceSession extends AbstractRestSession<RestWebServiceDoc
 	 * @return The uploaded {@link RestWebServiceDocument}.
 	 * @throws ResultException Shall be thrown, should the upload have failed.
 	 */
-	public async uploadDocument(data: Blob, fileName: string, options: {
+	public async uploadDocument(data: Blob, fileName: string, options?: {
 		onProgress?: (event: any) => void,
 		abortSignal?: AbortSignal
 	}): Promise<RestWebServiceDocument> {

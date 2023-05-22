@@ -50,20 +50,11 @@ const configPath = Path.join(__dirname, "config", "buildConfig.json");
 				throw error;
 			}
 		} else {
-			// TODO: deploy to live repo
-			// let registry = execSync('npm config get registry', {stdio: "inherit"}).toString();
-			//
-			// let username = execSync('npm config get username', {stdio: "inherit"}).toString();
-			// username.replaceAll("\n", "");
-			// let password = execSync('npm config get password', {stdio: "inherit"}).toString();
-			// password.replaceAll("\n", "");
-			// let token = ':_authToken=' + Buffer.from(username + ':' + password).toString('base64');
-			//
-			// console.log('-- deploy project --');
-			// execSync('npm config list', {stdio: "inherit"});
-			// execSync('npm login --registry=' + registry + token + ' --non-interactive', {stdio: "inherit"});
-			// execSync('npm publish --registry=' + registry, {stdio: "inherit"});
-			// execSync('npm logout --registry=' + registry, {stdio: "inherit"});
+			// public publish needs .npmrc file with: //registry.npmjs.org/:_authToken=<TOKEN>
+			let version = process.env.npm_package_version;
+
+			console.log('-- deploy project --');
+			execSync('yarn publish --access=public --always-auth=true --non-interactive --new-version ' + version, {stdio: "inherit"});
 		}
 	} catch (err) {
 		if (typeof err.stderr !== 'undefined' && err.stderr !== null && err.stderr.toString() !== '') {

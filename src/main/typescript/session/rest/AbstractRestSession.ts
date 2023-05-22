@@ -201,6 +201,6 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	public abstract uploadDocument(
 		data: Blob,
 		fileName: string,
-		options: { onProgress?: (event: any) => void; abortSignal?: AbortSignal }
+		options?: { onProgress?: (event: any) => void; abortSignal?: AbortSignal }
 	): Promise<T_REST_DOCUMENT>;
 }

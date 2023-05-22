@@ -11,14 +11,17 @@ The library implements the required stubs and session management in ready-to-use
 ## Download
 You can use this library, by adding this dependency to your project:
 ```
-npm install webpdf-wsclient-typescript
+yarn add @softvision/webpdf-wsclient-typescript
+```
+```
+npm install @softvision/webpdf-wsclient-typescript --save
 ```
 
 ## Usage
-You will find some [usage examples](https://github.com/softvision-dev/webpdf-wsclient/wiki/Usage) in the wiki.
+You will find some [usage examples](https://github.com/softvision-dev/webpdf-wsclient-typescript/wiki/Usage) in the wiki.
 
 ## Documentation
-Have a look at our [wiki](https://github.com/softvision-dev/webpdf-wsclient/wiki) for examples and details.
+Have a look at our [wiki](https://github.com/softvision-dev/webpdf-wsclient-typescript/wiki) for examples and details.
 
 ## Development and support
 If you have any questions on how to use webPDF, or this library, or have ideas for future development, please get in touch via our [product homepage](https://www.webpdf.de).
