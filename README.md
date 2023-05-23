@@ -14,7 +14,7 @@ You can use this library, by adding this dependency to your project:
 yarn add @softvision/webpdf-wsclient-typescript
 ```
 ```
-npm install @softvision/webpdf-wsclient-typescript --save
+npm install @softvision/webpdf-wsclient-typescript
 ```
 
 ## Usage
