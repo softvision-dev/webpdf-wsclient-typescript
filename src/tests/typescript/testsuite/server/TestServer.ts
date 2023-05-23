@@ -1,6 +1,7 @@
 import {TestConfig} from "../config";
 import {ServerType} from "./ServerType";
 import {TransferProtocol} from "./TransferProtocol";
+import {DetailedPeerCertificate, TLSSocket} from "tls";
 
 const https = require('https');
 
@@ -64,12 +65,13 @@ export class TestServer {
 		return TestConfig.instance.getServerConfig().getLocalPassword();
 	}
 
-	public async getDemoCertificate(): Promise<any> {
+	public async getDemoCertificate(): Promise<DetailedPeerCertificate> {
 		let serverUrl: URL = this.getServer(ServerType.PUBLIC, TransferProtocol.HTTPS);
 
 		return await new Promise<any>(function (resolve) {
 			var req = https.request(serverUrl.href, function (res: any) {
-				resolve(res.socket.getPeerCertificate(true));
+				let socket: TLSSocket = res.socket;
+				resolve(socket.getPeerCertificate(true));
 			});
 			req.end();
 		});

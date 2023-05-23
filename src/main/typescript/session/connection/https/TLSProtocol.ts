@@ -17,20 +17,20 @@ export enum TLSProtocol {
     /**
      * Transport Layer Security (protocol) version 1.0
      */
-    TLSV1 = "TLSv1_0_method",
+    TLSV1 = "TLSv1",
 
     /**
      * Transport Layer Security (protocol) version 1.1
      */
-    TLSV1_1 = "TLSv1_1_method",
+    TLSV1_1 = "TLSv1.1",
 
     /**
      * Transport Layer Security (protocol) version 1.2
      */
-    TLSV1_2 = "TLSv1_2_method",
+    TLSV1_2 = "TLSv1.2",
 
     /**
      * Transport Layer Security (protocol) version 1.3
      */
-    TLSV1_3 = "TLSv1_3_method"
+    TLSV1_3 = "TLSv1.3"
 }

@@ -4,6 +4,7 @@ import {RestDocument, RestSession, SessionContext, SessionFactory, TLSProtocol, 
 import {AxiosProxyConfig} from "axios";
 import {UrlConverter, UrlConverterInterface} from "../../main/typescript/generated-sources";
 import {Agent} from "https";
+import {DetailedPeerCertificate} from "tls";
 
 const fs = require('fs');
 const tmp = require('tmp');
@@ -64,7 +65,7 @@ describe("WebserviceProxyTest", function () {
 		let sessionContext: SessionContext = new SessionContext(
 			WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL, TransferProtocol.HTTPS)
 		);
-		let certificate = await testServer.getDemoCertificate();
+		let certificate: DetailedPeerCertificate = await testServer.getDemoCertificate();
 		sessionContext.setTlsContext(
 			new Agent({
 				secureProtocol: TLSProtocol.TLSV1_2,

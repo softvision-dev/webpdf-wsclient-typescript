@@ -3,6 +3,7 @@ import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} fro
 import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes, wsclientConfiguration} from "../../main/typescript";
 import {Agent, AgentOptions} from "https";
 import {it} from "mocha";
+import {DetailedPeerCertificate} from "tls";
 
 const fs = require('fs');
 const tmp = require('tmp');
@@ -17,20 +18,17 @@ describe("WebserviceTLSIntegrationTest", function () {
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	let testRestSSL = async function (url: URL, certificate: any, selfSigned: boolean) {
+	let testRestSSL = async function (url: URL, certificate: DetailedPeerCertificate | undefined, selfSigned: boolean) {
 		let options: AgentOptions = {
 			rejectUnauthorized: !selfSigned
 		};
 
 		if (typeof certificate !== "undefined") {
 			options.requestCert = true;
-			options.key = certificate.pubkey;
-			options.cert = certificate.raw;
+			options.ca = certificate.raw;
 		}
 
-		let sessionContext: SessionContext = new SessionContext(
-			WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL, TransferProtocol.HTTPS)
-		);
+		let sessionContext: SessionContext = new SessionContext(WebServiceProtocol.REST, url);
 		sessionContext.setTlsContext(new Agent(options));
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			sessionContext, new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
@@ -84,7 +82,8 @@ describe("WebserviceTLSIntegrationTest", function () {
 
 			try {
 				let url: URL = testServer.getServer(parameter.type, parameter.protocol);
-				let keystore: any = parameter.setCertificate ? await testServer.getDemoCertificate() : undefined;
+				let keystore: DetailedPeerCertificate | undefined =
+					parameter.setCertificate ? await testServer.getDemoCertificate() : undefined;
 
 				console.log("url:", url.href);
 				console.log("Parameters:", parameter);
