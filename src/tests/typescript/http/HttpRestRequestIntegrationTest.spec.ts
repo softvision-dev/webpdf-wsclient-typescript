@@ -4,11 +4,6 @@ import {ClientResultException, HttpMethod, HttpRestRequest, RestDocument, RestSe
 import {DocumentFile} from "../../../main/typescript/generated-sources";
 import {AxiosResponse} from "axios";
 
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
-
 describe("HttpRestRequestIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('http');
 	let testServer: TestServer = new TestServer();

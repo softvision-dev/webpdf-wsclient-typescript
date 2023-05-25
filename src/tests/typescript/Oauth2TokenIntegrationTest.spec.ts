@@ -1,15 +1,10 @@
 import {Auth0Config, Auth0Provider, AzureConfig, AzureProvider, ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
 import {expect} from "chai";
-import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, wsclientConfiguration} from "../../main/typescript";
+import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
 
 const fs = require('fs');
 const tmp = require('tmp');
-
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
 
 describe("Oauth2TokenIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');

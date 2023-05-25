@@ -16,8 +16,7 @@ import {
 	WebServiceFactory,
 	WebServiceProtocol,
 	WebServiceType,
-	WebServiceTypes,
-	wsclientConfiguration
+	WebServiceTypes
 } from "../../../main/typescript";
 import {
 	BarcodeOperation,
@@ -41,11 +40,6 @@ import {
 	ToolboxWatermark,
 	UrlConverterOperation
 } from "../../../main/typescript/generated-sources";
-
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
 
 describe("RestWebserviceFactoryTest", function () {
 	let testResources: TestResources = new TestResources('webservicefactory');

@@ -1,17 +1,12 @@
 import {expect} from "chai";
 import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} from "./testsuite";
-import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes, wsclientConfiguration} from "../../main/typescript";
+import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {Agent, AgentOptions} from "https";
 import {it} from "mocha";
 import {DetailedPeerCertificate} from "tls";
 
 const fs = require('fs');
 const tmp = require('tmp');
-
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
 
 describe("WebserviceTLSIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');

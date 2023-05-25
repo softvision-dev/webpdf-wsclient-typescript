@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
-import {AuthMaterial, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol, wsclientConfiguration} from "../../main/typescript";
+import {AuthMaterial, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol} from "../../main/typescript";
 import {
 	AggregationServerState,
 	Application,
@@ -38,10 +38,6 @@ import {
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
 
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
 const atob = function (data: string) {
 	return Buffer.from(data, "base64").toString("ascii");
 };

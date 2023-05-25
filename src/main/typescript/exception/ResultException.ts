@@ -66,7 +66,7 @@ export class ResultException extends Error {
 	 * @return The message describing this {@link ResultException}.
 	 */
 	public getMessage(): string {
-		return super.message;
+		return this.message;
 	}
 
 	/**

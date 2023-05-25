@@ -1,4 +1,4 @@
-# webPDF wsclient typescript
+# webPDF wsclient TypeScript
 This repository contains a simplified and optimized client library for the webPDF server, and serves as an alternative to more complex REST APIs.
 The library implements the required stubs and session management in ready-to-use interface classes and provides a common object based parameterization for webservice calls.
 

@@ -1,11 +1,13 @@
 {
 	"compilerOptions": {
-		"target": "es6",
+		"target": "ES6",
 		"module": "CommonJS",
+		"sourceMap": true,
 		"declaration": true,
 		"removeComments": true,
 		"esModuleInterop": true,
 		"downlevelIteration": true,
+		"moduleResolution": "Node",
 		"rootDirs": [
 			"src/main/typescript"
 		],

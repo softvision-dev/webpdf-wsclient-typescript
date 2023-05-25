@@ -1,12 +1,7 @@
 import {expect} from 'chai';
-import {ClientResultException, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol, wsclientConfiguration} from "../../../main/typescript";
+import {ClientResultException, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol} from "../../../main/typescript";
 import {ServerType, TestConfig, TestServer} from "../testsuite";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
-
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
 
 describe("RestWebserviceLdapTest", function () {
 	let testServer: TestServer = new TestServer();

@@ -53,11 +53,6 @@ import {
 const fs = require('fs');
 const tmp = require('tmp');
 
-wsclientConfiguration.FormData = require("form-data");
-wsclientConfiguration.btoa = function (data: string) {
-	return Buffer.from(data).toString('base64');
-};
-
 describe("RestWebserviceIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
@@ -489,16 +484,16 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		webService.setOperationParameters(
 			UrlConverter.fromJson({
-			url: "https://www.webpdf.de/",
-			page: {
-				width: 150.0,
-				height: 200.0,
-				top: 0,
-				left: 0,
-				right: 0,
-				bottom: 0,
-			}
-		} as UrlConverterInterface)
+				url: "https://www.webpdf.de/",
+				page: {
+					width: 150.0,
+					height: 200.0,
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+				}
+			} as UrlConverterInterface)
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process();
