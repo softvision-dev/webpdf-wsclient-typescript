@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<application xmlns="http://schema.webpdf.de/1.0/configuration/application"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://schema.webpdf.de/1.0/configuration/application http://schema.webpdf.de/1.0/configuration/application.xsd">
+    <webservices/>
+    <license key="" licensee=""/>
+    <bridges>
+        <chromium noSandbox="true"/>
+    </bridges>
+    <portal/>
+</application>

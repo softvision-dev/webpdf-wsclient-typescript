@@ -3,6 +3,8 @@ import {expect} from "chai";
 import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
 
+require("./bootstrap");
+
 const fs = require('fs');
 const tmp = require('tmp');
 

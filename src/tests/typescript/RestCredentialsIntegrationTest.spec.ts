@@ -3,6 +3,8 @@ import {expect} from "chai";
 import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {Converter, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
 
+require("./bootstrap");
+
 const fs = require('fs');
 const tmp = require('tmp');
 
@@ -19,7 +21,7 @@ describe("RestCredentialsIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let converterWebService: ConverterWebService<RestDocument> = session.createWebServiceInstance(WebServiceTypes.CONVERTER);
@@ -58,7 +60,7 @@ describe("RestCredentialsIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let webService: ConverterWebService<RestDocument> = WebServiceFactory.createByParameters(session, {

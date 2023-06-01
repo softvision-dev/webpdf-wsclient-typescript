@@ -3,6 +3,8 @@ import {expect} from "chai";
 import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../../main/typescript";
 import {BaseToolbox, FileDataSource, HistoryEntry, InfoForm, InfoType, PdfPassword, PdfPasswordInterface} from "../../../main/typescript/generated-sources";
 
+require("../bootstrap");
+
 describe("DocumentManagerIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('documents');
 	let testServer: TestServer = new TestServer();
@@ -15,7 +17,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -51,7 +53,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -77,7 +79,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -110,7 +112,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -161,7 +163,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -184,7 +186,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -213,7 +215,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -254,7 +256,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -269,7 +271,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		let resumedSession: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
 			new UserAuthProvider(
-				testServer.getLocalUser(), testServer.getLocalPassword(), await session.getAuthProvider().provide(session)
+				testServer.getLocalUserName(), testServer.getLocalUserPassword(), await session.getAuthProvider().provide(session)
 			)
 		);
 
@@ -292,7 +294,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let sourceFilename: string = "test.pdf";
@@ -395,7 +397,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 

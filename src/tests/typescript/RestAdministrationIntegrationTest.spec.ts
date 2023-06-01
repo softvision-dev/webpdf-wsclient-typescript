@@ -37,6 +37,9 @@ import {
 	Webservice,
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
+import {Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
+
+require("./bootstrap");
 
 const atob = function (data: string) {
 	return Buffer.from(data, "base64").toString("ascii");
@@ -69,7 +72,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		// User
 		session = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider("user", "user")
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		try {
@@ -83,7 +86,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		// Admin
 		session = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		try {
@@ -103,7 +106,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let userConfig: Users = await session.getAdministrationManager().getUserConfiguration();
@@ -149,7 +152,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let logConfig: LogFileConfiguration = await session.getAdministrationManager().getLogConfiguration();
@@ -182,7 +185,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let serverConfig: Server = await session.getAdministrationManager().getServerConfiguration();
@@ -216,7 +219,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let applicationConfig: Application = await session.getAdministrationManager().getApplicationConfiguration();
@@ -259,22 +262,22 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let applicationConfig: Application = await session.getAdministrationManager().getApplicationConfiguration();
 		expect(applicationConfig, "Application configuration should exist.").to.exist;
 
-		applicationConfig.license = License.fromJson({
-			licensee: TestConfig.instance.getIntegrationTestConfig().getLicensee(),
-			key: TestConfig.instance.getIntegrationTestConfig().getLicenseKey()
-		});
+		applicationConfig.tsa = Tsa.fromJson({
+			url: "http://timestamp.comodoca.com",
+			hashAlgorithm: TsaHashAlgorithm.SHA256
+		} as TsaInterface)
 
 		try {
 			let result: ConfigurationResult = await session.getAdministrationManager().validateApplicationConfiguration(
 				applicationConfig, [
 					ApplicationCheck.fromJson({
-						checkType: ApplicationCheckMode.License
+						checkType: ApplicationCheckMode.Tsa
 					} as ApplicationCheck)
 				]);
 
@@ -294,7 +297,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let applicationConfig: Application = await session.getAdministrationManager().getApplicationConfiguration();
@@ -324,7 +327,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let applicationConfig: Application = await session.getAdministrationManager().getApplicationConfiguration();
@@ -364,7 +367,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		try {
@@ -386,7 +389,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		try {
@@ -409,7 +412,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		try {
@@ -431,7 +434,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let logoFilename: string = "logo.png";
@@ -475,7 +478,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let truststoreFilename: string = "myTrustStore.jks";
@@ -526,7 +529,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let signatureFilename: string = "signatureKeyStore.jks";
@@ -579,7 +582,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let sslKeystoreFilename: string = "sslKeyStore.jks";
@@ -635,7 +638,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let currentDate: Date = new Date();
@@ -665,7 +668,7 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
 		let authMaterial: AuthMaterial = await session.getAuthProvider().provide(session);

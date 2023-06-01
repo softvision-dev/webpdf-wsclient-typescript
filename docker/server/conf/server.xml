@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<server xmlns="http://schema.webpdf.de/1.0/configuration/server"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://schema.webpdf.de/1.0/configuration/server http://schema.webpdf.de/1.0/configuration/server.xsd">
+    <host name="localhost" contextPath="webPDF"/>
+    <shutdown port="8005" command="SHUTDOWN" restart="true"/>
+    <connectors>
+        <connector enabled="true" port="8080" address=""/>
+        <connector enabled="true" port="8443" address="">
+            <ssl clientAuth="false" maxThreads="150" scheme="https">
+                <keystore type="JKS" password="webpdf" file="ssl.jks"/>
+                <protocols>
+                    <protocol>TLSv1</protocol>
+                    <protocol>TLSv1.1</protocol>
+                    <protocol>TLSv1.2</protocol>
+                    <protocol>TLSv1.3</protocol>
+                </protocols>
+                <ciphers>
+                    <cipher>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</cipher>
+                    <cipher>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</cipher>
+                    <cipher>SSL_RSA_WITH_3DES_EDE_CBC_SHA</cipher>
+                    <cipher>TLS_RSA_WITH_AES_128_CBC_SHA</cipher>
+                    <cipher>TLS_RSA_WITH_AES_256_CBC_SHA</cipher>
+                    <cipher>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</cipher>
+                    <cipher>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</cipher>
+                    <cipher>TLS_RSA_WITH_AES_128_GCM_SHA256</cipher>
+                    <cipher>TLS_RSA_WITH_AES_256_GCM_SHA384</cipher>
+                </ciphers>
+            </ssl>
+        </connector>
+    </connectors>
+    <user roleUserGroup="webPDFUser" roleAdminGroup="webPDFAdmin">
+        <ldap connectionURL="ldap://172.17.0.1:10389/"
+              connectionName="uid=admin,ou=users,dc=webpdf,dc=de"
+              connectionPassword="secret"
+              userBase="ou=users,dc=webpdf,dc=de"
+              userSearch="(uid={0})"
+              roleBase="ou=groups,dc=webpdf,dc=de"
+              roleSearch="(member={0})"
+              roleField="cn"
+              certificatesTrustMode="validate"
+              followReferral="false">
+        <userCertificates enabled="true" attributeName="userCertificate"/>
+        <userPKCS12 enabled="true" attributeName="userPKCS12"/>
+        </ldap>
+    </user>
+</server>

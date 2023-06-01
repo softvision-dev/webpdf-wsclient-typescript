@@ -1,33 +1,49 @@
 import {expect} from "chai";
 import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} from "./testsuite";
-import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
+import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {Agent, AgentOptions} from "https";
 import {it} from "mocha";
 import {DetailedPeerCertificate} from "tls";
+
+require("./bootstrap");
 
 const fs = require('fs');
 const tmp = require('tmp');
 
 describe("WebserviceTLSIntegrationTest", function () {
+	const CERT_START: string = '-----BEGIN CERTIFICATE-----\n';
+	const CERT_END: string = '\n-----END CERTIFICATE-----';
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	let testRestSSL = async function (url: URL, certificate: DetailedPeerCertificate | undefined, selfSigned: boolean) {
+	let testRestSSL = async function (url: URL, peerCertificate: DetailedPeerCertificate | undefined, selfSigned: boolean) {
 		let options: AgentOptions = {
 			rejectUnauthorized: !selfSigned
 		};
 
-		if (typeof certificate !== "undefined") {
-			options.requestCert = true;
-			options.ca = certificate.raw;
+		if (typeof peerCertificate !== "undefined") {
+			let certificateChain: Array<string> = [];
+
+			let currentCertificate: DetailedPeerCertificate = peerCertificate;
+			while (typeof currentCertificate.raw !== "undefined" && currentCertificate.raw !== null) {
+				certificateChain.push(
+					CERT_START + currentCertificate.raw.toString('base64') + CERT_END
+				);
+
+				if (typeof currentCertificate.issuerCertificate === "undefined") {
+					break;
+				}
+
+				currentCertificate = currentCertificate.issuerCertificate;
+			}
+
+			options.cert = certificateChain;
 		}
 
 		let sessionContext: SessionContext = new SessionContext(WebServiceProtocol.REST, url);
 		sessionContext.setTlsContext(new Agent(options));
-		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
-			sessionContext, new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
-		);
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(sessionContext);
 
 		let filename: string = "lorem-ipsum.docx";
 		let file: any = testResources.getResource(filename);
@@ -65,6 +81,34 @@ describe("WebserviceTLSIntegrationTest", function () {
 			"hasError": false,
 			"setCertificate": true,
 			"selfSigned": true
+		},
+		{
+			"type": ServerType.PUBLIC,
+			"protocol": TransferProtocol.HTTPS,
+			"hasError": false,
+			"setCertificate": false,
+			"selfSigned": false
+		},
+		{
+			"type": ServerType.PUBLIC,
+			"protocol": TransferProtocol.HTTPS,
+			"hasError": false,
+			"setCertificate": true,
+			"selfSigned": false
+		},
+		{
+			"type": ServerType.PUBLIC,
+			"protocol": TransferProtocol.HTTPS,
+			"hasError": false,
+			"setCertificate": false,
+			"selfSigned": true
+		},
+		{
+			"type": ServerType.PUBLIC,
+			"protocol": TransferProtocol.HTTPS,
+			"hasError": false,
+			"setCertificate": true,
+			"selfSigned": true
 		}
 	];
 
@@ -77,13 +121,13 @@ describe("WebserviceTLSIntegrationTest", function () {
 
 			try {
 				let url: URL = testServer.getServer(parameter.type, parameter.protocol);
-				let keystore: DetailedPeerCertificate | undefined =
+				let peerCertificate: DetailedPeerCertificate | undefined =
 					parameter.setCertificate ? await testServer.getDemoCertificate() : undefined;
 
 				console.log("url:", url.href);
 				console.log("Parameters:", parameter);
 
-				await testRestSSL(url, keystore, parameter.selfSigned);
+				await testRestSSL(url, peerCertificate, parameter.selfSigned);
 				expect(parameter.hasError, "unexpected error code").to.be.false;
 			} catch (ex: any) {
 				expect(parameter.hasError, "unexpected error code").to.be.true;

@@ -31,6 +31,10 @@ export class IntegrationTestConfig extends ConfigNodeContainer {
 		return this.getBoolean("/ldap/enabled", false);
 	}
 
+	public isContainerActive(): boolean {
+		return this.getBoolean("/useContainer", false);
+	}
+
 	public getAuth0Config(): Auth0Config {
 		return this.auth0Config;
 	}

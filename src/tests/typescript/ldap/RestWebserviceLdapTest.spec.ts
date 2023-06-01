@@ -3,6 +3,8 @@ import {ClientResultException, RestDocument, RestSession, SessionContext, Sessio
 import {ServerType, TestConfig, TestServer} from "../testsuite";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
 
+require("../bootstrap");
+
 describe("RestWebserviceLdapTest", function () {
 	let testServer: TestServer = new TestServer();
 

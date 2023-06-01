@@ -1,6 +1,8 @@
 import {expect} from "chai";
 import {WsclientError, WsclientErrors} from "../../../main/typescript";
 
+require("../bootstrap");
+
 describe("ErrorTest", function () {
 	it('testError', async function () {
 		let error: WsclientError = WsclientError.getName(WsclientErrors.UNKNOWN_EXCEPTION.getCode());

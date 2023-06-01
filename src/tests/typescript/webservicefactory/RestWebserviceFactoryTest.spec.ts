@@ -41,6 +41,8 @@ import {
 	UrlConverterOperation
 } from "../../../main/typescript/generated-sources";
 
+require("../bootstrap");
+
 describe("RestWebserviceFactoryTest", function () {
 	let testResources: TestResources = new TestResources('webservicefactory');
 	let testServer: TestServer = new TestServer();

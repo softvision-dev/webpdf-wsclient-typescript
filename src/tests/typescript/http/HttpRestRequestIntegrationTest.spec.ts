@@ -4,6 +4,8 @@ import {ClientResultException, HttpMethod, HttpRestRequest, RestDocument, RestSe
 import {DocumentFile} from "../../../main/typescript/generated-sources";
 import {AxiosResponse} from "axios";
 
+require("../bootstrap");
+
 describe("HttpRestRequestIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('http');
 	let testServer: TestServer = new TestServer();
@@ -16,7 +18,7 @@ describe("HttpRestRequestIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 
@@ -80,7 +82,7 @@ describe("HttpRestRequestIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let httpRestRequest: HttpRestRequest = HttpRestRequest.createRequest(session);

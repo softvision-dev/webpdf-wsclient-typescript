@@ -3,6 +3,8 @@ import {expect} from "chai";
 import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {BaseToolbox, Signature, SignatureInterface} from "../../main/typescript/generated-sources";
 
+require("./bootstrap");
+
 describe("RestFailureIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
@@ -15,7 +17,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "invalid.gif";
@@ -42,7 +44,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -80,7 +82,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "user-owner-password.pdf";
@@ -107,7 +109,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "user-owner-password.pdf";
@@ -143,7 +145,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -170,7 +172,7 @@ describe("RestFailureIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "user-owner-password.pdf";

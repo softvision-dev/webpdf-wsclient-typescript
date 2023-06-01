@@ -5,18 +5,21 @@
       "httpPort": "8080",
       "httpsPort": "8443",
       "path": "/webPDF",
-      "user": "admin",
-      "password": "admin"
+      "adminName": "jdo",
+      "adminPassword": "johndoe",
+      "userName": "bmi",
+      "userPassword": "billymiller"
     },
     "public": {
       "url": "https://portal.webpdf.de",
-      "httpPort": "80",
-      "httpsPort": "443",
+      "httpPort": "",
+      "httpsPort": "",
       "path": "/webPDF"
     }
   },
   "integrationTests": {
     "enabled": false,
+    "useContainer": false,
     "oAuth": {
       "azureClient": {
         "enabled": false,
@@ -41,10 +44,6 @@
     },
     "ldap": {
       "enabled": false
-    },
-    "license": {
-      "licensee": "Insert the licensee here",
-      "key": "Insert the license key here"
     }
   }
 }

@@ -2,12 +2,17 @@ import {TestConfig} from "../config";
 import {ServerType} from "./ServerType";
 import {TransferProtocol} from "./TransferProtocol";
 import {DetailedPeerCertificate, TLSSocket} from "tls";
+import {DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait} from "testcontainers";
+import path from "path";
 
 const https = require('https');
 
 export class TestServer {
 	private localServer: URL;
 	private publicServer: URL;
+	private environment?: StartedDockerComposeEnvironment;
+	private readonly composeFilePath: string = "../../../../../docker";
+	private readonly composeFile: string = "docker-compose.yml";
 
 	public constructor() {
 		this.localServer = new URL(TestConfig.instance.getServerConfig().getLocalURL());
@@ -57,12 +62,20 @@ export class TestServer {
 		return url;
 	}
 
-	public getLocalUser(): string {
-		return TestConfig.instance.getServerConfig().getLocalUser();
+	public getLocalAdminName(): string {
+		return TestConfig.instance.getServerConfig().getLocalAdminName();
 	}
 
-	public getLocalPassword(): string {
-		return TestConfig.instance.getServerConfig().getLocalPassword();
+	public getLocalAdminPassword(): string {
+		return TestConfig.instance.getServerConfig().getLocalAdminPassword();
+	}
+
+	public getLocalUserName(): string {
+		return TestConfig.instance.getServerConfig().getLocalUserName();
+	}
+
+	public getLocalUserPassword(): string {
+		return TestConfig.instance.getServerConfig().getLocalUserPassword();
 	}
 
 	public async getDemoCertificate(): Promise<DetailedPeerCertificate> {
@@ -75,5 +88,34 @@ export class TestServer {
 			});
 			req.end();
 		});
+	}
+
+	public async start(): Promise<void> {
+		if (this.isRunning()) {
+			return;
+		}
+
+		try {
+			this.environment = await new DockerComposeEnvironment(path.join(__dirname, this.composeFilePath), this.composeFile)
+				.withWaitStrategy("testapp-webpdf-wsclient-ldap", Wait.forListeningPorts())
+				.withWaitStrategy("testapp-webpdf-wsclient-proxy", Wait.forListeningPorts())
+				.withWaitStrategy("testapp-webpdf-wsclient-server", Wait.forListeningPorts())
+				.up();
+		} catch (e) {
+			console.debug("docker exception", e);
+		}
+	}
+
+	public async stop(): Promise<void> {
+		if (!this.isRunning()) {
+			return;
+		}
+
+		await this.environment!.down();
+		this.environment = undefined;
+	}
+
+	public isRunning(): boolean {
+		return typeof this.environment !== "undefined";
 	}
 }

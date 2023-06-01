@@ -1,0 +1,182 @@
+#########################################################
+# MICROSOFT SCHEMA for sAMAccountName and memberOf
+# these two attributes are not defined in Apache Directory Server
+#########################################################
+
+dn: cn=microsoft, ou=schema
+objectclass: metaSchema
+objectclass: top
+cn: microsoft
+
+dn: ou=attributetypes, cn=microsoft, ou=schema
+objectclass: organizationalUnit
+objectclass: top
+ou: attributetypes
+
+dn: m-oid=1.2.840.113556.1.4.221, ou=attributetypes, cn=microsoft, ou=schema
+objectclass: metaAttributeType
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.4.221
+m-name: sAMAccountName
+m-equality: caseIgnoreMatch
+m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
+m-singleValue: TRUE
+
+dn: m-oid=1.2.840.113556.1.4.222, ou=attributetypes, cn=microsoft, ou=schema
+objectclass: metaAttributeType
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.4.222
+m-name: memberOf
+m-equality: caseIgnoreMatch
+m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
+m-singleValue: FALSE
+
+dn: m-oid=1.2.840.113556.1.4.223, ou=attributetypes, cn=microsoft, ou=schema
+objectclass: metaAttributeType
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.4.223
+m-name: objectCategory
+m-equality: caseIgnoreMatch
+m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
+m-singleValue: TRUE
+
+dn: ou=objectclasses, cn=microsoft, ou=schema
+objectclass: organizationalUnit
+objectclass: top
+ou: objectClasses
+
+dn: m-oid=1.2.840.113556.1.5.6, ou=objectclasses, cn=microsoft, ou=schema
+objectclass: metaObjectClass
+objectclass: metaTop
+objectclass: top
+m-oid: 1.2.840.113556.1.5.6
+m-name: simulatedMicrosoftSecurityPrincipal
+m-supObjectClass: top
+m-typeObjectClass: AUXILIARY
+m-must: sAMAccountName
+m-may: memberOf
+m-must: objectCategory
+
+############
+# Domain
+############
+
+dn: dc=webpdf,dc=de
+dc: webpdf
+objectClass: top
+objectClass: domain
+
+############
+# Groups
+############
+
+dn: ou=users,dc=webpdf,dc=de
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: ou=groups,dc=webpdf,dc=de
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+############
+# Users
+############
+
+dn: uid=admin,ou=users,dc=webpdf,dc=de
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectCategory: User
+cn: Admin User
+sn: admin
+uid: admin
+sAMAccountName: admin
+userPassword: secret
+memberOf: admin
+
+dn: cn=Susan World,ou=users,dc=webpdf,dc=de
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectCategory: User
+cn: Susan World
+sn: World
+uid: swo
+sAMAccountName: swo
+userPassword: susanworld
+entryUUID: 2bfe6770-c793-11ec-9d64-0242ac120002
+
+dn: cn=Billy Miller,ou=users,dc=webpdf,dc=de
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectCategory: User
+cn: Billy Miller
+sn: Miller
+uid: bmi
+sAMAccountName: bmi
+userPassword: billymiller
+entryUUID: 342249da-c793-11ec-9d64-0242ac120002
+userPKCS12:< file:///ldap/bmi.p12
+
+dn: cn=John Doe,ou=users,dc=webpdf,dc=de
+objectClass: top
+objectClass: person
+objectclass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectCategory: User
+cn: John Doe
+sn: Doe
+uid: jdo
+sAMAccountName: jdo
+userPassword: johndoe
+entryUUID: 385fc392-c793-11ec-9d64-0242ac120002
+userPKCS12:< file:///ldap/jdo.jks
+
+dn: cn=Will Smith,ou=users,dc=webpdf,dc=de
+objectClass: top
+objectClass: person
+objectclass: inetOrgPerson
+objectClass: simulatedMicrosoftSecurityPrincipal
+objectCategory: User
+cn: Will Smith
+sn: Smith
+uid: wsm
+sAMAccountName: wsm
+userPassword: willsmith
+entryUUID: 9dc21eec-c793-11ec-9d64-0242ac120002
+
+################
+# Groups members
+################
+
+dn: cn=admin,ou=groups,dc=webpdf,dc=de
+objectClass: top
+objectClass: groupOfNames
+cn: admin
+member: uid=admin,ou=users,dc=webpdf,dc=de
+
+dn: cn=webPDFUser,ou=groups,dc=webpdf,dc=de
+objectClass: top
+objectClass: groupOfNames
+cn: webPDFUser
+member: cn=John Doe,ou=users,dc=webpdf,dc=de
+member: cn=Will Smith,ou=users,dc=webpdf,dc=de
+member: cn=Billy Miller,ou=users,dc=webpdf,dc=de
+member: cn=Susan World,ou=users,dc=webpdf,dc=de
+member: cn=James Dean,ou=subtree,dc=webpdf,dc=de
+
+dn: cn=webPDFAdmin,ou=groups,dc=webpdf,dc=de
+objectClass: top
+objectClass: groupOfNames
+cn: webPDFAdmin
+member: cn=John Doe,ou=users,dc=webpdf,dc=de
+member: cn=Will Smith,ou=users,dc=webpdf,dc=de

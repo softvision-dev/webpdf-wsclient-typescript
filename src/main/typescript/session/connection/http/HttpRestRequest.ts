@@ -1,4 +1,4 @@
-import {AxiosError, AxiosProgressEvent, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse} from "axios";
+import {AxiosError, AxiosHeaders, AxiosProgressEvent, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse, RawAxiosRequestHeaders} from "axios";
 import {RestSession} from "../../rest";
 import {DataFormats} from "../../DataFormat";
 import {HttpMethod} from "./HttpMethod";
@@ -25,7 +25,15 @@ export class HttpRestRequest {
 	private constructor(session: RestSession<any>) {
 		this.session = session;
 		this.acceptHeader = DataFormats.JSON.getMimeType();
-		this.requestConfig = {};
+		this.requestConfig = {
+			beforeRedirect: (options: Record<string, any>) => {
+				let requestHeaders: RawAxiosRequestHeaders | AxiosHeaders = this.requestConfig?.headers || {};
+
+				if (typeof options.headers[HttpHeaders.AUTHORIZATION] === "undefined") {
+					options.headers[HttpHeaders.AUTHORIZATION] = requestHeaders[HttpHeaders.AUTHORIZATION];
+				}
+			}
+		};
 	}
 
 	/**

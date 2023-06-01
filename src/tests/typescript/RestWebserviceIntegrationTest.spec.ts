@@ -50,6 +50,8 @@ import {
 	UserCredentials
 } from "../../main/typescript/generated-sources";
 
+require("./bootstrap");
+
 const fs = require('fs');
 const tmp = require('tmp');
 
@@ -66,7 +68,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.docx";
@@ -111,7 +113,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -177,7 +179,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -229,7 +231,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "signatur.pdf";
@@ -270,7 +272,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -333,7 +335,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -374,7 +376,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "ocr.png";
@@ -416,7 +418,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -476,7 +478,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let webService: UrlConverterWebService<RestDocument> = WebServiceFactory.createInstance(session, WebServiceTypes.URLCONVERTER);
@@ -484,7 +486,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		webService.setOperationParameters(
 			UrlConverter.fromJson({
-				url: "https://www.webpdf.de/",
+				url: "https://docs.webpdf.de/",
 				page: {
 					width: 150.0,
 					height: 200.0,
@@ -514,7 +516,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -555,7 +557,7 @@ describe("RestWebserviceIntegrationTest", function () {
 
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalUser(), testServer.getLocalPassword())
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 
 		let filename: string = "lorem-ipsum.pdf";
@@ -619,27 +621,27 @@ describe("RestWebserviceIntegrationTest", function () {
 		// User
 		session = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider("user", "user")
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 		user = await session.getUser();
 		expect(user, "UserInfo should have been initialized.").to.exist;
 		expect(user.isUser, "User should be user.").to.be.true;
 		expect(user.isAdmin, "User should not be admin.").to.not.be.true;
-		expect(user.userName, "Username should be user.").to.equal("user");
+		expect(user.userName, "Username should be user.").to.equal(testServer.getLocalUserName());
 		await session.close();
 
 		// Admin
 		session = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider("admin", "admin")
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 		expect(session, "Valid session should have been created.").to.exist;
 		user = await session.getUser();
 		expect(user, "UserInfo should have been initialized.").to.exist;
 		expect(user.isUser, "User should be user.").to.be.true;
 		expect(user.isAdmin, "User should be admin.").to.be.true;
-		expect(user.userName, "Username should be admin.").to.equal("admin");
+		expect(user.userName, "Username should be admin.").to.equal(testServer.getLocalAdminName());
 		await session.close();
 	});
 });

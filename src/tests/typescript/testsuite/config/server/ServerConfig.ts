@@ -11,12 +11,20 @@ export class ServerConfig extends ConfigNodeContainer {
 		return this.getString("/local/url", "");
 	}
 
-	public getLocalUser(): string {
-		return this.getString("/local/user", "");
+	public getLocalAdminName(): string {
+		return this.getString("/local/adminName", "");
 	}
 
-	public getLocalPassword(): string {
-		return this.getString("/local/password", "");
+	public getLocalAdminPassword(): string {
+		return this.getString("/local/adminPassword", "");
+	}
+
+	public getLocalUserName(): string {
+		return this.getString("/local/userName", "");
+	}
+
+	public getLocalUserPassword(): string {
+		return this.getString("/local/userPassword", "");
 	}
 
 	public getLocalHttpPort(): number {
@@ -34,7 +42,6 @@ export class ServerConfig extends ConfigNodeContainer {
 	public getPublicURL(): string {
 		return this.getString("/public/url", "");
 	}
-
 
 	public getPublicHttpPort(): number {
 		return this.getInteger("/public/httpPort", -1);
