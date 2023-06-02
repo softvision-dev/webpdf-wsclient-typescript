@@ -23,6 +23,14 @@ export class IntegrationTestConfig extends ConfigNodeContainer {
 		return this.getBoolean("/proxy/enabled", false);
 	}
 
+	public getProxyUrl(): string {
+		return this.getString("/proxy/url", "http://172.17.0.1:8080/webPDF");
+	}
+
+	public getProxyUrlSSL(): string {
+		return this.getString("/proxy/urlSSL", "https://172.17.0.1:8443/webPDF");
+	}
+
 	public isTlsTestsActive(): boolean {
 		return this.getBoolean("/tls/enabled", false);
 	}

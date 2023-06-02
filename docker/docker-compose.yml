@@ -15,6 +15,16 @@ services:
     stdin_open:
       true
 
+  Proxy:
+    image: mitmproxy/mitmproxy
+    ports:
+      - "8888:8888"
+    entrypoint: '/bin/sh -c "stty rows 24 cols 80 && mitmdump -p8888 --ssl-insecure"'
+    tty:
+      true
+    stdin_open:
+      true
+
   webPDF:
     image: testapp/webpdf-wsclient-server:latest
     build:
@@ -26,7 +36,6 @@ services:
     ports:
       - "8080:8080"
       - "8443:8443"
-      - "8888:8888"
     tty:
       true
     stdin_open:

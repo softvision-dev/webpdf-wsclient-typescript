@@ -54,8 +54,7 @@
 		"shx": "^0.3.4",
 		"tmp": "^0.2.1",
 		"ts-node": "^10.9.1",
-		"testcontainers": "^9.8.0",
-		"https-proxy-agent": "^7.0.0"
+		"testcontainers": "^9.8.0"
 	},
 	"files": [
 		"lib/**/*"

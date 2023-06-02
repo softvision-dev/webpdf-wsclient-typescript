@@ -37,7 +37,9 @@
       }
     },
     "proxy": {
-      "enabled": false
+      "enabled": false,
+      "url": "http://172.17.0.1:8080/webPDF",
+      "urlSSL": "https://172.17.0.1:8443/webPDF"
     },
     "tls": {
       "enabled": false
