@@ -9,6 +9,10 @@ The library implements the required stubs and session management in ready-to-use
 > **Note**: Unless otherwise marked, the following is based on webPDF version 9 or newer. If you are using an older version please update to use all parameters for the current release of the library. You will always find the newest version at the product [download page](https://download.softvision.de/?product=webpdf).
 
 ## Download
+> **Note:** The version 9.0.0 requires at least webPDF server version **9.0.0.2906**.
+
+> **Note:** Starting with wsclient 9.0.0 the wsclient´s and webPDF server´s version numbers have been synchronized, to simplify finding the proper wsclient for your webPDF server.
+
 You can use this library, by adding this dependency to your project:
 ```
 yarn add @softvision/webpdf-wsclient-typescript
