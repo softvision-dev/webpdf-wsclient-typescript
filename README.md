@@ -4,9 +4,9 @@ The library implements the required stubs and session management in ready-to-use
 
 ![webPDF Logo](images/logo.png)
 
-[webPDF](https://www.webpdf.de/) is a commercial multi-platform server solution for creating and processing PDF documents. To use the webPDF wsclient library for webservice calls, a running webPDF installation is required. A demo version as Windows installation, Linux package or as a virtual machine can be downloaded from the [product page](https://www.webpdf.de/en/download-web-pdf.html).
+[webPDF](https://www.webpdf.de/) is a commercial multi-platform server solution for creating and processing PDF documents. To use the webPDF wsclient library for webservice calls, a running webPDF installation is required. A demo version as Windows installation, Linux package or as a virtual machine can be downloaded from the [product page](https://docs.webpdf.de/docs/download/).
 
-> **Note**: Unless otherwise marked, the following is based on webPDF version 9 or newer. If you are using an older version please update to use all parameters for the current release of the library. You will always find the newest version at the product [download page](https://download.softvision.de/?product=webpdf).
+> **Note**: Unless otherwise marked, the following is based on webPDF version 9 or newer. If you are using an older version please update to use all parameters for the current release of the library. You will always find the newest version at the product [download page](https://docs.webpdf.de/docs/download/).
 
 ## Download
 > **Note:** The version 9.0.0 requires at least webPDF server version **9.0.0.2906**.
