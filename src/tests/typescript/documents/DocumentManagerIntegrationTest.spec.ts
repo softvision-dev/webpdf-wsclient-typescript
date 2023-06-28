@@ -1,7 +1,27 @@
 import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite";
 import {expect} from "chai";
-import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../../main/typescript";
-import {BaseToolbox, FileDataSource, HistoryEntry, InfoForm, InfoType, PdfPassword, PdfPasswordInterface} from "../../../main/typescript/generated-sources";
+import {
+	ConverterWebService,
+	RestDocument,
+	RestSession,
+	ServerResultException,
+	SessionContext,
+	SessionFactory,
+	ToolboxWebService,
+	UserAuthProvider,
+	WebServiceFactory,
+	WebServiceProtocol,
+	WebServiceTypes
+} from "../../../main/typescript";
+import {
+	BaseToolbox,
+	FileDataSource,
+	HistoryEntry,
+	InfoForm,
+	InfoType,
+	PdfPassword,
+	PdfPasswordInterface
+} from "../../../main/typescript/generated-sources";
 
 require("../bootstrap");
 
@@ -31,13 +51,13 @@ describe("DocumentManagerIntegrationTest", function () {
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentId()).to.exist;
 
-		let downloadedFile: any = await session.getDocumentManager().downloadDocument(uploadedFile.getDocumentId());
+		let downloadedFile: any = await uploadedFile.downloadDocument();
 		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
 
 		let fileList: Array<RestDocument> = await session.getDocumentManager().getDocuments();
 		expect(fileList.length, "file list should contain 1 document.").to.equal(1);
 
-		await session.getDocumentManager().deleteDocument(uploadedFile.getDocumentId());
+		await uploadedFile.deleteDocument();
 
 		fileList = await session.getDocumentManager().getDocuments();
 		expect(fileList.length, "file list should be empty.").to.equal(0);
@@ -64,7 +84,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		expect(uploadedFile.getDocumentId()).to.exist;
 		expect(uploadedFile.getDocumentFile().fileName, "Filename should be test").to.equal("test");
 
-		uploadedFile = await session.getDocumentManager().renameDocument(uploadedFile.getDocumentId(), "new");
+		uploadedFile = await uploadedFile.renameDocument("new");
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentFile().fileName, "Filename should be new").to.equal("new");
 
@@ -172,7 +192,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 
-		let downloadedFile: any = await session.getDocumentManager().downloadDocument(uploadedFile.getDocumentId());
+		let downloadedFile: any = await uploadedFile.downloadDocument();
 		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
 
 		await session.close();
@@ -200,7 +220,7 @@ describe("DocumentManagerIntegrationTest", function () {
 			open: "a"
 		} as PdfPasswordInterface);
 
-		uploadedFile = await session.getDocumentManager().updateDocumentSecurity(uploadedFile.getDocumentId()!, passwordType);
+		uploadedFile = await uploadedFile.updateDocumentSecurity(passwordType);
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentFile().error?.errorCode, "errorcode should be 0").to.equal(0);
 
@@ -241,7 +261,7 @@ describe("DocumentManagerIntegrationTest", function () {
 			}
 		} as PdfPassword);
 
-		uploadedFile = await session.getDocumentManager().updateDocumentSecurity(uploadedFile.getDocumentId()!, passwordType);
+		uploadedFile = await uploadedFile.updateDocumentSecurity(passwordType);
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentFile().error?.errorCode, "errorcode should be 0").to.equal(0);
 
@@ -343,9 +363,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		let passwordType: PdfPassword = PdfPassword.fromJson({
 			open: "wrong"
 		} as PdfPassword);
-		let openedDocument: RestDocument | undefined = await session.getDocumentManager().updateDocumentSecurity(
-			encryptedDocument!.getDocumentId(), passwordType
-		);
+		let openedDocument: RestDocument | undefined = await encryptedDocument?.updateDocumentSecurity(passwordType);
 		expect(openedDocument!.getDocumentFile().error!.errorCode, "The document password should be wrong.").to.equal(-5008);
 		expect(openedDocument!.getDocumentFile().metadata!.information, "The metadata should not be readable.").to.not.exist;
 
@@ -376,10 +394,7 @@ describe("DocumentManagerIntegrationTest", function () {
 			open: openPassword,
 			permission: permissionPassword
 		});
-
-		openedDocument = await session.getDocumentManager().updateDocumentSecurity(
-			encryptedDocument!.getDocumentId(), passwordType
-		);
+		openedDocument = await encryptedDocument?.updateDocumentSecurity(passwordType);
 
 		// rotate pages with correct password
 		toolboxWebService = WebServiceFactory.createInstance(session, WebServiceTypes.TOOLBOX);
@@ -406,12 +421,68 @@ describe("DocumentManagerIntegrationTest", function () {
 		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 
-		let formInfo: InfoForm = await session.getDocumentManager().getDocumentInfo(
-			uploadedFile.getDocumentId(), InfoType.Form
-		);
+		let formInfo: InfoForm = await uploadedFile.getDocumentInfo(InfoType.Form);
 		expect(formInfo, "Form info should have been fetched").to.exist;
 		expect(formInfo.infoType, "Info type should be form").to.equal(InfoType.Form);
 		expect(formInfo.value, "There should be a value").to.not.be.empty;
+
+		await session.close();
+	});
+
+	it('testDocumentExtract', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "files.zip";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+		expect(uploadedFile.getDocumentId()).to.exist;
+
+		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument();
+		expect(unzippedFiles, "Valid documents should have been returned.").to.exist;
+		expect(unzippedFiles.length, "There should be 3 result documents.").to.equal(3);
+
+		await session.close();
+	});
+
+	it('testDocumentCompress', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let documentIdList: Array<string> = [];
+		let sourceFilenames: Array<string> = ["test.pdf", "logo.png", "lorem-ipsum.txt"];
+		for (let sourceFilename of sourceFilenames) {
+			let sourceFile: any = testResources.getResource(sourceFilename);
+			let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+			expect(uploadedFile, "Valid document should have been returned.").to.exist;
+			expect(uploadedFile.getDocumentId()).to.exist;
+
+			documentIdList.push(uploadedFile.getDocumentId());
+		}
+
+
+		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(
+			documentIdList, "archive"
+		);
+		expect(resultDocument, "Valid document should have been returned.").to.exist;
+		expect(resultDocument.getDocumentFile().mimeType).to.equal("application/zip");
 
 		await session.close();
 	});

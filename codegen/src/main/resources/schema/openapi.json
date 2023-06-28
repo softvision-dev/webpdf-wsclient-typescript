@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.2906 (2023-05-17T09:00:18Z) "
+		"version" : "webPDF 9.0.0.2969 (2023-06-28T11:01:38Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -1043,10 +1043,7 @@
 						"content" : {
 							"application/json" : {
 								"schema" : {
-									"type" : "array",
-									"items" : {
-										"$ref" : "#/components/schemas/Document_FileCompress"
-									}
+									"$ref" : "#/components/schemas/Document_File"
 								}
 							}
 						},
@@ -12342,7 +12339,7 @@
 					"signatureEditProfile" : {
 						"type" : "string",
 						"default" : "adobeRestrictions",
-						"description" : "Defines the profile whose rules web services have to check before they can come to execution. These profiles define a set of rules concerning the validity of signatures. A web service whose execution for a given signed document would violate the ruleset selected here should instead abort with an appropriate error code.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed (by doing this, you accept the invalidation of included signatures).",
+						"description" : "Defines the profile whose rules web services have to check before they can come to execution. These profiles define a set of rules concerning the validity of signatures. A web service whose execution for a given signed document would violate the ruleset selected here should instead abort with an appropriate error code.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed (by doing this, you accept that all signatures could potentially be removed from the document when necessary).",
 						"enum" : [ "adobeRestrictions", "generalEditRestrictions", "noEditRestrictions" ],
 						"x-webpdf-codegen" : {
 							"enumName" : "Operation_SignatureEditProfile"
@@ -15996,6 +15993,23 @@
 					}
 				}
 			},
+			"ServerConfig_UserKeepAliveLdap" : {
+				"type" : "object",
+				"description" : "When these settings are present, the server sends a ping to the configured LDAP server to keep the connection alive.",
+				"properties" : {
+					"enabled" : {
+						"type" : "boolean",
+						"default" : false,
+						"description" : "When set to true the server sends a ping to the configured LDAP server to keep the connection alive."
+					},
+					"sendInterval" : {
+						"type" : "integer",
+						"format" : "int32",
+						"default" : 300,
+						"description" : "The sending interval in seconds at which the ping is sent."
+					}
+				}
+			},
 			"ServerConfig_UserLdap" : {
 				"type" : "object",
 				"description" : "Defines an LDAP dictionary or Active Directory as user source.",
@@ -16028,6 +16042,9 @@
 						"type" : "boolean",
 						"default" : false,
 						"description" : "When set to true, all LDAP requests that respond with references are followed. The same schema and credentials are used for the referred request."
+					},
+					"keepAlive" : {
+						"$ref" : "#/components/schemas/ServerConfig_UserKeepAliveLdap"
 					},
 					"roleBase" : {
 						"type" : "string",

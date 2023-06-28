@@ -1,6 +1,6 @@
 import {RestDocument} from "./RestDocument";
 import {RestSession} from "../RestSession";
-import {DocumentFile, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {DocumentFile, FileFilter, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -170,4 +170,49 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown, should fetching the document info have failed.
 	 */
 	getDocumentInfo(documentId: string, infoType: InfoType): Promise<Info>;
+
+	/**
+	 * <p>
+	 * Extracts the {@link RestDocument} with the given document ID in the document storage.
+	 * <ul>
+	 * <li>The document referenced by documentId must be a valid archive. If not, the operation will be aborted.</li>
+	 * <li>For each file in the archive, a new DocumentFile is created in the document storage with a new documentId.</li>
+	 * <li>Each newly created DocumentFile holds as parentDocumentId the documentId of the archive.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param documentId   The document ID of the {@link RestDocument} to extract.
+	 * @param fileFilter   An optional {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
+	 * 					   the "include rules" are applied. If a file matches, the "exclude rules" are applied. Only if
+	 * 					   both rules apply, the file will be passed through the filter.
+	 * @return A list of the extracted {@link RestDocument}s.
+	 * @throws ResultException Shall be thrown, should the extraction has failed.
+	 */
+	extractDocument(documentId: string, fileFilter?: FileFilter): Promise<Array<T_REST_DOCUMENT>>;
+
+	/**
+	 * <p>
+	 * Compresses a list of {@link RestDocument}s selected by documentId or file filter into a new archive document
+	 * in the document storage.
+	 * <ul>
+	 * <li>The list of documents that should be in the archive are selected via the documentId or a file filter.</li>
+	 * <li>The selection specifications can be made individually or together and act additively in the order documentId
+	 * and then file filter.</li>
+	 * <li>If the id is invalid for documents selected via documentId or documents are locked, then the call is aborted
+	 * with an error.</li>
+	 * <li>The created archive is stored as a new document with a new documentId in the document storage.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param documentIdList    The list of documentIds to be added to the archive document.
+	 * @param archiveFileName   the file name for the archive document.
+	 * @param fileFilter   		Defines a {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
+	 * 							the "include rules" are applied. If a file matches, the "exclude rules" are applied.
+	 * 							Only if both rules apply, the file will be passed through the filter.
+	 * @return The compressed {@link RestDocument}.
+	 * @throws ResultException Shall be thrown, should the compression has failed.
+	 */
+	compressDocuments(
+		documentIdList: Array<string>, archiveFileName: string, fileFilter?: FileFilter
+	): Promise<T_REST_DOCUMENT>;
 }
