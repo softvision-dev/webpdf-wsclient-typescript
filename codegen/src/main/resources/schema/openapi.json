@@ -3898,6 +3898,26 @@
 					}
 				}
 			},
+			"ArchiveEntryType" : {
+				"type" : "object",
+				"properties" : {
+					"lastModifiedDate" : {
+						"type" : "integer",
+						"format" : "int64",
+						"default" : 0
+					},
+					"path" : {
+						"type" : "string",
+						"default" : ""
+					},
+					"size" : {
+						"type" : "integer",
+						"format" : "int64",
+						"default" : 0
+					}
+				},
+				"readOnly" : true
+			},
 			"Auth_AnonymousLimits" : {
 				"type" : "object",
 				"allOf" : [ {
@@ -4137,10 +4157,27 @@
 				},
 				"readOnly" : true
 			},
+			"Document_Archive" : {
+				"type" : "object",
+				"description" : "Zip document",
+				"properties" : {
+					"entryList" : {
+						"type" : "array",
+						"items" : {
+							"$ref" : "#/components/schemas/ArchiveEntryType"
+						},
+						"readOnly" : true
+					}
+				},
+				"readOnly" : true
+			},
 			"Document_File" : {
 				"type" : "object",
 				"description" : "Contains the file information about a document in the document storage",
 				"properties" : {
+					"archive" : {
+						"$ref" : "#/components/schemas/Document_Archive"
+					},
 					"documentId" : {
 						"type" : "string",
 						"default" : "",
