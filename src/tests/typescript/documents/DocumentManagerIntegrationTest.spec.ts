@@ -15,7 +15,12 @@ import {
 } from "../../../main/typescript";
 import {
 	BaseToolbox,
+	FileCompress,
+	FileCompressInterface,
 	FileDataSource,
+	FileExtract,
+	FileExtractInterface,
+	FileFilterType,
 	HistoryEntry,
 	InfoForm,
 	InfoType,
@@ -429,7 +434,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentExtract', async function () {
+	it('testDocumentExtractAll', async function () {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -447,9 +452,45 @@ describe("DocumentManagerIntegrationTest", function () {
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentId()).to.exist;
 
-		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument();
+		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument(new FileExtract({}));
 		expect(unzippedFiles, "Valid documents should have been returned.").to.exist;
 		expect(unzippedFiles.length, "There should be 3 result documents.").to.equal(3);
+
+		await session.close();
+	});
+
+	it('testDocumentExtractWithFilter', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "files.zip";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+		expect(uploadedFile.getDocumentId()).to.exist;
+
+		let fileExtract: FileExtract = new FileExtract({
+			fileFilter: {
+				includeRules: [
+					{
+						rulePattern: "logo.png",
+						ruleType: FileFilterType.Glob
+					}
+				]
+			}
+		} as FileExtractInterface);
+
+		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument(fileExtract);
+		expect(unzippedFiles, "Valid documents should have been returned.").to.exist;
+		expect(unzippedFiles.length, "There should be 1 result document.").to.equal(1);
 
 		await session.close();
 	});
@@ -477,10 +518,12 @@ describe("DocumentManagerIntegrationTest", function () {
 			documentIdList.push(uploadedFile.getDocumentId());
 		}
 
+		let fileCompress: FileCompress = new FileCompress({
+			documentIdList: documentIdList,
+			archiveFileName: "archive"
+		} as FileCompressInterface);
 
-		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(
-			documentIdList, "archive"
-		);
+		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(fileCompress);
 		expect(resultDocument, "Valid document should have been returned.").to.exist;
 		expect(resultDocument.getDocumentFile().mimeType).to.equal("application/zip");
 

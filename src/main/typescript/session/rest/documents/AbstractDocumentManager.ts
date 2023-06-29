@@ -2,14 +2,14 @@ import {RestDocument} from "./RestDocument";
 import {DocumentManager} from "./DocumentManager";
 import {RestSession} from "../RestSession";
 import {
-	DocumentFile, FileCompressInterface,
-	FileFilter,
+	DocumentFile,
+	FileCompress,
+	FileExtract,
 	HistoryEntry,
 	Info,
 	InfoType,
 	Parameter,
-	PdfPassword,
-	FileCompress
+	PdfPassword
 } from "../../../generated-sources";
 import {HttpMethod, HttpRestRequest} from "../../connection";
 import {ClientResultException, WsclientErrors} from "../../../exception";
@@ -508,26 +508,20 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	 * </p>
 	 *
 	 * @param documentId   The document ID of the {@link RestDocument} to extract.
-	 * @param fileFilter   An optional {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
-	 * 					   the "include rules" are applied. If a file matches, the "exclude rules" are applied. Only if
-	 * 					   both rules apply, the file will be passed through the filter.
+	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
 	 * @return A list of the extracted {@link RestDocument}s.
 	 * @throws ResultException Shall be thrown, should the extraction has failed.
 	 */
-	public async extractDocument(documentId: string, fileFilter?: FileFilter): Promise<Array<T_REST_DOCUMENT>> {
+	public async extractDocument(documentId: string, fileExtract: FileExtract): Promise<Array<T_REST_DOCUMENT>> {
 		if (!this.containsDocument(documentId)) {
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
-		}
-
-		if (typeof fileFilter === "undefined") {
-			fileFilter = FileFilter.fromJson({});
 		}
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(
 				HttpMethod.POST,
 				this.session.getURL("documents/" + documentId + "/extract"),
-				this.prepareHttpEntity(fileFilter),
+				this.prepareHttpEntity(fileExtract),
 				DataFormats.JSON.getMimeType()
 			);
 
@@ -556,36 +550,28 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	 * </ul>
 	 * </p>
 	 *
-	 * @param documentIdList    The list of documentIds to be added to the archive document.
-	 * @param archiveFileName   the file name for the archive document.
-	 * @param fileFilter   		Defines a {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
-	 * 							the "include rules" are applied. If a file matches, the "exclude rules" are applied.
-	 * 							Only if both rules apply, the file will be passed through the filter.
+	 * @param fileCompress    The {@link FileCompress} settings for creating the archive document and for selecting and
+	 * 						  filtering the documents to be added to the archive.
 	 * @return The compressed {@link RestDocument}.
 	 * @throws ResultException Shall be thrown, should the compression has failed.
 	 */
-	public async compressDocuments(
-		documentIdList: Array<string>, archiveFileName: string, fileFilter?: FileFilter
-	): Promise<T_REST_DOCUMENT> {
+	public async compressDocuments(fileCompress: FileCompress): Promise<T_REST_DOCUMENT> {
+		let documentIdList: Array<string> = [];
+		if (typeof fileCompress.documentIdList !== "undefined") {
+			documentIdList = fileCompress.documentIdList;
+		}
+
 		for (let documentId of documentIdList) {
 			if (!this.containsDocument(documentId)) {
 				throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 			}
 		}
 
-		if (typeof fileFilter === "undefined") {
-			fileFilter = FileFilter.fromJson({});
-		}
-
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(
 				HttpMethod.POST,
 				this.session.getURL("documents/compress"),
-				this.prepareHttpEntity(FileCompress.fromJson({
-					documentIdList: documentIdList,
-					archiveFileName: archiveFileName,
-					fileFilter: fileFilter
-				} as FileCompressInterface)),
+				this.prepareHttpEntity(fileCompress),
 				DataFormats.JSON.getMimeType()
 			);
 

@@ -1,6 +1,14 @@
 import {RestDocument} from "./RestDocument";
 import {RestSession} from "../RestSession";
-import {DocumentFile, FileFilter, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {
+	DocumentFile, FileCompress,
+	FileExtract,
+	FileFilter,
+	HistoryEntry,
+	Info,
+	InfoType,
+	PdfPassword
+} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -182,13 +190,11 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * </p>
 	 *
 	 * @param documentId   The document ID of the {@link RestDocument} to extract.
-	 * @param fileFilter   An optional {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
-	 * 					   the "include rules" are applied. If a file matches, the "exclude rules" are applied. Only if
-	 * 					   both rules apply, the file will be passed through the filter.
+	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
 	 * @return A list of the extracted {@link RestDocument}s.
 	 * @throws ResultException Shall be thrown, should the extraction has failed.
 	 */
-	extractDocument(documentId: string, fileFilter?: FileFilter): Promise<Array<T_REST_DOCUMENT>>;
+	extractDocument(documentId: string, fileExtract: FileExtract): Promise<Array<T_REST_DOCUMENT>>;
 
 	/**
 	 * <p>
@@ -204,15 +210,10 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * </ul>
 	 * </p>
 	 *
-	 * @param documentIdList    The list of documentIds to be added to the archive document.
-	 * @param archiveFileName   the file name for the archive document.
-	 * @param fileFilter   		Defines a {@link FileFilter} with a list of "include" and "exclude" filter rules. First,
-	 * 							the "include rules" are applied. If a file matches, the "exclude rules" are applied.
-	 * 							Only if both rules apply, the file will be passed through the filter.
+	 * @param fileCompress    The {@link FileCompress} settings for creating the archive document and for selecting
+	 * 						  and filtering the documents to be added to the archive.
 	 * @return The compressed {@link RestDocument}.
 	 * @throws ResultException Shall be thrown, should the compression has failed.
 	 */
-	compressDocuments(
-		documentIdList: Array<string>, archiveFileName: string, fileFilter?: FileFilter
-	): Promise<T_REST_DOCUMENT>;
+	compressDocuments(fileCompress: FileCompress): Promise<T_REST_DOCUMENT>;
 }

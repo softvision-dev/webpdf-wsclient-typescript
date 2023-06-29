@@ -1,7 +1,7 @@
 import {AbstractDocument} from "../../documents";
 import {RestDocument} from "./RestDocument";
 import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState";
-import {DocumentFile, FileFilter, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -178,14 +178,11 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	/**
 	 * This is a shortcut for {@link DocumentManager#extractDocument} and extracts the {@link RestDocument}.
 	 *
-	 * @param fileFilter   A {@link FileFilter} with a list of "include" and "exclude" filter rules. First, the
-	 * 					   "include rules" are applied. If a file matches, the "exclude rules" are applied. Only if
-	 * 					   both rules apply, the file will be passed through the filter.
-	 * 					   @return
+	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
 	 * @return A list of the extracted {@link RestDocument}s.
 	 * @throws ResultException Shall be thrown, should the extraction have failed.
 	 */
-	public async extractDocument(fileFilter?: FileFilter): Promise<Array<RestDocument>> {
-		return await this.accessInternalState().getDocumentManager().extractDocument(this.getDocumentId(), fileFilter);
+	public async extractDocument(fileExtract: FileExtract): Promise<Array<RestDocument>> {
+		return await this.accessInternalState().getDocumentManager().extractDocument(this.getDocumentId(), fileExtract);
 	}
 }

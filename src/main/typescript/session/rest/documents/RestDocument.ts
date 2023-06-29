@@ -1,5 +1,5 @@
 import {Document} from "../../documents"
-import {DocumentFile, FileFilter, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -121,11 +121,9 @@ export interface RestDocument extends Document {
 	/**
 	 * This is a shortcut for {@link DocumentManager#extractDocument} and extracts the {@link RestDocument}.
 	 *
-	 * @param fileFilter   A {@link FileFilter} with a list of "include" and "exclude" filter rules. First, the
-	 * 					   "include rules" are applied. If a file matches, the "exclude rules" are applied. Only if
-	 * 					   both rules apply, the file will be passed through the filter.
+	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
 	 * @return A list of the extracted {@link RestDocument}s.
 	 * @throws ResultException Shall be thrown, should the extraction have failed.
 	 */
-	extractDocument(fileFilter?: FileFilter): Promise<Array<RestDocument>>;
+	extractDocument(fileExtract: FileExtract): Promise<Array<RestDocument>>;
 }
