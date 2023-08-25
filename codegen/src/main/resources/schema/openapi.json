@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.2969 (2023-06-28T11:01:38Z) "
+		"version" : "webPDF 9.0.0.3086 (2023-08-24T09:16:55Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -3017,10 +3017,22 @@
 				"type" : "object",
 				"description" : "Defines the settings for the Chromium bridge. The Chromium bridge is used for converting emails and HTML documents.",
 				"properties" : {
+					"commandLine" : {
+						"$ref" : "#/components/schemas/ApplicationConfig_ChromiumBridgeCommandLine"
+					},
 					"enabled" : {
 						"type" : "boolean",
 						"default" : true,
 						"description" : "If enabled, then the Chromium bridge is activated."
+					},
+					"headlessMode" : {
+						"type" : "string",
+						"default" : "new",
+						"description" : "Defines the different headless modes of the Chromium instance.\n\n*   NEW = Uses the same code base for the Chromium headless instance as the normal non-headless browser.\n*   OLD = Uses the old code base for the Chromium headless instance, which is different from the non-headless browser",
+						"enum" : [ "old", "new" ],
+						"x-webpdf-codegen" : {
+							"enumName" : "ApplicationConfig_ChromiumBridgeHeadlessMode"
+						}
 					},
 					"hostAddress" : {
 						"type" : "string",
@@ -3042,6 +3054,43 @@
 						"format" : "int32",
 						"default" : 0,
 						"description" : "The port on which Chromium should listen for requests."
+					}
+				}
+			},
+			"ApplicationConfig_ChromiumBridgeCommandLine" : {
+				"type" : "object",
+				"description" : "Allows you to define a list of command line switches that will be passed to the Chromium process. These values must be valid and fully declared switches that are passed unchanged to the Chromium process. Switches passed in this way have priority over all other defined switches.",
+				"properties" : {
+					"switch" : {
+						"type" : "array",
+						"items" : {
+							"$ref" : "#/components/schemas/ApplicationConfig_ChromiumBridgeCommandLineSwitch"
+						}
+					}
+				}
+			},
+			"ApplicationConfig_ChromiumBridgeCommandLineSwitch" : {
+				"type" : "object",
+				"description" : "Defines a single command line switch for the Chromium process. This switch consists of a name for the switch and an associated value.",
+				"properties" : {
+					"mode" : {
+						"type" : "string",
+						"default" : "add",
+						"description" : "Defines the operation mode for the command line switch.\n\n*   ADD = add the command line switch\n*   REMOVE = remove the command line switch",
+						"enum" : [ "add", "remove" ],
+						"x-webpdf-codegen" : {
+							"enumName" : "ApplicationConfig_ChromiumBridgeCommandlineSwitchMode"
+						}
+					},
+					"name" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "Sets the name of the Chromium command line switch. The name must be spelled correctly (without \"--\" and in correct upper/lower case), because it will be used unchanged."
+					},
+					"value" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "Defines the value of the Chromium command line switch. The value for the switch is used unchanged and must be escaped properly."
 					}
 				}
 			},
@@ -16449,53 +16498,6 @@
 												},
 												"nativeMethod" : {
 													"type" : "boolean"
-												}
-											}
-										}
-									},
-									"suppressed" : {
-										"type" : "array",
-										"items" : {
-											"type" : "object",
-											"properties" : {
-												"localizedMessage" : {
-													"type" : "string"
-												},
-												"message" : {
-													"type" : "string"
-												},
-												"stackTrace" : {
-													"type" : "array",
-													"items" : {
-														"type" : "object",
-														"properties" : {
-															"classLoaderName" : {
-																"type" : "string"
-															},
-															"className" : {
-																"type" : "string"
-															},
-															"fileName" : {
-																"type" : "string"
-															},
-															"lineNumber" : {
-																"type" : "integer",
-																"format" : "int32"
-															},
-															"methodName" : {
-																"type" : "string"
-															},
-															"moduleName" : {
-																"type" : "string"
-															},
-															"moduleVersion" : {
-																"type" : "string"
-															},
-															"nativeMethod" : {
-																"type" : "boolean"
-															}
-														}
-													}
 												}
 											}
 										}

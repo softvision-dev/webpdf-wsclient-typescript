@@ -19,8 +19,12 @@ export class TestConfig {
 			configNode = JSON.parse(fs.readFileSync(configPath, {encoding: "utf8"}));
 		}
 
-		this.serverConfig = new ServerConfig(JsonNode.find(configNode, ServerConfig.SERVER_CONFIG_NODE));
-		this.integrationTestConfig = new IntegrationTestConfig(JsonNode.find(configNode, IntegrationTestConfig.INTEGRATION_TEST_CONFIG));
+		this.integrationTestConfig = new IntegrationTestConfig(
+			JsonNode.find(configNode, IntegrationTestConfig.INTEGRATION_TEST_CONFIG)
+		);
+		this.serverConfig = new ServerConfig(
+			JsonNode.find(configNode, ServerConfig.SERVER_CONFIG_NODE), this.integrationTestConfig.isLdapTestsActive()
+		);
 	}
 
 	public getServerConfig(): ServerConfig {
