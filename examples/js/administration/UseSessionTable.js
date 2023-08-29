@@ -38,9 +38,6 @@ async function main() {
 
 		/** close a specific session */
 		await administrationManager.closeSession(sessionTableEntries[0].sessionId);
-
-		/** restart the server */
-		await administrationManager.restart();
 	} catch (resultException) {
 		/** Should an exception have occurred, you can use the following methods to request further information
 		 * about the exception: */
