@@ -98,7 +98,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return number the length of the requested log
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getLogLength(date?: string): Promise<number> {
+	public async fetchLogLength(date?: string): Promise<number> {
 		await this.validateUser();
 
 		let searchParams: URLSearchParams = new URLSearchParams();
@@ -129,7 +129,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return number The contents of the current log or a specific log file of the server
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getLog(range?: string, date?: string): Promise<string> {
+	public async fetchLog(range?: string, date?: string): Promise<string> {
 		await this.validateUser();
 
 		let searchParams: URLSearchParams = new URLSearchParams();
@@ -151,7 +151,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return {@link ServerStatus} The status information about the server.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getStatus(): Promise<ServerStatus> {
+	public async fetchServerStatus(): Promise<ServerStatus> {
 		await this.validateUser();
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
@@ -172,7 +172,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return {@link Buffer} The support files, that have been collected as a ZIP archive.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getSupport(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
+	public async buildSupportPackage(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<Buffer> {
@@ -208,7 +208,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 *
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async restart(): Promise<void> {
+	public async restartServer(): Promise<void> {
 		await this.validateUser();
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
@@ -893,7 +893,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return The requested {@link FileDataStore}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getDatastore(group: FileGroupDataStore, filename?: string): Promise<FileDataStore> {
+	public async fetchDatastore(group: FileGroupDataStore, filename?: string): Promise<FileDataStore> {
 		await this.validateUser();
 
 		let searchParams: URLSearchParams = new URLSearchParams();
@@ -969,7 +969,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	 * @return The requested {@link Statistic}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getStatistic(
+	public async fetchServerStatistic(
 		dataSource: DataSourceServerState, aggregation: AggregationServerState,
 		webservices: Array<Webservice>, start: Date, end: Date
 	): Promise<Statistic> {
@@ -993,12 +993,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	}
 
 	/**
-	 * Returns the session table with detailed status information about each session.
+	 * Returns the session table from server with detailed status information about each session.
 	 *
 	 * @return The requested {@link SessionTable}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async getSessionTable(): Promise<SessionTable> {
+	public async fetchSessionTable(): Promise<SessionTable> {
 		await this.validateUser();
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)

@@ -30,7 +30,7 @@ async function main() {
 		let administrationManager = session.getAdministrationManager();
 
 		/** Get {@link ServerStatus} from {@link AdministrationManager} */
-		let serverStatus = await administrationManager.getStatus();
+		let serverStatus = await administrationManager.fetchServerStatus();
 
 		await session.close();
 	} catch (resultException) {

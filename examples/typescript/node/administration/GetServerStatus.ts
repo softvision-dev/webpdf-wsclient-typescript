@@ -44,7 +44,7 @@ class GetServerStatus {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** Get {@link ServerStatus} from {@link AdministrationManager} */
-			let serverStatus: ServerStatus = await administrationManager.getStatus();
+			let serverStatus: ServerStatus = await administrationManager.fetchServerStatus();
 
 			await session.close();
 		} catch (ex: any) {

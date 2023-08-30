@@ -36,10 +36,10 @@ async function main() {
 		let administrationManager = session.getAdministrationManager();
 
 		/** Get the current length of the log */
-		let logLength = await administrationManager.getLogLength();
+		let logLength = await administrationManager.fetchLogLength();
 
 		/** Get the contents of the current log from byte 0 to log length */
-		let logContents = await administrationManager.getLog("0-" + logLength);
+		let logContents = await administrationManager.fetchLog("0-" + logLength);
 
 		await session.close();
 	} catch (resultException) {

@@ -41,7 +41,7 @@ async function main() {
 		let administrationManager = session.getAdministrationManager();
 
 		/** get the currently set logo file */
-		let currentLogo = await administrationManager.getDatastore(FileGroupDataStore.Logo);
+		let currentLogo = await administrationManager.fetchDatastore(FileGroupDataStore.Logo);
 
 		/**
 		 * initialize a {@link LogoFileDataStore} parameter to update with.

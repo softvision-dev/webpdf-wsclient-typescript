@@ -43,10 +43,10 @@ class GetServerLog {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** Get the current length of the log */
-			let logLength: number = await administrationManager.getLogLength();
+			let logLength: number = await administrationManager.fetchLogLength();
 
 			/** Get the contents of the current log from byte 0 to log length */
-			let logContents: string = await administrationManager.getLog("0-" + logLength);
+			let logContents: string = await administrationManager.fetchLog("0-" + logLength);
 
 			await session.close();
 		} catch (ex: any) {

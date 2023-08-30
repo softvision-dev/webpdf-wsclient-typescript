@@ -45,7 +45,7 @@ class UseSessionTable {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** Get {@link SessionTable} from {@link AdministrationManager} */
-			let sessionTable: SessionTable = await administrationManager.getSessionTable();
+			let sessionTable: SessionTable = await administrationManager.fetchSessionTable();
 
 			/** get the {@link Array<SessionTableEntry>} */
 			let sessionTableEntries: Array<SessionTableEntry> = sessionTable.sessionList || [];

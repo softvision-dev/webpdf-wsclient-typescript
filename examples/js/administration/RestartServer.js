@@ -29,7 +29,7 @@ async function main() {
 		let administrationManager = session.getAdministrationManager();
 
 		/** restart the server */
-		await administrationManager.restart();
+		await administrationManager.restartServer();
 	} catch (resultException) {
 		/** Should an exception have occurred, you can use the following methods to request further information
 		 * about the exception: */
