@@ -371,7 +371,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		);
 
 		try {
-			let serverStatus: ServerStatus = await session.getAdministrationManager().getStatus();
+			let serverStatus: ServerStatus = await session.getAdministrationManager().fetchServerStatus();
 			expect(serverStatus.webservices!.toolbox, "Webservice toolbox should exist.").to.exist;
 			expect(serverStatus.webservices!.toolbox.status, "Webservice status should be ok.").to.equal(WebserviceStatus.Ok);
 		} catch (ex: any) {
@@ -393,8 +393,8 @@ describe("RestAdministrationIntegrationTest", function () {
 		);
 
 		try {
-			let logLength: number = await session.getAdministrationManager().getLogLength();
-			let result: string = await session.getAdministrationManager().getLog("0-" + logLength);
+			let logLength: number = await session.getAdministrationManager().fetchLogLength();
+			let result: string = await session.getAdministrationManager().fetchLog("0-" + logLength);
 			expect(result, "Log should exist.").to.exist;
 			expect(result.length, "Content size should be > 0.").to.be.greaterThan(0);
 		} catch (ex: any) {
@@ -416,7 +416,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		);
 
 		try {
-			let result: Buffer = await session.getAdministrationManager().getSupport();
+			let result: Buffer = await session.getAdministrationManager().buildSupportPackage();
 			expect(result, "Result should exist").to.exist;
 			expect(result.byteLength, "Content size should be > 0.").to.be.greaterThan(0);
 		} catch (ex: any) {
@@ -447,19 +447,19 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		try {
 			let currentLogo: LogoFileDataStore =
-				await session.getAdministrationManager().getDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
+				await session.getAdministrationManager().fetchDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
 			expect(
 				currentLogo.fileContent, "Content of uploaded logo file should be different to local file."
 			).to.not.equal(fileDataStore.fileContent);
 
 			await session.getAdministrationManager().updateDatastore(fileDataStore);
-			currentLogo = await session.getAdministrationManager().getDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
+			currentLogo = await session.getAdministrationManager().fetchDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
 			expect(
 				currentLogo.fileContent, "Content of uploaded logo file should be identical to local file."
 			).to.equal(fileDataStore.fileContent);
 
 			await session.getAdministrationManager().deleteDatastore(FileGroupDataStore.Logo);
-			currentLogo = await session.getAdministrationManager().getDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
+			currentLogo = await session.getAdministrationManager().fetchDatastore(FileGroupDataStore.Logo) as LogoFileDataStore;
 			expect(
 				currentLogo.fileContent, "Content of uploaded logo file should be different to local file."
 			).to.not.equal(fileDataStore.fileContent);
@@ -646,7 +646,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		yesterday.setDate(currentDate.getDate() - 1);
 
 		try {
-			let result: Statistic = await session.getAdministrationManager().getStatistic(
+			let result: Statistic = await session.getAdministrationManager().fetchServerStatistic(
 				DataSourceServerState.Realtime, AggregationServerState.Month,
 				[Webservice.Converter], yesterday, currentDate
 			);
@@ -678,7 +678,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		let sessions: SessionTable | undefined;
 
 		try {
-			sessions = await session.getAdministrationManager().getSessionTable();
+			sessions = await session.getAdministrationManager().fetchSessionTable();
 		} catch (ex: any) {
 			expect(ex, "The server request did not work").to.be.undefined;
 		}

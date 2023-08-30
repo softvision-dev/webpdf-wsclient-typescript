@@ -43,7 +43,7 @@ class RestartServer {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** restart the server */
-			await administrationManager.restart();
+			await administrationManager.restartServer();
 		} catch (ex: any) {
 			let resultException: ResultException = ex;
 

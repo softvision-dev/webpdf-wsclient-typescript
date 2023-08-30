@@ -31,7 +31,7 @@ async function main() {
 		let administrationManager = session.getAdministrationManager();
 
 		/** Get {@link SessionTable} from {@link AdministrationManager} */
-		let sessionTable = await administrationManager.getSessionTable();
+		let sessionTable = await administrationManager.fetchSessionTable();
 
 		/** get the {@link Array<SessionTableEntry>} */
 		let sessionTableEntries = sessionTable.sessionList || [];

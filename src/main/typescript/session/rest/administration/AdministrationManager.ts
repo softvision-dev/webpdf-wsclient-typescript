@@ -48,7 +48,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return number the length of the requested log
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getLogLength(date?: string): Promise<number>;
+	fetchLogLength(date?: string): Promise<number>;
 
 	/**
 	 * Returns the contents of the current log or a specific log file of the server. If the date query parameter
@@ -59,7 +59,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return number The contents of the current log or a specific log file of the server
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getLog(range?: string, date?: string): Promise<string>;
+	fetchLog(range?: string, date?: string): Promise<string>;
 
 	/**
 	 * Provides status information about the server, the JVM and the Web services.
@@ -67,7 +67,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return {@link ServerStatus} The status information about the server.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getStatus(): Promise<ServerStatus>;
+	fetchServerStatus(): Promise<ServerStatus>;
 
 	/**
 	 * Collects a set of support information, that may simplify finding the cause and solution of issues.
@@ -81,7 +81,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return {@link Buffer} The support files, that have been collected as a ZIP archive.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getSupport(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
+	buildSupportPackage(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<Buffer>;
@@ -91,7 +91,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 *
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	restart(): Promise<void>;
+	restartServer(): Promise<void>;
 
 	/**
 	 * Gets the {@link Application} configuration from the server updating the cached configuration.
@@ -423,7 +423,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return The requested {@link FileDataStore}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getDatastore(group: FileGroupDataStore, filename?: string): Promise<FileDataStore>;
+	fetchDatastore(group: FileGroupDataStore, filename?: string): Promise<FileDataStore>;
 
 	/**
 	 * Updates a file in the server's data store.
@@ -463,17 +463,17 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return The requested {@link Statistic}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	getStatistic(
+	fetchServerStatistic(
 		dataSource: DataSourceServerState, aggregation: AggregationServerState,
 		webservices: Array<Webservice>, start: Date, end: Date
 	): Promise<Statistic>;
 
 	/**
-	 * Returns the session table with detailed status information about each session.
+	 * Returns the session table from server with detailed status information about each session.
 	 *
 	 * @return The requested {@link SessionTable}.
 	 */
-	getSessionTable(): Promise<SessionTable>;
+	fetchSessionTable(): Promise<SessionTable>;
 
 	/**
 	 * Closes the session with the specified ID, by activating the session expiration. After the call, any access

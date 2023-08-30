@@ -45,7 +45,7 @@ class GetServerSupport {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** download the support information */
-			let serverStatus: Buffer = await administrationManager.getSupport();
+			let serverStatus: Buffer = await administrationManager.buildSupportPackage();
 			fs.writeFileSync(targetDocument, serverStatus);
 
 			await session.close();

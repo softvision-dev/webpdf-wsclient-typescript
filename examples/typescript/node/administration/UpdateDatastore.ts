@@ -48,7 +48,7 @@ class UpdateDatastore {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** get the currently set logo file */
-			let currentLogo: LogoFileDataStore = await administrationManager.getDatastore(
+			let currentLogo: LogoFileDataStore = await administrationManager.fetchDatastore(
 				FileGroupDataStore.Logo
 			) as LogoFileDataStore;
 
