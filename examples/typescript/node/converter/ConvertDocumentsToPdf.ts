@@ -96,6 +96,6 @@ class ConvertDocumentsToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ConvertDocumentsToPdf.main();
 })();

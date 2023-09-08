@@ -42,20 +42,14 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Returns the {@link RestSession} the {@link DocumentManager} is managing {@link RestDocument}s for.
-	 *
-	 * @return The {@link RestSession} the {@link DocumentManager} is managing {@link RestDocument}s for.
+	 * @inheritDoc
 	 */
 	public getSession(): RestSession<T_REST_DOCUMENT> {
 		return this.session;
 	}
 
 	/**
-	 * Synchronizes the given {@link DocumentFile} with the matching {@link RestDocument} managed by this
-	 * {@link DocumentManager}.
-	 *
-	 * @return The synchronized {@link RestDocument}.
-	 * @throws ResultException Shall be thrown upon a synchronization failure.
+	 * @inheritDoc
 	 */
 	public async synchronizeDocument(documentFile: DocumentFile): Promise<T_REST_DOCUMENT> {
 		if (documentFile.documentId === "") {
@@ -78,11 +72,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Synchronizes the {@link RestDocument}s of this {@link DocumentManager} with the actually uploaded documents of
-	 * the webPDF server.
-	 *
-	 * @return A list of the synchronized {@link RestDocument}s.
-	 * @throws ResultException Shall be thrown upon a synchronization failure.
+	 * @inheritDoc
 	 */
 	public async synchronize(fileList?: Array<DocumentFile>): Promise<Array<T_REST_DOCUMENT>> {
 		let documentFileList: Array<DocumentFile>;
@@ -114,11 +104,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Returns the {@link RestDocument} that is known to the {@link DocumentManager} for the given document ID.
-	 *
-	 * @param documentId The document ID a {@link RestDocument} shall be found for.
-	 * @return The {@link RestDocument} mapped to the given document ID.
-	 * @throws ResultException Shall be thrown, if requesting the document failed.
+	 * @inheritDoc
 	 */
 	public getDocument(documentId: string): T_REST_DOCUMENT {
 		if (!this.containsDocument(documentId)) {
@@ -129,31 +115,21 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Returns a list of all {@link RestDocument}s known to this {@link DocumentManager}.
-	 *
-	 * @return A list of all {@link RestDocument}s known to this {@link DocumentManager}.
+	 * @inheritDoc
 	 */
 	public getDocuments(): Array<T_REST_DOCUMENT> {
 		return Array.from(this.documentMap.values());
 	}
 
 	/**
-	 * Returns true, if this {@link DocumentManager} contains a {@link RestDocument} with the given ID.
-	 *
-	 * @param documentId The document ID, that shall be checked for existence.
-	 * @return true, if this {@link DocumentManager} contains a {@link RestDocument} with the given ID.
+	 * @inheritDoc
 	 */
 	public containsDocument(documentId: string): boolean {
 		return this.documentMap.has(documentId);
 	}
 
 	/**
-	 * Downloads the {@link RestDocument} with the given document ID and returns it as {@link Buffer}.
-	 *
-	 * @param documentId   The document ID of the {@link RestDocument} to download.
-	 * @param options      Additional request options - see {@link HttpRestRequest}.
-	 * @return The {@link Buffer} of the downloaded {@link RestDocument}.
-	 * @throws ResultException Shall be thrown, should the download have failed.
+	 * @inheritDoc
 	 */
 	public async downloadDocument(documentId: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
@@ -173,21 +149,14 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Uploads the given {@link Blob} to the webPDF server as a document resource with the given file name, adds
-	 * it to this {@link DocumentManager} and returns the resulting {@link RestDocument} handle.
-	 *
-	 * @param data     The document {@link Blob} to upload.
-	 * @param fileName The name of the uploaded document.
-	 * @param options  Additional request options - see {@link HttpRestRequest}.
-	 * @return The resulting {@link RestDocument} handle.
-	 * @throws ResultException Shall be thrown, should the upload have failed.
+	 * @inheritDoc
 	 */
-	public async uploadDocument(data: Blob, fileName: string, options?: {
+	public async uploadDocument(data: Blob | Buffer, fileName: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<T_REST_DOCUMENT> {
 		let formData: FormData = new wsclientConfiguration.FormData();
-		formData.append('filedata', data, fileName);
+		formData.append('filedata', data as any, fileName);
 
 		let searchParams: URLSearchParams = new URLSearchParams();
 		searchParams.set("history", String(this.isDocumentHistoryActive()));
@@ -209,10 +178,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Deletes the {@link RestDocument} with the given document ID from the webPDF server.
-	 *
-	 * @param documentId The document ID of the {@link RestDocument} to delete.
-	 * @throws ResultException Shall be thrown, should deleting the document have failed.
+	 * @inheritDoc
 	 */
 	public async deleteDocument(documentId: string): Promise<void> {
 		if (!this.containsDocument(documentId)) {
@@ -228,12 +194,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Rename the {@link RestDocument} with the given document ID.
-	 *
-	 * @param documentId The document ID of the {@link RestDocument} to rename.
-	 * @param fileName   The new name for the {@link RestDocument}.
-	 * @return The resulting {@link RestDocument} handle.
-	 * @throws ResultException Shall be thrown, should renaming the document have failed.
+	 * @inheritDoc
 	 */
 	public async renameDocument(documentId: string, fileName: string): Promise<T_REST_DOCUMENT> {
 		if (!this.containsDocument(documentId)) {
@@ -261,18 +222,14 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 
 
 	/**
-	 * Checks whether a document history is collected for managed {@link RestDocument}s.
-	 *
-	 * @return true should collecting the document history be active.
+	 * @inheritDoc
 	 */
 	public isDocumentHistoryActive(): boolean {
 		return this.documentHistoryActive;
 	}
 
 	/**
-	 * Sets whether a document history shall be collected for managed {@link RestDocument}s.
-	 *
-	 * @param documentHistoryActive true should collecting the document history be activated.
+	 * @inheritDoc
 	 */
 	public setDocumentHistoryActive(documentHistoryActive: boolean): void {
 		this.documentHistoryActive = documentHistoryActive;
@@ -285,11 +242,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Returns the {@link HistoryEntry}s known for the {@link RestDocument} with the given document ID.
-	 *
-	 * @param documentId The document ID of the {@link RestDocument} the history shall be requested for.
-	 * @return The {@link HistoryEntry}s known for the selected {@link RestDocument}.
-	 * @throws ResultException Shall be thrown, should requesting the document history have failed.
+	 * @inheritDoc
 	 */
 	public getDocumentHistory(documentId: string): Array<HistoryEntry> {
 		if (!this.isDocumentHistoryActive()) {
@@ -301,13 +254,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 
 
 	/**
-	 * Returns the {@link HistoryEntry} with the given history ID for the {@link RestDocument} with the given document
-	 * ID.
-	 *
-	 * @param documentId The document ID of the {@link RestDocument} the {@link HistoryEntry} shall be requested for.
-	 * @param historyId  The history ID of the {@link HistoryEntry}, that shall be requested.
-	 * @return The selected {@link HistoryEntry}.
-	 * @throws ResultException Shall be thrown, should requesting the document history have failed.
+	 * @inheritDoc
 	 */
 	public getDocumentHistoryEntry(documentId: string, historyId: number): HistoryEntry {
 		if (!this.isDocumentHistoryActive()) {
@@ -318,12 +265,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Updates the history of the {@link RestDocument} with the given document ID using the given {@link HistoryEntry}.
-	 *
-	 * @param documentId   The document ID of the {@link RestDocument} to update.
-	 * @param historyEntry The {@link HistoryEntry} to update the contained values for.
-	 * @return The updated {@link HistoryEntry}.
-	 * @throws ResultException Shall be thrown, should updating the document history have failed.
+	 * @inheritDoc
 	 */
 	public async updateDocumentHistory(documentId: string, historyEntry: HistoryEntry): Promise<HistoryEntry> {
 		if (!this.isDocumentHistoryActive()) {
@@ -428,12 +370,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * Updates the security information of a selected document in the server´s document storage.
-	 *
-	 * @param documentId   The unique documentId of the document in the server´s document storage.
-	 * @param passwordType The security information to update the document with
-	 * @return The updated {@link RestDocument}.
-	 * @throws ResultException Shall be thrown, should updating the document security have failed.
+	 * @inheritDoc
 	 */
 	public async updateDocumentSecurity(documentId: string, passwordType: PdfPassword): Promise<T_REST_DOCUMENT> {
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
@@ -477,13 +414,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	protected abstract accessInternalState(document: T_REST_DOCUMENT): RestDocumentState<T_REST_DOCUMENT>;
 
 	/**
-	 * Returns information about the document selected by documentId in the document storage.
-	 *
-	 * @param documentId   The unique documentId of the document in the server´s document storage.
-	 * @param infoType     Detailed information for the document referenced by the unique documentId
-	 *                     in the server´s document storage.
-	 * @return The requested document {@link Info}
-	 * @throws ResultException Shall be thrown, should fetching the document info have failed.
+	 * @inheritDoc
 	 */
 	public async getDocumentInfo(documentId: string, infoType: InfoType): Promise<Info> {
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
@@ -498,19 +429,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * <p>
-	 * Extracts the {@link RestDocument} with the given document ID in the document storage.
-	 * <ul>
-	 * <li>The document referenced by documentId must be a valid archive. If not, the operation will be aborted.</li>
-	 * <li>For each file in the archive, a new DocumentFile is created in the document storage with a new documentId.</li>
-	 * <li>Each newly created DocumentFile holds as parentDocumentId the documentId of the archive.</li>
-	 * </ul>
-	 * </p>
-	 *
-	 * @param documentId   The document ID of the {@link RestDocument} to extract.
-	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
-	 * @return A list of the extracted {@link RestDocument}s.
-	 * @throws ResultException Shall be thrown, should the extraction has failed.
+	 * @inheritDoc
 	 */
 	public async extractDocument(documentId: string, fileExtract: FileExtract): Promise<Array<T_REST_DOCUMENT>> {
 		if (!this.containsDocument(documentId)) {
@@ -537,23 +456,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	}
 
 	/**
-	 * <p>
-	 * Compresses a list of {@link RestDocument}s selected by documentId or file filter into a new archive document
-	 * in the document storage.
-	 * <ul>
-	 * <li>The list of documents that should be in the archive are selected via the documentId or a file filter.</li>
-	 * <li>The selection specifications can be made individually or together and act additively in the order documentId
-	 * and then file filter.</li>
-	 * <li>If the id is invalid for documents selected via documentId or documents are locked, then the call is aborted
-	 * with an error.</li>
-	 * <li>The created archive is stored as a new document with a new documentId in the document storage.</li>
-	 * </ul>
-	 * </p>
-	 *
-	 * @param fileCompress    The {@link FileCompress} settings for creating the archive document and for selecting and
-	 * 						  filtering the documents to be added to the archive.
-	 * @return The compressed {@link RestDocument}.
-	 * @throws ResultException Shall be thrown, should the compression has failed.
+	 * @inheritDoc
 	 */
 	public async compressDocuments(fileCompress: FileCompress): Promise<T_REST_DOCUMENT> {
 		let documentIdList: Array<string> = [];
@@ -576,6 +479,34 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			);
 
 		let documentFile: DocumentFile = DocumentFile.fromJson(
+			await request.executeRequest()
+		);
+
+		return await this.synchronizeDocument(documentFile);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async updateDocument(documentId: string, data: Blob | Buffer): Promise<T_REST_DOCUMENT> {
+		if (!this.containsDocument(documentId)) {
+			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
+		}
+
+		let restDocument: T_REST_DOCUMENT = this.getDocument(documentId);
+		let documentFile: DocumentFile = restDocument.getDocumentFile();
+
+		let formData: FormData = new wsclientConfiguration.FormData();
+		formData.append('filedata', data as any, documentFile.fileName);
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+		.buildRequest(
+			HttpMethod.PUT,
+			this.session.getURL("documents/" + documentId),
+			formData
+		);
+
+		documentFile = DocumentFile.fromJson(
 			await request.executeRequest()
 		);
 

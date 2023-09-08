@@ -72,6 +72,6 @@ class UseSessionTable {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await UseSessionTable.main();
 })();

@@ -95,7 +95,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	 *
 	 * @param authMaterial The {@link AuthMaterial} to set.
 	 */
-	protected setAuthMaterial(authMaterial: AuthMaterial) {
+	protected setAuthMaterial(authMaterial: AuthMaterial): void {
 		this.authMaterial = authMaterial;
 	}
 

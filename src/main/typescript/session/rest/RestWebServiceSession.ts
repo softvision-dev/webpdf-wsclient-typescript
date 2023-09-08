@@ -42,13 +42,13 @@ export class RestWebServiceSession extends AbstractRestSession<RestWebServiceDoc
 	 * This is a shortcut for {@link DocumentManager#uploadDocument} and uploads the given source
 	 * to the webPDF server.
 	 *
-	 * @param data     The document {@link Blob} to upload.
+	 * @param data     The document {@link Blob} or {@link Buffer} to upload.
 	 * @param fileName The name of the uploaded document.
 	 * @param options  Additional request options - see {@link HttpRestRequest}.
 	 * @return The uploaded {@link RestWebServiceDocument}.
 	 * @throws ResultException Shall be thrown, should the upload have failed.
 	 */
-	public async uploadDocument(data: Blob, fileName: string, options?: {
+	public async uploadDocument(data: Blob | Buffer, fileName: string, options?: {
 		onProgress?: (event: any) => void,
 		abortSignal?: AbortSignal
 	}): Promise<RestWebServiceDocument> {

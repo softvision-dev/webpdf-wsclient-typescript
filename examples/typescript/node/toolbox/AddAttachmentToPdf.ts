@@ -156,6 +156,6 @@ class AddAttachmentToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await AddAttachmentToPdf.main();
 })();

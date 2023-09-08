@@ -37,7 +37,7 @@ export class PdfaWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Pdfa} operation parameters.
 	 */
-	public setOperationParameters(operation: Pdfa | undefined) {
+	public setOperationParameters(operation: Pdfa | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

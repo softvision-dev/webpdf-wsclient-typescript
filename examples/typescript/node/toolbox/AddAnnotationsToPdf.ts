@@ -157,6 +157,6 @@ class AddAnnotationsToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await AddAnnotationsToPdf.main();
 })();

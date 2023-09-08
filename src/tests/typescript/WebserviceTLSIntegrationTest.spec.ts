@@ -1,6 +1,15 @@
 import {expect} from "chai";
 import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} from "./testsuite";
-import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
+import {
+	ConverterWebService,
+	RestDocument,
+	RestSession,
+	SessionContext,
+	SessionFactory,
+	WebServiceFactory,
+	WebServiceProtocol,
+	WebServiceTypes
+} from "../../main/typescript";
 import {Agent, AgentOptions} from "https";
 import {it} from "mocha";
 import {DetailedPeerCertificate} from "tls";
@@ -17,7 +26,9 @@ describe("WebserviceTLSIntegrationTest", function () {
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	let testRestSSL = async function (url: URL, peerCertificate: DetailedPeerCertificate | undefined, selfSigned: boolean) {
+	let testRestSSL = async function (
+		url: URL, peerCertificate: DetailedPeerCertificate | undefined, selfSigned: boolean
+	): Promise<void> {
 		let options: AgentOptions = {
 			rejectUnauthorized: !selfSigned
 		};

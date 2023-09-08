@@ -67,6 +67,6 @@ class GetServerSupport {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await GetServerSupport.main();
 })();

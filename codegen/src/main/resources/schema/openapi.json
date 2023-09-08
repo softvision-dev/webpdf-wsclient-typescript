@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.3086 (2023-08-24T09:16:55Z) "
+		"version" : "webPDF 9.0.0.3093 (2023-09-07T09:40:08Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -1214,6 +1214,61 @@
 					"BearerAuth" : [ ]
 				} ],
 				"summary" : "Returns the binary data of a document",
+				"tags" : [ "documents" ]
+			},
+			"put" : {
+				"description" : "Updates the binary data of a document in the document store referenced by the `DocumentID`.\n\nIf history is enabled for the document, then a new entry with the uploaded content is created.\n* The returned document information `DocumentFile` contains the information for the updated document.\n* The document information `DocumentFile` is fetched via `303 See Other` from `GET /documents/{documentId}/info`.",
+				"operationId" : "updateContent",
+				"parameters" : [ {
+					"description" : "The unique `documentId` of the document in the server´s **document storage**.",
+					"in" : "path",
+					"name" : "documentId",
+					"required" : true,
+					"schema" : {
+						"type" : "string"
+					}
+				} ],
+				"requestBody" : {
+					"content" : {
+						"multipart/form-data" : {
+							"schema" : {
+								"type" : "object",
+								"properties" : {
+									"filedata" : {
+										"type" : "string",
+										"format" : "binary",
+										"description" : "The document to upload, as binary data bytes."
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses" : {
+					"200" : {
+						"content" : {
+							"application/json" : {
+								"schema" : {
+									"$ref" : "#/components/schemas/Document_File"
+								}
+							}
+						},
+						"description" : "The file content of the document has been updated successfully. Use the `documentId` contained in the returned `DocumentFile` to reference it."
+					},
+					"303" : {
+						"$ref" : "#/components/responses/303SeeOther"
+					},
+					"400" : {
+						"$ref" : "#/components/responses/400BadRequest"
+					},
+					"401" : {
+						"$ref" : "#/components/responses/401Unauthorized"
+					}
+				},
+				"security" : [ {
+					"BearerAuth" : [ ]
+				} ],
+				"summary" : "Updates the binary data of a document in the document store",
 				"tags" : [ "documents" ]
 			}
 		},

@@ -105,6 +105,6 @@ class ConvertPdfsToPdfa {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ConvertPdfsToPdfa.main();
 })();

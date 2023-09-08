@@ -86,6 +86,6 @@ class UpdateDatastore {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await UpdateDatastore.main();
 })();

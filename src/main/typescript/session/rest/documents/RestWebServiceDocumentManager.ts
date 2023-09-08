@@ -21,20 +21,14 @@ export class RestWebServiceDocumentManager extends AbstractDocumentManager<RestW
 	}
 
 	/**
-	 * Creates a new {@link RestWebServiceDocument} for the given document {@link documentFile}.
-	 *
-	 * @param documentFile The {@link documentFile} a matching {@link RestWebServiceDocument} shall be created for.
-	 * @return The created {@link RestWebServiceDocument}.
+	 * @inheritDoc
 	 */
 	protected createDocument(documentFile: DocumentFile): RestWebServiceDocument {
 		return new RestWebServiceDocument(new RestWebServiceDocumentState(documentFile, this));
 	}
 
 	/**
-	 * Requests access to the internal {@link RestDocumentState}.
-	 *
-	 * @param document The {@link RestDocument} to request access for.
-	 * @return The internal {@link RestDocumentState}.
+	 * @inheritDoc
 	 */
 	protected accessInternalState(document: RestWebServiceDocument): RestWebServiceDocumentState {
 		return document.accessInternalState();

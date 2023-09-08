@@ -14,7 +14,7 @@ class WsclientConfiguration {
 		// init defaults
 		if (typeof process !== "undefined") {
 			this._FormData = require("form-data");
-			this._btoa = function (data: string) {
+			this._btoa = function (data: string): string {
 				return Buffer.from(data).toString('base64');
 			};
 		} else {

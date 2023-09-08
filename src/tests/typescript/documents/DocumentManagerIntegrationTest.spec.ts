@@ -30,11 +30,11 @@ import {
 
 require("../bootstrap");
 
-describe("DocumentManagerIntegrationTest", function () {
+describe("DocumentManagerIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('documents');
 	let testServer: TestServer = new TestServer();
 
-	it('testHandleDocument', async function () {
+	it('testHandleDocument', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -70,7 +70,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentRename', async function () {
+	it('testDocumentRename', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -96,7 +96,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentList', async function () {
+	it('testDocumentList', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -129,7 +129,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentHistory', async function () {
+	it('testDocumentHistory', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -180,7 +180,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testHandleDocumentByID', async function () {
+	it('testHandleDocumentByID', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -203,7 +203,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentSecurityTextPassword', async function () {
+	it('testDocumentSecurityTextPassword', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -232,7 +232,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentSecurityCertificate', async function () {
+	it('testDocumentSecurityCertificate', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -273,7 +273,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentListFromSession', async function () {
+	it('testDocumentListFromSession', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -311,7 +311,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await resumedSession.close();
 	});
 
-	it('testDocumentPasswordHandling', async function () {
+	it('testDocumentPasswordHandling', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -409,7 +409,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentInfo', async function () {
+	it('testDocumentInfo', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -434,7 +434,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentExtractAll', async function () {
+	it('testDocumentExtractAll', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -459,7 +459,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentExtractWithFilter', async function () {
+	it('testDocumentExtractWithFilter', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -495,7 +495,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentCompress', async function () {
+	it('testDocumentCompress', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -526,6 +526,35 @@ describe("DocumentManagerIntegrationTest", function () {
 		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(fileCompress);
 		expect(resultDocument, "Valid document should have been returned.").to.exist;
 		expect(resultDocument.getDocumentFile().mimeType).to.equal("application/zip");
+
+		await session.close();
+	});
+
+	it('testDocumentUpdate', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "lorem-ipsum.txt";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+
+		let fileContent: string = "This is test content";
+		let newData: any = Buffer.from(fileContent);
+
+		let updatedFile: RestDocument = await uploadedFile.updateDocument(newData);
+		expect(updatedFile, "Valid document should have been returned.").to.exist;
+
+		let downloadedFile: Buffer = await updatedFile.downloadDocument();
+		expect(downloadedFile.toString(), "content should equal \"" + fileContent + "\"").to.equal(fileContent);
 
 		await session.close();
 	});

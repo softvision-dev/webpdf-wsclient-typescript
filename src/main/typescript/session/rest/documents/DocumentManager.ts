@@ -82,16 +82,16 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	}): Promise<Buffer>;
 
 	/**
-	 * Uploads the given {@link Blob} to the webPDF server as a document resource with the given file name, adds
+	 * Uploads the given {@link Blob} or {@link Buffer} to the webPDF server as a document resource with the given file name, adds
 	 * it to this {@link DocumentManager} and returns the resulting {@link RestDocument} handle.
 	 *
-	 * @param data     The document {@link Blob} to upload.
+	 * @param data     The document {@link Blob} or {@link Buffer} to upload.
 	 * @param fileName The name of the uploaded document.
 	 * @param options  Additional request options - see {@link HttpRestRequest}.
 	 * @return The resulting {@link RestDocument} handle.
 	 * @throws ResultException Shall be thrown, should the upload have failed.
 	 */
-	uploadDocument(data: Blob, fileName: string, options?: {
+	uploadDocument(data: Blob | Buffer, fileName: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<T_REST_DOCUMENT>;
@@ -216,4 +216,15 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown, should the compression has failed.
 	 */
 	compressDocuments(fileCompress: FileCompress): Promise<T_REST_DOCUMENT>;
+
+	/**
+	 * Updates a {@link RestDocument} selected by documentId with the given {@link Blob} or {@link Buffer}, updating it in this
+	 * {@link DocumentManager} and returns the resulting {@link RestDocument} handle.
+	 *
+	 * @param documentId The document ID of the {@link RestDocument} to update.
+	 * @param data     	 The data {@link Blob} or {@link Buffer} to update the document with.
+	 * @return The resulting {@link RestDocument} handle.
+	 * @throws ResultException Shall be thrown, should the update have failed.
+	 */
+	updateDocument(documentId: string, data: Blob | Buffer): Promise<T_REST_DOCUMENT>;
 }

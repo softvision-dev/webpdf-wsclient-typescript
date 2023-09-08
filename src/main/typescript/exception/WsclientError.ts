@@ -24,7 +24,7 @@ export class WsclientError {
      * @param errorCode The errorCode an {@link WsclientError} shall be found for.
      * @return The {@link WsclientError} representing the given errorCode.
      */
-    public static getName(errorCode: number) {
+    public static getName(errorCode: number): WsclientError {
         for (let value of Object.values(WsclientErrors)) {
             if (value.getCode() === errorCode) {
                 return value;

@@ -109,6 +109,6 @@ class UpdateConfiguration {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await UpdateConfiguration.main();
 })();

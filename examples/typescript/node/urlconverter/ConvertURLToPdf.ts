@@ -98,6 +98,6 @@ class ConvertURLToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ConvertURLToPdf.main();
 })();
