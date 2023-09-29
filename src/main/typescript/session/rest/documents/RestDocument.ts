@@ -128,11 +128,11 @@ export interface RestDocument extends Document {
 	extractDocument(fileExtract: FileExtract): Promise<Array<RestDocument>>;
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#extractDocument} and extracts the {@link RestDocument}.
+	 * This is a shortcut for {@link DocumentManager#extractDocument} and updates the {@link RestDocument}.
 	 *
-	 * @param data The data {@link Blob} or {@link Buffer} to update the document with.
+	 * @param data The data {@link Blob} to update the document with.
 	 * @return The updated {@link RestDocument}.
 	 * @throws ResultException Shall be thrown, should the update have failed.
 	 */
-	updateDocument(data: Blob | Buffer): Promise<RestDocument>;
+	updateDocument(data: Blob): Promise<RestDocument>;
 }

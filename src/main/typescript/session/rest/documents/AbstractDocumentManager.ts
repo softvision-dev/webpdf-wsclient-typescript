@@ -151,7 +151,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	/**
 	 * @inheritDoc
 	 */
-	public async uploadDocument(data: Blob | Buffer, fileName: string, options?: {
+	public async uploadDocument(data: Blob, fileName: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<T_REST_DOCUMENT> {
@@ -488,7 +488,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	/**
 	 * @inheritDoc
 	 */
-	public async updateDocument(documentId: string, data: Blob | Buffer): Promise<T_REST_DOCUMENT> {
+	public async updateDocument(documentId: string, data: Blob): Promise<T_REST_DOCUMENT> {
 		if (!this.containsDocument(documentId)) {
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 		}

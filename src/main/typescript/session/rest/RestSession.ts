@@ -37,13 +37,13 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
 	 * to the webPDF server.
 	 *
 	 * @template T_REST_DOCUMENT
-	 * @param data     The document {@link Blob} or {@link Buffer} to upload.
+	 * @param data     The document {@link Blob} to upload.
 	 * @param fileName The name of the uploaded document.
 	 * @param options  Additional request options - see {@link HttpRestRequest}.
 	 * @return The uploaded {@link T_REST_DOCUMENT}.
 	 * @throws ResultException Shall be thrown, should the upload have failed.
 	 */
-	uploadDocument(data: Blob | Buffer, fileName: string, options?: {
+	uploadDocument(data: Blob, fileName: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
 	}): Promise<T_REST_DOCUMENT>;
