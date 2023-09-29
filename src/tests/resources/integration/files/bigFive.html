@@ -1,0 +1,121 @@
+<html lang="de">
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+	<style>
+        a {
+            text-decoration: none;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .content-box {
+            display: flex;
+        }
+
+        .content-box p {
+            margin-right: 20px;
+        }
+
+        .images {
+            width: 100px;
+        }
+
+        .images img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .table-img {
+            width: 100px;
+            height: 100px;
+            margin-left: 20px;
+        }
+
+        * {
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        @page landscape {
+            size: A4 landscape;
+			margin: 3cm 2cm;
+        }
+
+        @page portrait {
+            size: A4 portrait;
+            margin: 3cm 2cm;
+        }
+
+        /* This definition is used to create a new page after each .page block during conversion */
+        .page {
+            page-break-after: always;
+            page-break-inside: avoid;
+			page: portrait;
+        }
+
+		.page:first-child {
+            page: landscape;
+		}
+	</style>
+</head>
+<body>
+
+<!-- The first page with static content and linked images -->
+<div class="page">
+	<div class="content-box">
+		<div class="text">
+			<p>
+				<a href="https://de.wikipedia.org/wiki/Big_Five_(Safari)">© Wikipedia</a> Als die Big Five, auf deutsch
+				die „Großen Fünf“, bezeichneten Großwildjäger früher fünf bestimmte Tiere in Afrika. Es waren
+				Afrikanischer Elefant, Nashorn (das Spitzmaulnashorn, die aggressivere und früher häufigere Art, oder
+				das größere Breitmaulnashorn), Kaffernbüffel, Löwe und Leopard. Die Auswahl bezog sich dabei nicht in
+				erster Linie auf die Körpergröße der Tiere, sondern vorwiegend auf die Schwierigkeiten und Gefahren bei
+				der Jagd auf sie.
+			</p>
+			<h2>Verbreitung</h2>
+			<p>
+				Die Großen Fünf sind heute beispielsweise in Botswana, Eswatini, Kenia, Mosambik, Namibia, Ruanda,
+				Simbabwe,
+				Südafrika, Tansania und Uganda anzutreffen. Big-Five-Safaris in diese Länder sind mittlerweile entweder
+				Jagdreisen oder touristische Ausflüge, bei denen die Tiere beobachtet und fotografiert werden.
+			</p>
+			<h3>Die Großen Fünf</h3>
+			<p>
+				Durch Wilderei, die den Verkauf der Stoßzähne von Elefanten, der Hörner von Nashorn und Büffel oder von
+				Löwen- bzw. Leopardenfellen auf dem Schwarzmarkt bezweckt, sind einige der Big Five in ihrem Bestand
+				bedroht
+				und stehen auf der Roten Liste gefährdeter Arten.
+			</p>
+		</div>
+		<div class="images">
+			<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/African_Elephant_%28188286877%29.jpeg/1280px-African_Elephant_%28188286877%29.jpeg"/>
+			<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Neushoorn.JPG/1024px-Neushoorn.JPG"/>
+			<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/African_buffalo_Syncerus_caffer_nu.jpg/1280px-African_buffalo_Syncerus_caffer_nu.jpg"/>
+			<img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Lion_waiting_in_Namibia.jpg"/>
+			<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Namibie_Etosha_Leopard_01edit.jpg/1280px-Namibie_Etosha_Leopard_01edit.jpg"/>
+		</div>
+	</div>
+</div>
+
+<!-- The second page with dynamic content -->
+<div class="page">
+	<h2>Details</h2>
+
+	<table>
+		<!-- At this point it is iterated over the individual contents of the data list -->
+		<#list custom.data as data>
+			<tr>
+				<td colspan="2"><h3><a href="${data.link}">${data.title}</a></h3></td>
+			</tr>
+			<tr>
+				<td>${data.text}</td>
+				<td><img class="table-img" src="${data.image}"/></td>
+			</tr>
+		</#list>
+	</table>
+</div>
+
+</body>
+</html>

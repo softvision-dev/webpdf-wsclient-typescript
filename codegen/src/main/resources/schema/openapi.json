@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.3081 (2023-08-20T15:49:01Z) "
+		"version" : "webPDF 9.0.0.3110 (2023-09-27T11:38:29Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -7405,6 +7405,19 @@
 					}
 				}
 			},
+			"Operation_CiphersHttpSettingsSSL" : {
+				"type" : "object",
+				"description" : "Defines the list of allowed TLS ciphers for the HTTP requests.",
+				"properties" : {
+					"cipher" : {
+						"type" : "array",
+						"items" : {
+							"type" : "string"
+						}
+					}
+				},
+				"required" : [ "cipher" ]
+			},
 			"Operation_CircleAnnotation" : {
 				"type" : "object",
 				"description" : "An annotation that draws a circle on a page.",
@@ -7931,12 +7944,26 @@
 					"baseURL" : {
 						"type" : "string",
 						"default" : "",
-						"description" : "Used to define the URL used as a basis for all URLs in the HTML document that are not defined as absolute URLs."
+						"description" : "Used to define the URL that will be the base for all URLs in the HTML document that are not defined as absolute URLs. The URL must be absolute and contain a scheme (e.g. 'http' or 'https'); the scheme 'file' is not allowed."
 					},
 					"downloadImages" : {
 						"type" : "boolean",
 						"default" : false,
-						"description" : "If \"true\", then the images of an e-mail or an HTML document are downloaded automatically. This option could slow down the conversion considerably if there are many images contained or if, for example, e-mail documents are converted in which the images can no longer be invoked."
+						"description" : "If \"true\", then externally referenced images of the HTML document are downloaded and inserted into the document. If false, the images are not downloaded and the external references to the image are removed, leaving already embedded images intact."
+					},
+					"imageMode" : {
+						"type" : "string",
+						"default" : "base64",
+						"description" : "This defines how downloaded images are inserted into the HTML content (with reference to the `<downloadImages>` parameter). When referencing large images in the HTML content, it is recommended to use `<file>` to reduce the size of the HTML file and speed up the rendering of the HTML.\n\n*   base64 = embed images as BASE64 content\n*   file = embed images as file links to local temporary files",
+						"enum" : [ "base64", "file" ],
+						"x-webpdf-codegen" : {
+							"enumName" : "Operation_ConverterHtmlImageMode"
+						}
+					},
+					"preferCSSPageSize" : {
+						"type" : "boolean",
+						"default" : false,
+						"description" : "If \"true\", then the page size and margins are preferentially used from the CSS. Otherwise, the sizes from the passed page parameter are used. The values can also be only partially overwritten, so that e.g. the page size is determined by the parameter values and the page margins are defined in the CSS."
 					},
 					"templateData" : {
 						"$ref" : "#/components/schemas/Operation_TemplateData"
@@ -7985,7 +8012,7 @@
 					"downloadImages" : {
 						"type" : "boolean",
 						"default" : false,
-						"description" : "If \"true\", then the images of an e-mail or an HTML document are downloaded automatically. This option could slow down the conversion considerably if there are many images contained or if, for example, e-mail documents are converted in which the images can no longer be invoked."
+						"description" : "If \"true\", then externally referenced images in the HTML content of the e-mail are downloaded and inserted into the document. If false, the images are not downloaded and the external references to the image are removed, leaving already embedded images intact. This option can slow down the conversion if many images are included or if, for example, e-mail documents are converted in which the images can no longer be retrieved."
 					},
 					"ignoreMissingBodyChunk" : {
 						"type" : "boolean",
@@ -9539,6 +9566,85 @@
 						"type" : "string",
 						"default" : "",
 						"description" : "Username if access to the proxy service requires authentication."
+					}
+				}
+			},
+			"Operation_HttpSettings" : {
+				"type" : "object",
+				"description" : "Defines the options for all external HTTP requests made by the server during the execution of the web service operation.",
+				"properties" : {
+					"followRedirect" : {
+						"type" : "boolean",
+						"default" : true
+					},
+					"headers" : {
+						"$ref" : "#/components/schemas/Operation_HttpSettingsHeader"
+					},
+					"ssl" : {
+						"$ref" : "#/components/schemas/Operation_HttpSettingsSSL"
+					},
+					"timeout" : {
+						"$ref" : "#/components/schemas/Operation_HttpSettingsTimeout"
+					},
+					"userAgent" : {
+						"type" : "string",
+						"default" : ""
+					}
+				}
+			},
+			"Operation_HttpSettingsHeader" : {
+				"type" : "object",
+				"description" : "Defines the HTTP headers that will be sent for all HTTP requests.",
+				"properties" : {
+					"header" : {
+						"type" : "array",
+						"items" : {
+							"$ref" : "#/components/schemas/Operation_HttpSettingsHeaderEntry"
+						}
+					}
+				}
+			},
+			"Operation_HttpSettingsHeaderEntry" : {
+				"type" : "object",
+				"description" : "Defines an HTTP header entry consisting of a `<name>` (header name) and a `<value>` (header value). All header entries are sent with each HTTP request and override the default headers.",
+				"properties" : {
+					"name" : {
+						"type" : "string",
+						"default" : ""
+					},
+					"value" : {
+						"type" : "string",
+						"default" : ""
+					}
+				}
+			},
+			"Operation_HttpSettingsSSL" : {
+				"type" : "object",
+				"description" : "Defines the SSL options for all HTTP requests.",
+				"properties" : {
+					"ciphers" : {
+						"$ref" : "#/components/schemas/Operation_CiphersHttpSettingsSSL"
+					},
+					"protocols" : {
+						"$ref" : "#/components/schemas/Operation_ProtocolsHttpSettingsSSL"
+					}
+				}
+			},
+			"Operation_HttpSettingsTimeout" : {
+				"type" : "object",
+				"description" : "Defines the timeout options for all HTTP requests.",
+				"properties" : {
+					"connect" : {
+						"type" : "integer",
+						"format" : "int32",
+						"default" : 10000,
+						"description" : "Sets the timeout for the connection establishment of the HTTP requests."
+					},
+					"response" : {
+						"type" : "integer",
+						"format" : "int32",
+						"default" : 60000,
+						"description" : "Sets the timeout to wait for the arrival of a response to the HTTP request."
 					}
 				}
 			},
@@ -11152,6 +11258,25 @@
 					}
 				}
 			},
+			"Operation_ProtocolsHttpSettingsSSL" : {
+				"type" : "object",
+				"description" : "Defines the allowed TLS protocols for the HTTP requests.",
+				"properties" : {
+					"protocol" : {
+						"type" : "array",
+						"items" : {
+							"type" : "string",
+							"default" : "TLSv1.2",
+							"description" : "Sets the TLS protocol type for SSL connections.",
+							"enum" : [ "TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3" ],
+							"x-webpdf-codegen" : {
+								"enumName" : "Operation_HttpSettingsSSLProtocol"
+							}
+						}
+					}
+				},
+				"required" : [ "protocol" ]
+			},
 			"Operation_QrBarcode" : {
 				"type" : "object",
 				"description" : "A QR barcode.",
@@ -12174,6 +12299,9 @@
 				"properties" : {
 					"compress" : {
 						"$ref" : "#/components/schemas/Operation_CompressSettings"
+					},
+					"http" : {
+						"$ref" : "#/components/schemas/Operation_HttpSettings"
 					},
 					"pdfa" : {
 						"$ref" : "#/components/schemas/Operation_PdfaSettings"

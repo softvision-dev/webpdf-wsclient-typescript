@@ -24,9 +24,11 @@ import {
 	BarcodeInterface,
 	BaseToolbox,
 	Converter,
+	ConverterHtmlImageMode,
 	Document,
 	ExtractionFileFormat,
 	FileDataFormat,
+	FileDataSource,
 	MergeMode,
 	Metrics,
 	Ocr,
@@ -95,6 +97,88 @@ describe("RestWebserviceIntegrationTest", function () {
 		expect(resultDocument, "REST document could not be downloaded.").to.exist;
 		expect(resultDocument?.getDocumentFile(), "Downloaded REST document is undefined").to.exist;
 		expect(filename.split(".")[0]).to.equal(resultDocument?.getDocumentFile().fileName);
+
+		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+
+		let fileOut = tmp.fileSync();
+		fs.writeFileSync(fileOut.name, downloadedFile);
+		expect(fs.existsSync(fileOut.name)).to.be.true;
+
+		await session.close();
+	});
+
+	it('testConverterTemplate', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+
+		let resourceFilename: string = "bigFive.html";
+		let resourceFile: any = testResources.getResource(resourceFilename);
+		let templateFile: any = testResources.getResource("bigFive.json", {encoding: "base64"});
+		let headerFile: any = testResources.getResource("bigFive-header.html", {encoding: "base64"});
+		let footerFile: any = testResources.getResource("bigFive-footer.html", {encoding: "base64"});
+
+		let uploadedFile: RestDocument =
+			await session.getDocumentManager().uploadDocument(resourceFile, resourceFilename);
+
+		let webService: ConverterWebService<RestDocument> =
+			WebServiceFactory.createInstance(session, WebServiceTypes.CONVERTER);
+		expect(webService.getOperationParameters(), "Operation should have been initialized").to.exist;
+
+		webService.setOperationParameters(
+			Converter.fromJson({
+				html: {
+					imageMode: ConverterHtmlImageMode.File,
+					preferCSSPageSize: true,
+					useAsTemplate: true,
+					downloadImages: true,
+					baseURL: "https://upload.wikimedia.org/",
+					templateData: {
+						source: FileDataSource.Value,
+						value: templateFile.toString()
+					}
+				},
+				page: {
+					header: {
+						value: headerFile.toString()
+					},
+					footer: {
+						value: footerFile.toString()
+					}
+				}
+			} as Converter)
+		);
+
+		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
+		expect(resultDocument, "REST document could not be downloaded.").to.exist;
+		expect(resultDocument?.getDocumentFile(), "Downloaded REST document is undefined").to.exist;
+		expect(resultDocument?.getDocumentFile().metadata, "REST Document should have metadata").to.exist;
+		expect(resultDocument?.getDocumentFile().metadata?.pages, "REST Document should have pages").to.exist;
+
+		let pageCount: number = 0;
+		for (let page of resultDocument?.getDocumentFile().metadata?.pages?.page || []) {
+			pageCount++;
+
+			switch (pageCount) {
+				case 1:
+					expect(Math.round(page.boxes.mediaBox.height || 0)).to.equal(595);
+					expect(Math.round(page.boxes.mediaBox.width || 0)).to.equal(842);
+					break;
+				case 2:
+					expect(Math.round(page.boxes.mediaBox.height || 0)).to.equal(842);
+					expect(Math.round(page.boxes.mediaBox.width || 0)).to.equal(595);
+					break;
+			}
+		}
+
+		expect(pageCount).to.equal(2);
+		expect(resourceFilename.split(".")[0]).to.equal(resultDocument?.getDocumentFile().fileName);
 
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
