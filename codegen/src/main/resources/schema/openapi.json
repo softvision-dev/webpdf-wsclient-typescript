@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.3110 (2023-09-27T11:38:29Z) "
+		"version" : "webPDF 9.0.0.3129 (2023-10-16T06:53:25Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -7951,6 +7951,9 @@
 						"default" : false,
 						"description" : "If \"true\", then externally referenced images of the HTML document are downloaded and inserted into the document. If false, the images are not downloaded and the external references to the image are removed, leaving already embedded images intact."
 					},
+					"errorReport" : {
+						"$ref" : "#/components/schemas/Operation_ConverterHtmlErrorReport"
+					},
 					"imageMode" : {
 						"type" : "string",
 						"default" : "base64",
@@ -7977,6 +7980,30 @@
 						"type" : "boolean",
 						"default" : true,
 						"description" : "If \"true\", the background defined in the HTML document will be output in the PDF document as well. If \"false\", the background will be hidden."
+					}
+				}
+			},
+			"Operation_ConverterHtmlErrorReport" : {
+				"type" : "object",
+				"description" : "This parameter specifies whether HTML content errors should be detected and, if so, whether a report should be provided along with the error code. The report is created only if at least one error was found. If the parameter is not specified, then any errors that may occur in the HTML document will not be detected and will be silently ignored.\n\n**Important:** This parameter refers only to the content of the passed HTML document and not to the web service call itself.",
+				"properties" : {
+					"format" : {
+						"type" : "string",
+						"default" : "xml",
+						"description" : "Defines the output format of the error report.\n\n*   xml = XML document.\n*   json = JSON document",
+						"enum" : [ "xml", "json" ],
+						"x-webpdf-codegen" : {
+							"enumName" : "Operation_ConverterHtmlErrorReportFormat"
+						}
+					},
+					"mode" : {
+						"type" : "string",
+						"default" : "none",
+						"description" : "This parameter specifies whether HTML content errors should be detected and, if so, how to provide a report with the errors. A detected error can be a failed download of a resource (for example, an image) or a script or CSS syntax error.\n\n*   none = No content errors are detected and no report is generated and returned.\n*   message = Content errors are detected and the report is returned as part of the error message",
+						"enum" : [ "none", "message" ],
+						"x-webpdf-codegen" : {
+							"enumName" : "Operation_ConverterHtmlErrorReportMode"
+						}
 					}
 				}
 			},
