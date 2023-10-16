@@ -274,8 +274,8 @@ public class WebPDFExtension {
         }
 
         if (actual.getIsEnum() && actual.getIsListContainer()) {
-            actual = property.getItems();
-            extension = determineExtension(actual);
+            CodegenProperty childProperties = property.getItems();
+            extension = determineExtension(childProperties);
         }
 
         if (!extension.isTypeInfoInitialized() && !actual.getIsEnum() && actual.getComplexType() != null) {

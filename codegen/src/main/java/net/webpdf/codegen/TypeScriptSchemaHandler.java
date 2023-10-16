@@ -190,7 +190,12 @@ public class TypeScriptSchemaHandler extends SchemaHandler {
                 property.getVendorExtensions().put(CodegenConstants.IS_ENUM_EXT_NAME, Boolean.FALSE);
                 property.getVendorExtensions().put(CodegenConstants.IS_PRIMITIVE_TYPE_EXT_NAME, Boolean.FALSE);
                 property.setComplexType(packageLocation);
-                property.setDatatypeWithEnum(typeName.getName());
+
+                if (property.getIsListContainer()) {
+                    property.setDatatypeWithEnum("Array<" + typeName.getName() + ">");
+                } else {
+                    property.setDatatypeWithEnum(typeName.getName());
+                }
             }
         }
     }
