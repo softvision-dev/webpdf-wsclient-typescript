@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta charset="UTF-8">
+	<style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+        }
+
+        #footer {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            width: 100%;
+            margin: 0;
+            font-family: Helvetica, sans-serif;
+            font-size: 11pt;
+            color: #000000;
+            padding: 0 20mm 5mm;
+        }
+	</style>
+</head>
+<body>
+<div class="footer">
+	<p>${html.pageNumber} von ${html.totalPages}</p>
+</div>
+</body>
+</html>

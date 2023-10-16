@@ -272,6 +272,12 @@ public class WebPDFExtension {
         if (property.getIsMapContainer()) {
             actual = property.getItems();
         }
+
+        if (actual.getIsEnum() && actual.getIsListContainer()) {
+            CodegenProperty childProperties = property.getItems();
+            extension = determineExtension(childProperties);
+        }
+
         if (!extension.isTypeInfoInitialized() && !actual.getIsEnum() && actual.getComplexType() != null) {
             TypeName type = new TypeName(actual.getComplexType());
             extension.setTypePackageName(type.getPackagePath(modelPackage));

@@ -1,0 +1,34 @@
+{
+	"data": [
+		{
+			"title": "Afrikanischer Elefant",
+			"link": "https://de.wikipedia.org/wiki/Afrikanischer_Elefant",
+			"image": "https://upload.wikimedia.org/wikipedia/commons/a/a0/African_Elephant_%28188286877%29.jpeg",
+			"text": "Der Afrikanische Elefant (Loxodonta africana), auch Afrikanischer Steppenelefant oder Afrikanischer Buschelefant, ist eine Säugetierart aus der Familie der Elefanten."
+		},
+		{
+			"title": "Breitmaulnashorn",
+			"link": "https://de.wikipedia.org/wiki/Breitmaulnashorn",
+			"image": "/wikipedia/commons/8/82/Neushoorn.JPG",
+			"text": "Das Breitmaulnashorn (Ceratotherium simum) oder Breitlippennashorn ist ein Säugetier aus der Familie der Nashörner."
+		},
+		{
+			"title": "Kaffernbüffel",
+			"link": "https://de.wikipedia.org/wiki/Kaffernb%C3%BCffel",
+			"image": "/wikipedia/commons/thumb/2/22/African_buffalo_Syncerus_caffer_nu.jpg/1920px-African_buffalo_Syncerus_caffer_nu.jpg",
+			"text": "Der Kaffernbüffel (Syncerus caffer), auch Schwarzbüffel, Afrikanischer Büffel oder Steppenbüffel genannt, ist ein sehr großer Vertreter aus der Familie der Hornträger, welcher in weiten Teilen des östlichen und südlichen Afrikas vorkommt."
+		},
+		{
+			"title": "Löwe",
+			"link": "https://de.wikipedia.org/wiki/L%C3%B6we",
+			"image": "wikipedia/commons/7/73/Lion_waiting_in_Namibia.jpg",
+			"text": "Der Löwe (Panthera leo) ist neben dem Tiger eine der beiden größten Arten aus der Familie der Katzen. Er ist heute nur noch in Teilen Afrikas südlich der Sahara sowie im indischen Bundesstaat Gujarat beheimatet; in Afrika ist er das größte Landraubtier."
+		},
+		{
+			"title": "Leopard",
+			"link": "https://de.wikipedia.org/wiki/Leopard",
+			"image": "wikipedia/commons/thumb/a/a1/Namibie_Etosha_Leopard_01edit.jpg/1920px-Namibie_Etosha_Leopard_01edit.jpg",
+			"text": "Der Leopard (Panthera pardus), auch Panther oder Panter, ist eine Art aus der Familie der Katzen, die in Afrika und Asien verbreitet ist. Darüber hinaus kommt sie auch im Kaukasus vor. Der Leopard ist nach Tiger, Löwe und Jaguar die viertgrößte Großkatze."
+		}
+	]
+}
