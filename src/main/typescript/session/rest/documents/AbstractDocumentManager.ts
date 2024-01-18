@@ -497,7 +497,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		let documentFile: DocumentFile = restDocument.getDocumentFile();
 
 		let formData: FormData = new wsclientConfiguration.FormData();
-		formData.append('filedata', data as any, documentFile.fileName);
+		formData.append('filedata', data as any, documentFile.fileName + "." + documentFile.fileExtension);
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 		.buildRequest(
