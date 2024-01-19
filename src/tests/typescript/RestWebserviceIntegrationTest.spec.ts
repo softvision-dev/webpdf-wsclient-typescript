@@ -49,7 +49,8 @@ import {
 	ToolboxSecurity,
 	UrlConverter,
 	UrlConverterInterface,
-	UserCredentials
+	UserCredentials,
+	MetadataPdf
 } from "../../main/typescript/generated-sources";
 
 require("./bootstrap");
@@ -159,10 +160,10 @@ describe("RestWebserviceIntegrationTest", function () {
 		expect(resultDocument, "REST document could not be downloaded.").to.exist;
 		expect(resultDocument?.getDocumentFile(), "Downloaded REST document is undefined").to.exist;
 		expect(resultDocument?.getDocumentFile().metadata, "REST Document should have metadata").to.exist;
-		expect(resultDocument?.getDocumentFile().metadata?.pages, "REST Document should have pages").to.exist;
+		expect((resultDocument?.getDocumentFile().metadata as MetadataPdf)?.pages, "REST Document should have pages").to.exist;
 
 		let pageCount: number = 0;
-		for (let page of resultDocument?.getDocumentFile().metadata?.pages?.page || []) {
+		for (let page of (resultDocument?.getDocumentFile().metadata as MetadataPdf)?.pages?.page || []) {
 			pageCount++;
 
 			switch (pageCount) {
@@ -440,8 +441,8 @@ describe("RestWebserviceIntegrationTest", function () {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		expect(resultDocument!.getDocumentFile().metadata!.information.pdfa.part).to.equal("3");
-		expect(resultDocument!.getDocumentFile().metadata!.information.pdfa.conformance).to.equal("b");
+		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.part).to.equal("3");
+		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.conformance).to.equal("b");
 
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
