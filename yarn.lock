@@ -829,6 +829,13 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.3.tgz#472eaab5f15c1ffdd7f8628bd4c4f753995ec79e"
   integrity sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==
 
+"@types/adm-zip@^0.5.5":
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/@types/adm-zip/-/adm-zip-0.5.5.tgz#4588042726aa5f351d7ea88232e4a952f60e7c1a"
+  integrity sha512-YCGstVMjc4LTY5uK9/obvxBya93axZOVOyf2GSUulADzmLhYE45u2nAssCs/fWBs1Ifq5Vat75JTPwd5XZoPJw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/archiver@^5.3.2":
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/@types/archiver/-/archiver-5.3.2.tgz#a9f0bcb0f0b991400e7766d35f6e19d163bdadcc"
@@ -989,6 +996,11 @@ acorn@^8.4.1:
   version "8.8.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.8.0.tgz#88c0187620435c7f6015803f5539dae05a9dbea8"
   integrity sha512-QOxyigPVrpZ2GXT+PFyZTl6TtOFc5egxHIP9IlQ+RbupQuX4RkT/Bee4/kQuC02Xkzg84JcT7oLYtDIQxp+v7w==
+
+adm-zip@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.10.tgz#4a51d5ab544b1f5ce51e1b9043139b639afff45b"
+  integrity sha512-x0HvcHqVJNTPk/Bw8JbLWlWoo6Wwnsug0fnYYro1HBrjxZ3G7/AZk7Ahv8JwDe1uIcz8eBqvu86FuF1POiG7vQ==
 
 ansi-colors@4.1.1:
   version "4.1.1"

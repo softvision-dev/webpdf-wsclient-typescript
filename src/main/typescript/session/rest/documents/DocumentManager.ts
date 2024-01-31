@@ -82,6 +82,19 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	}): Promise<Buffer>;
 
 	/**
+	 * Downloads the {@link RestDocument}s with the given documents IDs as archive and returns it as {@link Buffer}.
+	 *
+	 * @param documentIdList   	The document IDs of the {@link RestDocument}s to download.
+	 * @param options      		Additional request options - see {@link HttpRestRequest}.
+	 * @return The {@link Buffer} of the downloaded archived {@link RestDocument}s.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	downloadArchive(documentIdList: Array<string>, options?: {
+		onProgress?: (event: AxiosProgressEvent) => void,
+		abortSignal?: AbortSignal
+	}): Promise<Buffer>
+
+	/**
 	 * Uploads the given {@link Blob} to the webPDF server as a document resource with the given file name, adds
 	 * it to this {@link DocumentManager} and returns the resulting {@link RestDocument} handle.
 	 *
@@ -195,6 +208,17 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown, should the extraction has failed.
 	 */
 	extractDocument(documentId: string, fileExtract: FileExtract): Promise<Array<T_REST_DOCUMENT>>;
+
+	/**
+	 * Extracts and downloads the given archive path in the {@link RestDocument} with the given document ID and
+	 * returns it as {@link Buffer}.
+	 *
+	 * @param documentId   The document ID of the {@link RestDocument} to extract and download from.
+	 * @param archivePath  The path of the file to extract in the given archive.
+	 * @return The {@link Buffer} of the extracted and downloaded archive file.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	extractArchiveFile(documentId: string, archivePath: string): Promise<Buffer>;
 
 	/**
 	 * <p>

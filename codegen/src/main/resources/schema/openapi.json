@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 9.0.0.0 (2024-01-19T13:57:08Z) "
+		"version": "webPDF 10.0.0.0 (2024-01-30T13:17:30Z) "
 	},
 	"servers": [
 		{
@@ -1179,8 +1179,21 @@
 		},
 		"/documents/compress": {
 			"post": {
-				"description": "Compresses a list of documents selected by `documentId` or file filter into a new archive document in the **document storage**.\n\n* The list of documents that should be in the archive are selected via the `documentId` or a file filter.\n* The selection specifications can be made individually or together and act additively in the order `documentId` and then file filter.\n* If the id is invalid for documents selected via `documentId` or documents are locked, then the call is aborted with an error.\n* The created archive is stored as a new document with a new `documentId` in the **document storage**.",
+				"description": "Compresses a list of documents from the **document storage** selected by `documentId` or a file filter into a new archive document.\n\n* The list of documents that should be in the archive are selected via the `documentId` or a file filter.\n* The selection specifications can be made individually or together and act additively in the order `documentId` and then file filter.\n* If the id is invalid for documents selected via `documentId` or documents are locked, then the call is aborted with an error.\n* Depending on the `storeArchive` (default `true`) flag in the body of the request, the created archive is stored in the document storage or created as a temporary archive.\n* Depending on the `accept` header, the created archive itself is returned as binary data or the file information about the archive.",
 				"operationId": "compressDocument",
+				"parameters": [
+					{
+						"allowEmptyValue": true,
+						"in": "header",
+						"name": "accept",
+						"schema": {
+							"type": "string",
+							"default": "application/json",
+							"description": "Defines how the created archive is to be returned. If `application/octet-stream` is specified, the created archive is returned directly. If `application/json` is used (or nothing is defined), a `303 SEE OTHER` with `location` header is used if possible, otherwise the document information is returned directly as a JSON structure.",
+							"example": "application/json"
+						}
+					}
+				],
 				"requestBody": {
 					"content": {
 						"application/json": {
@@ -1199,9 +1212,21 @@
 								"schema": {
 									"$ref": "#/components/schemas/Document_File"
 								}
+							},
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
 							}
 						},
-						"description": "The archive document has been created successfully. The response contains the `DocumentFile` with the `documentId` of the created archive document in the **document storage**."
+						"description": "The archive document has been created successfully. Depending on the `accept` header, the response body contains the result as specified in the `content-type` header.",
+						"headers": {
+							"content-type": {
+								"description": "The content type of the response body is selected depending on the `accept` header.",
+								"style": "simple"
+							}
+						}
 					},
 					"303": {
 						"$ref": "#/components/responses/303SeeOther"
@@ -1218,7 +1243,7 @@
 						"BearerAuth": []
 					}
 				],
-				"summary": "Compresses the selected documents into a new archive document within the document store.",
+				"summary": "Compresses the selected documents from the document storage into a new archive document.",
 				"tags": [
 					"documents"
 				]
@@ -1266,7 +1291,7 @@
 				"operationId": "getDocumentInfoListWithParentId",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document known in the server's **document storage** and whose id is to be used as the parent filter for the list of documents.",
+						"description": "The unique `documentId` of the document known in the server's document storage and whose id is to be used as the parent filter for the list of documents.",
 						"in": "path",
 						"name": "parentDocumentId",
 						"required": true,
@@ -1313,7 +1338,7 @@
 				"operationId": "deleteDocument",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1348,7 +1373,7 @@
 				"operationId": "getDocument",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document it is known by in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document it is known by in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1402,7 +1427,7 @@
 				"operationId": "updateContent",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1459,13 +1484,69 @@
 				]
 			}
 		},
+		"/documents/{documentId}/archive/{archivePath}": {
+			"get": {
+				"description": "Selects an archive document via its `documentId` and returns the binary data stream for a file within the archive.\n\n* To select the archive document use the `documentId` returned, when uploading the document to the server´s **document storage**, or select a `documentId` of one of the documents returned by `GET /documents/list`.\n* The referenced document **must** be an archive in a supported format\n* The `archivePath` **must** refer to a file within the archive. Wildcards are **not** supported.\n* Requires a valid session token `[API token]` (see **Authentication** at the top of document).",
+				"operationId": "getDocumentFromArchive",
+				"parameters": [
+					{
+						"description": "The unique `documentId` of the archive document in the server´s document storage.",
+						"in": "path",
+						"name": "documentId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The file path to the file within the archive document that is to be extracted.",
+						"example": "/folder/file.txt",
+						"in": "path",
+						"name": "archivePath",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": ".+"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						},
+						"description": "The document as binary data bytes"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Returns the binary data of a file in an archive document",
+				"tags": [
+					"documents"
+				]
+			}
+		},
 		"/documents/{documentId}/extract": {
 			"post": {
 				"description": "Extracts a document selected by the `documentId` in the **document storage**.\n\n* The document referenced by `documentId` must be a valid archive. If not, the operation will be aborted.\n* For each file in the archive, a new `DocumentFile` is created in the **document storage** with a new `documentId`.\n* Each newly created `DocumentFile` holds as `parentDocumentId` the `documentId` of the archive.",
 				"operationId": "extractDocument",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the archive document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the archive document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1526,7 +1607,7 @@
 				"operationId": "getDocumentHistoryList",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1573,7 +1654,7 @@
 				"operationId": "getHistoryEntry",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1625,7 +1706,7 @@
 				"operationId": "updateHistoryEntry",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1690,7 +1771,7 @@
 				"operationId": "getDocumentInfo",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1743,7 +1824,7 @@
 				"operationId": "getDocumentInfoDetails",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1752,7 +1833,7 @@
 						}
 					},
 					{
-						"description": "Detailed information for the document referenced by the unique `documentId` in the server´s **document storage**.",
+						"description": "Detailed information for the document referenced by the unique `documentId` in the server´s document storage.",
 						"in": "path",
 						"name": "details",
 						"required": true,
@@ -1796,7 +1877,7 @@
 				"operationId": "updateDocumentSecurity",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -1854,7 +1935,7 @@
 				"operationId": "renameDocument",
 				"parameters": [
 					{
-						"description": "The unique `documentId` of the document in the server´s **document storage**.",
+						"description": "The unique `documentId` of the document in the server´s document storage.",
 						"in": "path",
 						"name": "documentId",
 						"required": true,
@@ -4821,6 +4902,11 @@
 					},
 					"fileFilter": {
 						"$ref": "#/components/schemas/Document_FileFilter"
+					},
+					"storeArchive": {
+						"type": "boolean",
+						"default": false,
+						"description": "Defines whether the archive is saved in the document storage or only created temporarily."
 					}
 				}
 			},
@@ -17418,7 +17504,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 2048,
-						"description": "Sets the minimum amount of bytes a message must reach before GZIP compression shall be applied."
+						"description": "Sets the minimum number of bytes a message must reach before GZIP compression shall be applied."
 					},
 					"configuration": {
 						"$ref": "#/components/schemas/ServerConfig_ConnectorConfiguration"
@@ -17486,7 +17572,7 @@
 			},
 			"ServerConfig_ConnectorsServer": {
 				"type": "object",
-				"description": "Defines a set of connectors on which the server listens. These can provide encrypted or unencrypted access to the server.",
+				"description": "Defines a series of connectors that the server listens to. These can provide encrypted or unencrypted access to the server.",
 				"properties": {
 					"connector": {
 						"type": "array",
@@ -17503,7 +17589,17 @@
 					"contextPath": {
 						"type": "string",
 						"default": "webPDF",
-						"description": "Sets the context path of the server address for the portal and the web services (e.g. http://localhost/webPDF)."
+						"description": "Sets the context path of the server address for the portal and the web services (e.g., http://localhost/webPDF)."
+					},
+					"csp": {
+						"$ref": "#/components/schemas/ServerConfig_HostCsp"
+					},
+					"filter": {
+						"type": "array",
+						"description": "A `filter` element represents a component to insert into the request processing pipeline of the underlying Tomcat server. (See: https://tomcat.apache.org/tomcat-10.1-doc/config/filter.html for further information.)",
+						"items": {
+							"$ref": "#/components/schemas/ServerConfig_HostFilter"
+						}
 					},
 					"name": {
 						"type": "string",
@@ -17512,10 +17608,91 @@
 					},
 					"valve": {
 						"type": "array",
-						"description": "A component to insert into the request processing pipeline of the underlying tomcat server. (See: https://tomcat.apache.org/tomcat-8.5-doc/config/valve.html for further information.)",
+						"description": "A `valve` element represents a component to insert into the request processing pipeline of the underlying Tomcat server. (See: https://tomcat.apache.org/tomcat-10.1-doc/config/valve.html for further information.)",
 						"items": {
-							"$ref": "#/components/schemas/ServerConfig_ValveHost"
+							"$ref": "#/components/schemas/ServerConfig_HostValve"
 						}
+					}
+				}
+			},
+			"ServerConfig_HostCsp": {
+				"type": "object",
+				"description": "The `csp` element allows you to set a content security policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) for the server portal page.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "When set to true, the CSP is activated. The HTTP header \"Content-Security-Policy\" is added, and a \"nonce\" is added to the required resources."
+					},
+					"headerValue": {
+						"type": "string",
+						"default": "",
+						"description": "Defines the value for the HTTP header `Content-Security-Policy`. Use `${nonce}` to insert a nonce value from the server for the entry `'nonce-...'`."
+					}
+				}
+			},
+			"ServerConfig_HostFilter": {
+				"type": "object",
+				"description": "A `filter` element represents a component to insert into the request processing pipeline of the underlying Tomcat server. (See: https://tomcat.apache.org/tomcat-10.1-doc/config/filter.html for further information.)",
+				"properties": {
+					"className": {
+						"type": "string",
+						"default": "",
+						"description": "The Java class name of the filter implementation to use."
+					},
+					"mapping": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ServerConfig_HostFilterMapping"
+						}
+					},
+					"parameter": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ServerConfig_HostFilterParameter"
+						}
+					}
+				}
+			},
+			"ServerConfig_HostFilterMapping": {
+				"type": "object",
+				"description": "Defines the URL pattern assignment for the filter (e.g. \"/\\*\" for all URLs)",
+				"properties": {
+					"pattern": {
+						"type": "string",
+						"default": ""
+					}
+				},
+				"required": [
+					"pattern"
+				]
+			},
+			"ServerConfig_HostFilterParameter": {
+				"type": "object",
+				"description": "Defines a parameter for the filter that consists of a `name` and a `value`",
+				"properties": {
+					"name": {
+						"type": "string",
+						"default": ""
+					},
+					"value": {
+						"type": "string",
+						"default": ""
+					}
+				},
+				"required": [
+					"name",
+					"value"
+				]
+			},
+			"ServerConfig_HostValve": {
+				"type": "object",
+				"description": "A `valve` element represents a component to insert into the request processing pipeline of the underlying Tomcat server. (See: https://tomcat.apache.org/tomcat-10.1-doc/config/valve.html for further information.)",
+				"properties": {
+					"className": {
+						"type": "string",
+						"default": "",
+						"description": "The Java class name of the valve implementation to use."
 					}
 				}
 			},
@@ -17611,7 +17788,7 @@
 					"allowAnonymous": {
 						"type": "boolean",
 						"default": true,
-						"description": "If enabled, then anonymous logins (without username and password) are allowed."
+						"description": "If enabled, then anonymous logins (without a username and password) are allowed."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -17639,7 +17816,7 @@
 					"allowAnonymous": {
 						"type": "boolean",
 						"default": true,
-						"description": "If enabled, then anonymous logins (without username and password) are allowed."
+						"description": "If enabled, then anonymous logins (without a username and password) are allowed."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -17694,7 +17871,7 @@
 					"displayName": {
 						"type": "string",
 						"default": "",
-						"description": "The displayed name for the provider (e.g. in the portal)."
+						"description": "The displayed name for the provider (e.g., in the portal)."
 					},
 					"flow": {
 						"type": "string",
@@ -17725,7 +17902,7 @@
 					"name": {
 						"type": "string",
 						"default": "generic",
-						"description": "Selects the OAuth2 provider or \"generic\", when not available in the list.",
+						"description": "Selects the OAuth2 provider or \"generic\" when not available in the list.",
 						"enum": [
 							"generic",
 							"azureAd",
@@ -17873,7 +18050,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 86400,
-						"description": "The time in seconds before a session is encountering it's timeout.",
+						"description": "The time in seconds before a session is encountering its timeout.",
 						"minimum": 0
 					},
 					"truststore": {
@@ -18002,13 +18179,13 @@
 					"command": {
 						"type": "string",
 						"default": "SHUTDOWN",
-						"description": "The command, that shall be listened for."
+						"description": "The command that shall be listened for."
 					},
 					"port": {
 						"type": "integer",
 						"format": "int32",
 						"default": 8005,
-						"description": "The port, that shall listen for shutdown commands."
+						"description": "The port that shall listen for shutdown commands."
 					},
 					"restart": {
 						"type": "boolean",
@@ -18035,7 +18212,7 @@
 			},
 			"ServerConfig_UserAzureAd": {
 				"type": "object",
-				"description": "Defines an Azure Active Directory as user source.",
+				"description": "Defines an Azure Active Directory as a user source.",
 				"properties": {
 					"authority": {
 						"type": "string",
@@ -18072,7 +18249,7 @@
 			},
 			"ServerConfig_UserDb": {
 				"type": "object",
-				"description": "Defines a relational user database as user source.",
+				"description": "Defines a relational user database as a user source.",
 				"properties": {
 					"connectionName": {
 						"type": "string",
@@ -18117,7 +18294,7 @@
 					"userRoleTable": {
 						"type": "string",
 						"default": "user_roles",
-						"description": "The name of the table, that defines the available user roles."
+						"description": "The name of the table that defines the available user roles."
 					},
 					"userTable": {
 						"type": "string",
@@ -18145,12 +18322,12 @@
 			},
 			"ServerConfig_UserLdap": {
 				"type": "object",
-				"description": "Defines an LDAP dictionary or Active Directory as user source.",
+				"description": "Defines an LDAP dictionary or Active Directory as a user source.",
 				"properties": {
 					"certificatesTrustMode": {
 						"type": "string",
 						"default": "validate",
-						"description": "Specifies the mode of handling the certificates presented by the LDAP server during connection establishment.\n\n*   validate = Only certificates that can be verified as publicly valid are classified as trusted. It may be necessary to place the certificate or the issuer's certificate in the server's truststore. Self-signed certificates (e.g. from an own certificate authority) are excluded if they cannot be verified via a configured truststore.\n*   acceptAll = All certificates are classified as trusted, including expired, unverifiable, invalid or self-signed certificates.",
+						"description": "Specifies the mode for handling the certificates presented by the LDAP server when establishing a connection.\n\n*   validate = Only certificates that can be verified as publicly valid are classified as trusted. It may be necessary to place the certificate or the issuer's certificate in the server's truststore. Self-signed certificates (e.g., from an own certificate authority) are excluded if they cannot be verified via a configured truststore.\n*   acceptAll = All certificates are classified as trusted, including expired, unverifiable, invalid or self-signed certificates.",
 						"enum": [
 							"validate",
 							"acceptAll"
@@ -18190,7 +18367,7 @@
 					"roleField": {
 						"type": "string",
 						"default": "",
-						"description": "The field indicating, that a user is part of a group. (e.g. \"cn\".)"
+						"description": "The field that indicates that a user is part of a group. (e.g. \"cn\".)"
 					},
 					"roleSearch": {
 						"type": "string",
@@ -18262,17 +18439,6 @@
 			"ServerConfig_UserXml": {
 				"type": "object",
 				"description": "Defines the local XML file \"conf/users.xml\" as the user source. The users are managed locally via the portal administration area."
-			},
-			"ServerConfig_ValveHost": {
-				"type": "object",
-				"description": "A component to insert into the request processing pipeline of the underlying tomcat server. (See: https://tomcat.apache.org/tomcat-8.5-doc/config/valve.html for further information.)",
-				"properties": {
-					"className": {
-						"type": "string",
-						"default": "",
-						"description": "The Java class name of the valve implementation to use."
-					}
-				}
 			},
 			"Session_State": {
 				"type": "string",

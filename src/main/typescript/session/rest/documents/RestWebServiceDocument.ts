@@ -144,6 +144,15 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	/**
 	 * @inheritDoc
 	 */
+	public async extractArchiveFile(archivePath: string): Promise<Buffer> {
+		return await this.accessInternalState().getDocumentManager().extractArchiveFile(
+			this.getDocumentId(), archivePath
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public async updateDocument(data: Blob): Promise<RestDocument> {
 		return await this.accessInternalState().getDocumentManager().updateDocument(this.getDocumentId(), data);
 	}
