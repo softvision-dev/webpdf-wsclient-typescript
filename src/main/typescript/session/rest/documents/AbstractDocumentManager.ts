@@ -4,6 +4,7 @@ import {RestSession} from "../RestSession";
 import {
 	DocumentFile,
 	FileCompress,
+	FileCompressInterface,
 	FileExtract,
 	HistoryEntry,
 	Info,
@@ -144,6 +145,39 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			.setOnDownloadProgress(options?.onProgress)
 			.setAbortSignal(options?.abortSignal)
 			.buildRequest(HttpMethod.GET, this.session.getURL("documents/" + documentId));
+
+		return await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async downloadArchive(documentIdList: Array<string>, options?: {
+		onProgress?: (event: AxiosProgressEvent) => void,
+		abortSignal?: AbortSignal
+	}): Promise<Buffer> {
+		for (let documentId of documentIdList) {
+			if (!this.containsDocument(documentId)) {
+				throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
+			}
+		}
+
+		let fileCompress: FileCompress = new FileCompress({
+			documentIdList: documentIdList,
+			storeArchive: false,
+			archiveFileName: "files"
+		} as FileCompressInterface);
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
+			.setOnDownloadProgress(options?.onProgress)
+			.setAbortSignal(options?.abortSignal)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("documents/compress"),
+				this.prepareHttpEntity(fileCompress),
+				DataFormats.JSON.getMimeType()
+			);
 
 		return await request.executeRequest();
 	}
@@ -458,6 +492,29 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	/**
 	 * @inheritDoc
 	 */
+	public async extractArchiveFile(documentId: string, archivePath: string): Promise<Buffer> {
+		if (!this.containsDocument(documentId)) {
+			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
+		}
+
+		let archiveParts: Array<string> = archivePath.split("/");
+		for (let part of archiveParts) {
+			part = encodeURI(part);
+		}
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
+			.buildRequest(
+				HttpMethod.GET,
+				this.session.getURL("documents/" + documentId + "/archive/" + archivePath)
+			);
+
+		return await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public async compressDocuments(fileCompress: FileCompress): Promise<T_REST_DOCUMENT> {
 		let documentIdList: Array<string> = [];
 		if (typeof fileCompress.documentIdList !== "undefined") {
@@ -471,6 +528,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		}
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.JSON.getMimeType())
 			.buildRequest(
 				HttpMethod.POST,
 				this.session.getURL("documents/compress"),
@@ -502,11 +560,11 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		);
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
-		.buildRequest(
-			HttpMethod.PUT,
-			this.session.getURL("documents/" + documentId),
-			formData
-		);
+			.buildRequest(
+				HttpMethod.PUT,
+				this.session.getURL("documents/" + documentId),
+				formData
+			);
 
 		documentFile = DocumentFile.fromJson(
 			await request.executeRequest()

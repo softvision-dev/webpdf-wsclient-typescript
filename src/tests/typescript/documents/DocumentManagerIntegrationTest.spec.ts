@@ -27,6 +27,7 @@ import {
 	PdfPassword,
 	PdfPasswordInterface
 } from "../../../main/typescript/generated-sources";
+import AdmZip = require("adm-zip");
 
 require("../bootstrap");
 
@@ -58,6 +59,14 @@ describe("DocumentManagerIntegrationTest", function (): void {
 
 		let downloadedFile: any = await uploadedFile.downloadDocument();
 		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
+
+		let downloadedFileArchive: Buffer = await session.getDocumentManager().downloadArchive(
+			[uploadedFile.getDocumentId()]
+		);
+		let zipFile: AdmZip = new AdmZip(downloadedFileArchive);
+		let zipEntries: Array<AdmZip.IZipEntry> = zipFile.getEntries();
+		expect(zipEntries.length, "archive should contain 1 document.").to.equal(1);
+		expect(zipEntries[0].entryName, "names should be equal.").to.equal(sourceFilename);
 
 		let fileList: Array<RestDocument> = await session.getDocumentManager().getDocuments();
 		expect(fileList.length, "file list should contain 1 document.").to.equal(1);
@@ -495,6 +504,31 @@ describe("DocumentManagerIntegrationTest", function (): void {
 		await session.close();
 	});
 
+	it('testDocumentExtractFile', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "files.zip";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+		expect(uploadedFile.getDocumentId()).to.exist;
+
+		let downloadedFile: Buffer = await uploadedFile.extractArchiveFile("logo.png");
+		let compareFile: any = testResources.getResource("logo.png");
+		expect(downloadedFile.equals(compareFile), "Content of output file should be identical to test file.").to.be.true;
+
+		await session.close();
+	});
+
 	it('testDocumentCompress', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
@@ -520,7 +554,8 @@ describe("DocumentManagerIntegrationTest", function (): void {
 
 		let fileCompress: FileCompress = new FileCompress({
 			documentIdList: documentIdList,
-			archiveFileName: "archive"
+			archiveFileName: "archive",
+			storeArchive: true
 		} as FileCompressInterface);
 
 		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(fileCompress);
