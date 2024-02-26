@@ -379,7 +379,7 @@ describe("DocumentManagerIntegrationTest", function (): void {
 		} as PdfPassword);
 		let openedDocument: RestDocument | undefined = await encryptedDocument?.updateDocumentSecurity(passwordType);
 		expect(openedDocument!.getDocumentFile().error!.errorCode, "The document password should be wrong.").to.equal(-5008);
-		expect((openedDocument!.getDocumentFile().metadata as MetadataPdf).information, "The metadata should not be readable.").to.not.exist;
+		expect(openedDocument!.getDocumentFile().metadata, "The metadata should not be readable.").to.not.exist;
 
 		// rotate pages with wrong password
 		toolboxWebService = WebServiceFactory.createInstance(session, WebServiceTypes.TOOLBOX);
@@ -490,7 +490,7 @@ describe("DocumentManagerIntegrationTest", function (): void {
 			fileFilter: {
 				includeRules: [
 					{
-						rulePattern: "logo.png",
+						rulePattern: "{logo.png,form.pdf}",
 						ruleType: FileFilterType.Glob
 					}
 				]
@@ -499,7 +499,7 @@ describe("DocumentManagerIntegrationTest", function (): void {
 
 		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument(fileExtract);
 		expect(unzippedFiles, "Valid documents should have been returned.").to.exist;
-		expect(unzippedFiles.length, "There should be 1 result document.").to.equal(1);
+		expect(unzippedFiles.length, "There should be 2 result document.").to.equal(2);
 
 		await session.close();
 	});

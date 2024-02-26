@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.0.0 (2024-01-30T13:17:30Z) "
+		"version": "webPDF 10.0.0.0 (2024-02-26T07:48:27Z) "
 	},
 	"servers": [
 		{
@@ -5116,7 +5116,6 @@
 					"mapping": {
 						"archive": "#/components/schemas/Document_MetadataArchive",
 						"image": "#/components/schemas/Document_MetadataImage",
-						"other": "#/components/schemas/Document_MetadataOther",
 						"pdf": "#/components/schemas/Document_MetadataPdf"
 					},
 					"propertyName": "metadataType"
@@ -5210,7 +5209,7 @@
 					"height": {
 						"$ref": "#/components/schemas/Document_MetadataImageResolutionUnit"
 					},
-					"iaAnimated": {
+					"isAnimated": {
 						"type": "boolean",
 						"default": false,
 						"description": "True if it is an animated image"
@@ -5272,18 +5271,6 @@
 					"centimeter"
 				]
 			},
-			"Document_MetadataOther": {
-				"type": "object",
-				"allOf": [
-					{
-						"$ref": "#/components/schemas/Document_Metadata"
-					}
-				],
-				"description": "The metadata that describes an unknown document type",
-				"required": [
-					"metadataType"
-				]
-			},
 			"Document_MetadataPdf": {
 				"type": "object",
 				"allOf": [
@@ -5341,7 +5328,6 @@
 				"default": "pdf",
 				"description": "Selects the metadata structure depending on the type of document.\n\n- pdf = a PDF document\n\n- archive = a archive document\n\n- image = a image document\n\n",
 				"enum": [
-					"other",
 					"pdf",
 					"archive",
 					"image"
@@ -9231,6 +9217,11 @@
 						"type": "boolean",
 						"default": false,
 						"description": "If this option is enabled, an error will not be triggered (the conversion will not be aborted) for e-mails if there is no body element in the file structure. However, this should not be confused with an e-mail not having any content."
+					},
+					"reduceImageSize": {
+						"type": "boolean",
+						"default": false,
+						"description": "If \"true\", then all images are reduced in their pixel size so that they fit into the maximum page width. This only applies to images that have been resized using the `resizeImages` option. These images are reduced to the maximum number of pixels required to fit the page width. Images that are not affected by the `resizeImages` option are not resized.\n\n**Important:** If you activate the `reduceImageSize` option, you must also activate `resizeImages` and only resized images will be affected by this option. This option also leads to a significant reduction in the number of pixels in images, which can lead to an improved document size."
 					},
 					"resizeImages": {
 						"type": "boolean",
