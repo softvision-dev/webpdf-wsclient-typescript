@@ -6,6 +6,7 @@ import {
 	FileCompress,
 	FileCompressInterface,
 	FileExtract,
+	FileUpdate,
 	HistoryEntry,
 	Info,
 	InfoType,
@@ -235,19 +236,19 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 		}
 
-		let restDocument: T_REST_DOCUMENT = this.getDocument(documentId);
-		let documentFile: DocumentFile = restDocument.getDocumentFile();
-		documentFile.fileName = fileName;
+		let parameter: FileUpdate = new FileUpdate({
+			fileName: fileName
+		});
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(
 				HttpMethod.POST,
 				this.session.getURL("documents/" + documentId + "/update"),
-				this.prepareHttpEntity(documentFile),
+				this.prepareHttpEntity(parameter),
 				DataFormats.JSON.getMimeType()
 			);
 
-		documentFile = DocumentFile.fromJson(
+		let documentFile: DocumentFile = DocumentFile.fromJson(
 			await request.executeRequest()
 		);
 

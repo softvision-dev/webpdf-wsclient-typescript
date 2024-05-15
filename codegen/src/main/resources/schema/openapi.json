@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.0.0 (2024-02-26T07:48:27Z) "
+		"version": "webPDF 10.0.0.0 (2024-05-15T06:47:02Z) "
 	},
 	"servers": [
 		{
@@ -1948,7 +1948,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Document_File"
+								"$ref": "#/components/schemas/Document_FileUpdate"
 							}
 						}
 					},
@@ -4856,9 +4856,7 @@
 					},
 					"isFileLocked": {
 						"type": "boolean",
-						"default": false,
-						"description": "File is locked on the server, because an other operation uses the file",
-						"readOnly": true
+						"default": false
 					},
 					"metadata": {
 						"$ref": "#/components/schemas/Document_Metadata"
@@ -4962,6 +4960,23 @@
 					"regex",
 					"glob"
 				]
+			},
+			"Document_FileUpdate": {
+				"type": "object",
+				"description": "Contains the update information for a document in the document storage",
+				"properties": {
+					"fileName": {
+						"type": "string",
+						"default": "",
+						"description": "File name for the document (without extension)"
+					},
+					"parentDocumentId": {
+						"type": "string",
+						"default": "",
+						"description": "The id of the parent document",
+						"readOnly": true
+					}
+				}
 			},
 			"Document_HistoryEntry": {
 				"type": "object",
@@ -8232,8 +8247,7 @@
 					}
 				},
 				"required": [
-					"formats",
-					"scanArea"
+					"formats"
 				]
 			},
 			"Operation_BaseToolbox": {
@@ -18469,11 +18483,6 @@
 						"default": 0,
 						"description": "Total size in bytes required by all sessions together on the hard disk in the base folder."
 					},
-					"sessionFolder": {
-						"type": "string",
-						"default": "",
-						"description": "Base folder for all session data (e.g. files and file history)."
-					},
 					"sessionId": {
 						"type": "string",
 						"default": "",
@@ -18514,11 +18523,6 @@
 						"format": "int64",
 						"default": 0,
 						"description": "Number of files saved in the session."
-					},
-					"fileFolder": {
-						"type": "string",
-						"default": "",
-						"description": "Unique name of the session storage folder."
 					},
 					"fileSize": {
 						"type": "integer",
