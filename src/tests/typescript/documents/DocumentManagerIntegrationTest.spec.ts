@@ -349,7 +349,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let encryptedDocument: RestDocument | undefined = await toolboxWebService.process(uploadedFile);
 		expect(encryptedDocument!.getDocumentFile().error!.errorCode, "The document password should be set").to.equal(0);
-		expect(encryptedDocument!.getDocumentFile().metadata!.information, "The metadata should be readable").to.exist;
+		expect(encryptedDocument!.getDocumentFile().metadata?.information, "The metadata should be readable").to.exist;
 
 		// rotate pages with initially set password
 		let rotationParameter: Array<BaseToolbox> = [
@@ -370,7 +370,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		} as PdfPassword);
 		let openedDocument: RestDocument | undefined = await encryptedDocument?.updateDocumentSecurity(passwordType);
 		expect(openedDocument!.getDocumentFile().error!.errorCode, "The document password should be wrong.").to.equal(-5008);
-		expect(openedDocument!.getDocumentFile().metadata!.information, "The metadata should not be readable.").to.not.exist;
+		expect(openedDocument!.getDocumentFile().metadata?.information, "The metadata should not be readable.").to.not.exist;
 
 		// rotate pages with wrong password
 		toolboxWebService = WebServiceFactory.createInstance(session, WebServiceTypes.TOOLBOX);

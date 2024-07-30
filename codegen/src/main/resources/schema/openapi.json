@@ -10,7 +10,7 @@
 			"url" : "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title" : "webPDF",
-		"version" : "webPDF 9.0.0.3129 (2023-10-16T06:53:25Z) "
+		"version" : "webPDF 9.0.0.3495 (2024-07-30T07:36:32Z) "
 	},
 	"servers" : [ {
 		"url" : "/webPDF/rest"
@@ -4605,6 +4605,9 @@
 					"drawStyle" : {
 						"$ref" : "#/components/schemas/Metadata_DrawStyle"
 					},
+					"field" : {
+						"$ref" : "#/components/schemas/Metadata_FieldAnnotation"
+					},
 					"hidden" : {
 						"type" : "boolean",
 						"default" : false,
@@ -5208,6 +5211,35 @@
 						"items" : {
 							"$ref" : "#/components/schemas/Metadata_FormValueStyle"
 						}
+					}
+				}
+			},
+			"Metadata_FieldAnnotation" : {
+				"type" : "object",
+				"description" : "Defines a set of attributes for field annotations.",
+				"properties" : {
+					"alternateName" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "The alternate name of the annotation´s field."
+					},
+					"mappingName" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "The mapping name of the annotation´s field."
+					},
+					"name" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "The partial name of the annotation´s field."
+					},
+					"signature" : {
+						"$ref" : "#/components/schemas/Metadata_Signature"
+					},
+					"type" : {
+						"type" : "string",
+						"default" : "",
+						"description" : "Indicates the type of the annotation´s field.\n\n*   Btn = Button\n*   Tx = Textfield\n*   Ch = Choicefield\n*   Sig = Signaturefield"
 					}
 				}
 			},
@@ -6453,7 +6485,7 @@
 			},
 			"Operation_AddBackground" : {
 				"type" : "object",
-				"description" : "Adds a background image or a solid colour background layer to the document (the \"colorBackground\" and \"imageBackground\" elements are mutually exclusive, i.e., you must select one or the other). A document is not allowed to have more than one background layer.",
+				"description" : "Adds a background image or a solid color background layer to the document (the \"colorBackground\" and \"imageBackground\" elements are mutually exclusive, i.e., you must select one or the other). A document is not allowed to have more than one background layer.",
 				"properties" : {
 					"colorBackground" : {
 						"$ref" : "#/components/schemas/Operation_ColorBackground"
@@ -8046,6 +8078,11 @@
 						"default" : false,
 						"description" : "If this option is enabled, an error will not be triggered (the conversion will not be aborted) for e-mails if there is no body element in the file structure. However, this should not be confused with an e-mail not having any content."
 					},
+					"reduceImageSize" : {
+						"type" : "boolean",
+						"default" : false,
+						"description" : "If \"true\", then all images are reduced in their pixel size so that they fit into the maximum page width. This only applies to images that have been resized using the `resizeImages` option. These images are reduced to the maximum number of pixels required to fit the page width. Images that are not affected by the `resizeImages` option are not resized.\n\n**Important:** If you activate the `reduceImageSize` option, you must also activate `resizeImages` and only resized images will be affected by this option. This option also leads to a significant reduction in the number of pixels in images, which can lead to an improved document size."
+					},
 					"resizeImages" : {
 						"type" : "boolean",
 						"default" : false,
@@ -9440,7 +9477,7 @@
 					"replaceExisting" : {
 						"type" : "boolean",
 						"default" : false,
-						"description" : "If true, an existing header and footer definition will be automatically deleted and replaced with the new one. If false, an existing definition will cause the operation to be aborted."
+						"description" : "If true, preexisting header and footer definition will be automatically deleted from all pages of the document and replaced with the new one. If false, preexisting header and footer definitions on any page of the document will cause the operation to be aborted."
 					}
 				}
 			},
@@ -9474,7 +9511,7 @@
 			},
 			"Operation_HeaderFooterPositions" : {
 				"type" : "object",
-				"description" : "The header/footer consists of three parts (left margin, centre, right margin). This element can be used to define the text contents that should be shown at these positions. The contents can consist of static and dynamic contents.\n\n**Important:** Please consult the chapter \"Display Options\" concerning the format of the hereby set contents.",
+				"description" : "The header/footer consists of three parts (left margin, center, right margin). This element can be used to define the text contents that should be shown at these positions. The contents can consist of static and dynamic contents.\n\n**Important:** Please consult the chapter \"Display Options\" concerning the format of the hereby set contents.",
 				"properties" : {
 					"center" : {
 						"type" : "string",
@@ -11672,7 +11709,7 @@
 			},
 			"Operation_RemoveBackground" : {
 				"type" : "object",
-				"description" : "Removes a background layer from a document. As of this writing, this operation does not have any additional parameters. The \"backgroundSelection\" element, which must be included without fail, is meant simply as a placeholder for potential future detailed parameters.",
+				"description" : "Removes background layers from all pages of a document. As of this writing, this operation does not have any additional parameters. The \"backgroundSelection\" element, which must be included without fail, is meant simply as a placeholder for potential future detailed parameters.",
 				"properties" : {
 					"backgroundSelection" : {
 						"$ref" : "#/components/schemas/Operation_SelectionBackground"
@@ -11689,7 +11726,7 @@
 			},
 			"Operation_RemoveHeaderFooter" : {
 				"type" : "object",
-				"description" : "Removes a header and footer definition from a document. As of this writing, this operation does not have any additional parameters. The \"headerFooterSelection\" element, which must be included without fail, is meant simply as a placeholder for potential future detailed parameters.",
+				"description" : "Removes header and footer definitions from all pages of a document. As of this writing, this operation does not have any additional parameters. The \"headerFooterSelection\" element, which must be included without fail, is meant simply as a placeholder for potential future detailed parameters.",
 				"properties" : {
 					"headerFooterSelection" : {
 						"$ref" : "#/components/schemas/Operation_SelectionHeaderFooter"
@@ -12234,7 +12271,7 @@
 			},
 			"Operation_SelectionBackground" : {
 				"type" : "object",
-				"description" : "Defines which backgrounds shall be removed. (Currently all backgrounds shall be selected for removal, if this element is present.)"
+				"description" : "Defines which backgrounds shall be removed. (Currently all backgrounds on all pages shall be selected for removal, if this element is present.)"
 			},
 			"Operation_SelectionBox" : {
 				"type" : "object",
@@ -12626,13 +12663,9 @@
 								"minimum" : 1
 							},
 							"sound" : {
-								"type" : "array",
-								"description" : "The audio file that should be played. The file must be encoded as a BASE64 value. The passed file must be completely independent and contain all the information and data required to play it. The AIFF, AIFF-C, RIFF (\\*.wav), snd(\\*.au) audio formats are supported, for example.",
-								"items" : {
-									"type" : "string",
-									"format" : "byte",
-									"description" : "The audio file that should be played. The file must be encoded as a BASE64 value. The passed file must be completely independent and contain all the information and data required to play it. The AIFF, AIFF-C, RIFF (\\*.wav), snd(\\*.au) audio formats are supported, for example."
-								}
+								"type" : "string",
+								"format" : "byte",
+								"description" : "The audio file that should be played. The file must be encoded as a BASE64 value. The passed file must be completely independent and contain all the information and data required to play it. The AIFF, AIFF-C, RIFF (\\*.wav), snd(\\*.au) audio formats are supported, for example."
 							},
 							"soundChannels" : {
 								"type" : "integer",

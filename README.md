@@ -9,7 +9,7 @@ The library implements the required stubs and session management in ready-to-use
 > **Note**: Unless otherwise marked, the following is based on webPDF version 9 or newer. If you are using an older version please update to use all parameters for the current release of the library. You will always find the newest version at the product [download page](https://docs.webpdf.de/docs/download/).
 
 ## Download
-> **Note:** The version 9.0.1 requires at least webPDF server version **9.0.0.3081**.
+> **Note:** The version 9.0.2 requires at least webPDF server version **9.0.0.3479**.
 
 > **Note:** Starting with wsclient 9.x the wsclient´s and webPDF server´s version numbers have been synchronized, to simplify finding the proper wsclient for your webPDF server.
 
