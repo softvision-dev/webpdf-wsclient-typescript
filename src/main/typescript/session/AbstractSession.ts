@@ -94,7 +94,7 @@ export abstract class AbstractSession implements Session {
 
 		if (typeof parameters !== "undefined") {
 			for (let [key, value] of parameters.entries()) {
-				url.searchParams.set(key, value);
+				url.searchParams.append(key, value);
 			}
 		}
 

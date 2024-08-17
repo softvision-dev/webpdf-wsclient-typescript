@@ -6,6 +6,9 @@ import {
 	AggregationServerState,
 	Application,
 	ApplicationCheck,
+	ClusterCheck,
+	ClusterSettings,
+	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
 	DataSourceServerState,
@@ -15,6 +18,8 @@ import {
 	GlobalKeyStore,
 	LogCheck,
 	LogFileConfiguration,
+	ProviderCheck,
+	ProviderSettings,
 	Server,
 	ServerCheck,
 	ServerStatus,
@@ -482,4 +487,120 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @param sessionId ID of the session to be closed.
 	 */
 	closeSession(sessionId: string): Promise<void>;
+
+
+	/**
+	 * Gets the {@link ClusterSettings} configuration from the server updating the cached configuration.
+	 *
+	 * @return {@link ClusterSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	fetchClusterConfiguration(): Promise<ClusterSettings>;
+
+	/**
+	 * Gets the cached {@link ClusterSettings} configuration of the server or fetches via
+	 * {@link AdministrationManager#fetchClusterConfiguration} if cache is empty
+	 *
+	 * @return {@link ClusterSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	getClusterConfiguration(): Promise<ClusterSettings>;
+
+	/**
+	 * <p>
+	 * Updates the {@link ClusterSettings} configuration if no {@link ConfigurationResult#error} occured.
+	 * </p>
+	 * <p>
+	 * Optionally also validates the {@link ClusterSettings} configuration with additional {@link ClusterCheck}s.
+	 * </p>
+	 * <p>
+	 * <b>Be Aware:</b> Some of these changes might require a server restart to take effect.
+	 * </p>
+	 *
+	 * @param configuration The {@link ClusterSettings} configuration defines settings for server clusters.
+	 * @param checks 		An optional list of {@link ClusterCheck}s to validate the configuration.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ClusterSettings} configuration is updated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	updateClusterConfiguration(
+		configuration: ClusterSettings, checks?: Array<ClusterCheck>
+	): Promise<ConfigurationResult>;
+
+	/**
+	 * <p>
+	 * Validates the {@link ClusterSettings} configuration with the given {@link ClusterCheck}s.
+	 * </p>
+	 *
+	 * @param configuration The {@link ClusterSettings} configuration defines settings for server clusters.
+	 * @param checks 		The list of {@link ClusterCheck}s to validate the configuration with.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ClusterSettings} configuration is validated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	validateClusterConfiguration(
+		configuration: ClusterSettings, checks: Array<ClusterCheck>,
+	): Promise<ConfigurationResult>;
+
+
+	/**
+	 * Gets the {@link ProviderSettings} configuration from the server updating the cached configuration.
+	 *
+	 * @return {@link ProviderSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	fetchProviderConfiguration(): Promise<ProviderSettings>;
+
+	/**
+	 * Gets the cached {@link ProviderSettings} configuration of the server or fetches via
+	 * {@link AdministrationManager#fetchProviderConfiguration} if cache is empty
+	 *
+	 * @return {@link ProviderSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	getProviderConfiguration(): Promise<ProviderSettings>;
+
+	/**
+	 * <p>
+	 * Updates the {@link ProviderSettings} configuration if no {@link ConfigurationResult#error} occured.
+	 * </p>
+	 * <p>
+	 * Optionally also validates the {@link ProviderSettings} configuration with additional {@link ProviderCheck}s.
+	 * </p>
+	 * <p>
+	 * <b>Be Aware:</b> Some of these changes might require a server restart to take effect.
+	 * </p>
+	 *
+	 * @param configuration The {@link ProviderSettings} configuration defines settings for providers.
+	 * @param checks 		An optional list of {@link ProviderCheck}s to validate the configuration.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ProviderSettings} configuration is updated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	updateProviderConfiguration(
+		configuration: ProviderSettings, checks?: Array<ProviderCheck>
+	): Promise<ConfigurationResult>;
+
+	/**
+	 * <p>
+	 * Validates the {@link ProviderSettings} configuration with the given {@link ProviderCheck}s.
+	 * </p>
+	 *
+	 * @param configuration The {@link ProviderSettings} configuration defines settings for server providers.
+	 * @param checks 		The list of {@link ProviderCheck}s to validate the configuration with.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ProviderSettings} configuration is validated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	validateProviderConfiguration(
+		configuration: ProviderSettings, checks: Array<ProviderCheck>,
+	): Promise<ConfigurationResult>;
+
+	/**
+	 * Returns the cluster status from server.
+	 *
+	 * @return The requested {@link ClusterStatus}.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	fetchClusterStatus(): Promise<ClusterStatus>;
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "10.0.0-dev.11",
+	"version": "10.0.0-dev.30",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -64,5 +64,6 @@
 	"jshintConfig": {
 		"esversion": 9,
 		"node": true
-	}
+	},
+	"packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
