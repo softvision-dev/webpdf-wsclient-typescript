@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.0.3536 (2024-08-08T11:58:33Z)"
+		"version": "webPDF 10.0.0.3615 (2024-12-12T13:36:25Z)"
 	},
 	"servers": [
 		{
@@ -2921,9 +2921,6 @@
 				"type": "object",
 				"description": "Provides information about the used Java virtual machine and it´sexecution context.",
 				"properties": {
-					"container": {
-						"$ref": "#/components/schemas/Admin_JavaStatusContainer"
-					},
 					"gc": {
 						"type": "array",
 						"description": "The list of GC used and their execution values.",
@@ -2947,53 +2944,34 @@
 						"description": "The java version of the running JVM."
 					},
 					"memoryAllocated": {
-						"type": "string",
-						"default": "",
-						"description": "The MB size of the memory currently allocated for the running JVM."
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The byte size of the memory currently allocated for the running JVM."
 					},
 					"memoryFree": {
-						"type": "string",
-						"default": "",
-						"description": "The MB size of free memory, that currently is available for further object allocations."
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The byte size of free memory, that currently is available for further object allocations."
 					},
 					"memoryMax": {
-						"type": "string",
-						"default": "",
-						"description": "The MB size of the maximum memory, that could be allocated by the JVM, if required."
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The byte size of the maximum memory, that could be allocated by the JVM, if required."
 					},
 					"memoryTotalFree": {
-						"type": "string",
-						"default": "",
-						"description": "The MB size of the free memory, that would currently be available for further object allocations, if the JVM would allocate the maximum allowed memory size."
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The byte size of the free memory, that would currently be available for further object allocations, if the JVM would allocate the maximum allowed memory size."
 					},
 					"memoryUsed": {
-						"type": "string",
-						"default": "",
-						"description": "The MB size of the allocated memory, that is actually used by the JVM at the moment."
-					},
-					"osArchitecture": {
-						"type": "string",
-						"default": "",
-						"description": "The operating system´s architecture."
-					},
-					"osDistro": {
-						"$ref": "#/components/schemas/Admin_JavaStatusOsDistro"
-					},
-					"osName": {
-						"type": "string",
-						"default": "",
-						"description": "The name of the operating system, the server is running on."
-					}
-				},
-				"readOnly": true
-			},
-			"Admin_JavaStatusContainer": {
-				"type": "object",
-				"description": "Information about the container plattform.",
-				"properties": {
-					"name": {
-						"type": "string",
-						"default": ""
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The byte size of the allocated memory, that is actually used by the JVM at the moment."
 					}
 				},
 				"readOnly": true
@@ -3013,21 +2991,6 @@
 						"default": 0
 					},
 					"name": {
-						"type": "string",
-						"default": ""
-					}
-				},
-				"readOnly": true
-			},
-			"Admin_JavaStatusOsDistro": {
-				"type": "object",
-				"description": "Information about the OS distribution.",
-				"properties": {
-					"name": {
-						"type": "string",
-						"default": ""
-					},
-					"version": {
 						"type": "string",
 						"default": ""
 					}
@@ -3174,6 +3137,90 @@
 					"fileGroup"
 				]
 			},
+			"Admin_OsStatus": {
+				"type": "object",
+				"description": "Provides information about the operating system on which the server is running",
+				"properties": {
+					"container": {
+						"$ref": "#/components/schemas/Admin_OsStatusContainer"
+					},
+					"cpuLogicalProcessors": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The number of logical processors available to the application"
+					},
+					"memoryCommittedVirtualSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The amount of virtual memory that is guaranteed to be available to the application in bytes"
+					},
+					"memoryFree": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The amount of free memory in bytes"
+					},
+					"memoryFreeSwapSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The amount of free swap space in bytes"
+					},
+					"memoryTotal": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The total amount of memory in bytes"
+					},
+					"memoryTotalSwapSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The total amount of swap space in bytes"
+					},
+					"osArchitecture": {
+						"type": "string",
+						"default": "",
+						"description": "The operating system´s architecture"
+					},
+					"osName": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the operating system, the server is running on"
+					},
+					"osVersion": {
+						"type": "string",
+						"default": "",
+						"description": "The operating system´s version number"
+					},
+					"processCpuLoad": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "The recent CPU usage of the JVM with a value between 0.0 and 1.0 (a value of 1.0 means that threads were actively executed on all CPUs)"
+					},
+					"systemLoadAverage": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "The system load average for the last minute (or a negative value if not available)"
+					}
+				},
+				"readOnly": true
+			},
+			"Admin_OsStatusContainer": {
+				"type": "object",
+				"description": "Information about the container plattform.",
+				"properties": {
+					"name": {
+						"type": "string",
+						"default": ""
+					}
+				},
+				"readOnly": true
+			},
 			"Admin_PoolEntryServerState": {
 				"type": "object",
 				"properties": {
@@ -3252,7 +3299,7 @@
 			},
 			"Admin_ProviderCheckMode": {
 				"type": "string",
-				"default": "connect",
+				"default": "documentStorage",
 				"enum": [
 					"documentStorage",
 					"fileStorage",
@@ -3402,6 +3449,16 @@
 					"configurationType"
 				]
 			},
+			"Admin_ServerOS": {
+				"type": "string",
+				"default": "windows",
+				"description": "Defines the operating system platform on which the server operates.",
+				"enum": [
+					"windows",
+					"linux"
+				],
+				"readOnly": true
+			},
 			"Admin_ServerState": {
 				"type": "object",
 				"description": "Stores statistic information about a server instance and the executed jobs",
@@ -3427,6 +3484,9 @@
 				"properties": {
 					"java": {
 						"$ref": "#/components/schemas/Admin_JavaStatus"
+					},
+					"os": {
+						"$ref": "#/components/schemas/Admin_OsStatus"
 					},
 					"server": {
 						"$ref": "#/components/schemas/Admin_ServerVersionInfo"
@@ -3473,6 +3533,9 @@
 					},
 					"providers": {
 						"$ref": "#/components/schemas/Admin_Providers"
+					},
+					"serverPlatform": {
+						"$ref": "#/components/schemas/Admin_ServerOS"
 					},
 					"serverStart": {
 						"type": "integer",
@@ -3982,6 +4045,12 @@
 							"$ref": "#/components/schemas/ApplicationConfig_KeystoreEntry"
 						}
 					},
+					"filter": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ApplicationConfig_KeystoreFilter"
+						}
+					},
 					"password": {
 						"type": "string",
 						"default": "",
@@ -3995,7 +4064,9 @@
 							"NONE",
 							"JKS",
 							"PKCS11",
-							"PKCS12"
+							"PKCS12",
+							"WINDOWS_MACHINE",
+							"WINDOWS_USER"
 						],
 						"x-webpdf-codegen": {
 							"enumName": "ApplicationConfig_GlobalKeystoreFormat"
@@ -4016,6 +4087,17 @@
 						"type": "string",
 						"default": "",
 						"description": "The password of the keystore entry."
+					}
+				}
+			},
+			"ApplicationConfig_KeystoreFilter": {
+				"type": "object",
+				"description": "Defines filters for the certificates used from the keystore.",
+				"properties": {
+					"pattern": {
+						"type": "string",
+						"default": "",
+						"description": "Defines a filter pattern that allows the use of '\\*' and '?' wildcards."
 					}
 				}
 			},
@@ -4584,7 +4666,7 @@
 					"enabled": {
 						"type": "boolean",
 						"default": false,
-						"description": "When set to true the MS SharePoint bridge shall be enabled."
+						"description": "When set to true the SharePoint Online bridge shall be enabled."
 					},
 					"site": {
 						"$ref": "#/components/schemas/ApplicationConfig_SharePointBridgeSite"
@@ -5070,6 +5152,14 @@
 				},
 				"readOnly": true
 			},
+			"Cluster_Mode": {
+				"type": "string",
+				"default": "single",
+				"enum": [
+					"single",
+					"cluster"
+				]
+			},
 			"Cluster_NodeState": {
 				"type": "string",
 				"default": "init",
@@ -5110,6 +5200,15 @@
 				},
 				"readOnly": true
 			},
+			"Cluster_Role": {
+				"type": "string",
+				"default": "member",
+				"description": "Defines the role of a server node. A coordinator role defines the node that initializes the cluster and passes on the configuration to the other nodes. A node with a member role defines a normal working node that receives the configuration from a coordinator.",
+				"enum": [
+					"coordinator",
+					"member"
+				]
+			},
 			"Cluster_Settings": {
 				"type": "object",
 				"description": "Settings for the cluster",
@@ -5121,13 +5220,7 @@
 						"description": "Defines the number of milliseconds that a server node waits when it joins the cluster (e.g. when waiting for a coordinator server node)"
 					},
 					"mode": {
-						"type": "string",
-						"default": "",
-						"description": "Defines the mode in which the server node is running. If it operates as a node in a cluster, the mode is \"CLUSTER\", otherwise the mode is \"SINGLE\" (stand-alone server node).",
-						"enum": [
-							"SINGLE",
-							"CLUSTER"
-						]
+						"$ref": "#/components/schemas/Cluster_Mode"
 					},
 					"name": {
 						"type": "string",
@@ -5140,13 +5233,7 @@
 						"description": "Defines the name for the node. If it is empty, the host name of the machine is used."
 					},
 					"role": {
-						"type": "string",
-						"default": "",
-						"description": "Defines the role of a server node. A coordinator role defines the node that initializes the cluster and passes on the configuration to the other nodes. A node with a member role defines a normal working node that receives the configuration from a coordinator.",
-						"enum": [
-							"COORDINATOR",
-							"MEMBER"
-						]
+						"$ref": "#/components/schemas/Cluster_Role"
 					},
 					"secretKey": {
 						"type": "string",
@@ -5265,7 +5352,9 @@
 					},
 					"isFileLocked": {
 						"type": "boolean",
-						"default": false
+						"default": false,
+						"description": "If set the document is currently locked",
+						"readOnly": true
 					},
 					"metadata": {
 						"$ref": "#/components/schemas/Document_Metadata"
@@ -5286,6 +5375,7 @@
 						"$ref": "#/components/schemas/Document_Password"
 					}
 				},
+				"readOnly": true,
 				"required": [
 					"documentId"
 				]
@@ -5552,7 +5642,10 @@
 				"readOnly": true,
 				"required": [
 					"metadataType"
-				]
+				],
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_MetadataArchive": {
 				"type": "object",
@@ -5571,6 +5664,7 @@
 						"readOnly": true
 					}
 				},
+				"readOnly": true,
 				"required": [
 					"metadataType"
 				]
@@ -5583,18 +5677,21 @@
 						"type": "integer",
 						"format": "int64",
 						"default": 0,
-						"description": "Time at which the file was last changed"
+						"description": "Time at which the file was last changed",
+						"readOnly": true
 					},
 					"path": {
 						"type": "string",
 						"default": "",
-						"description": "File name and path within the archive"
+						"description": "File name and path within the archive",
+						"readOnly": true
 					},
 					"size": {
 						"type": "integer",
 						"format": "int64",
 						"default": 0,
-						"description": "File size in bytes"
+						"description": "File size in bytes",
+						"readOnly": true
 					}
 				},
 				"readOnly": true
@@ -5613,9 +5710,11 @@
 						"description": "A list of metadata directories, where each directory contains a key-value map with the respective entries of the directory.",
 						"items": {
 							"$ref": "#/components/schemas/Document_MetadataImageEntry"
-						}
+						},
+						"readOnly": true
 					}
 				},
+				"readOnly": true,
 				"required": [
 					"metadataType"
 				]
@@ -5628,47 +5727,75 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Color depth in bits"
+						"description": "Color depth in bits",
+						"readOnly": true
 					},
 					"height": {
-						"$ref": "#/components/schemas/Document_MetadataImageResolutionUnit"
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "Image height",
+						"readOnly": true
 					},
 					"isAnimated": {
 						"type": "boolean",
 						"default": false,
-						"description": "True if it is an animated image"
+						"description": "True if it is an animated image",
+						"readOnly": true
 					},
 					"metadata": {
 						"type": "object",
 						"additionalProperties": {
 							"type": "object",
 							"additionalProperties": {
-								"type": "string"
+								"type": "string",
+								"description": "Metadata dictionary of the image file format",
+								"readOnly": true,
+								"x-webpdf-codegen": {
+									"isReadOnly": "true"
+								}
+							},
+							"description": "Metadata dictionary of the image file format",
+							"readOnly": true,
+							"x-webpdf-codegen": {
+								"isReadOnly": "true"
 							}
+						},
+						"description": "Metadata dictionary of the image file format",
+						"readOnly": true,
+						"x-webpdf-codegen": {
+							"isReadOnly": "true"
 						}
 					},
 					"orientation": {
 						"$ref": "#/components/schemas/Document_MetadataImageOrientation"
 					},
+					"unit": {
+						"$ref": "#/components/schemas/Document_MetadataImageResolutionUnit"
+					},
 					"width": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Image width"
+						"description": "Image width",
+						"readOnly": true
 					},
 					"xRes": {
 						"type": "number",
 						"format": "float",
 						"default": 0,
-						"description": "Horizontal resolution"
+						"description": "Horizontal resolution",
+						"readOnly": true
 					},
 					"yRes": {
 						"type": "number",
 						"format": "float",
 						"default": 0,
-						"description": "Vertical resolution"
+						"description": "Vertical resolution",
+						"readOnly": true
 					}
-				}
+				},
+				"readOnly": true
 			},
 			"Document_MetadataImageOrientation": {
 				"type": "string",
@@ -5683,7 +5810,11 @@
 					"rightTop",
 					"rightBottom",
 					"leftBottom"
-				]
+				],
+				"readOnly": true,
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_MetadataImageResolutionUnit": {
 				"type": "string",
@@ -5693,7 +5824,11 @@
 					"none",
 					"inch",
 					"centimeter"
-				]
+				],
+				"readOnly": true,
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_MetadataPdf": {
 				"type": "object",
@@ -5755,7 +5890,11 @@
 					"pdf",
 					"archive",
 					"image"
-				]
+				],
+				"readOnly": true,
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_Password": {
 				"type": "object",
@@ -5788,7 +5927,10 @@
 						"readOnly": true
 					}
 				},
-				"readOnly": true
+				"readOnly": true,
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_Recipient": {
 				"type": "object",
@@ -6869,7 +7011,7 @@
 						"format": "int64",
 						"default": 0,
 						"description": "The byte size of the document.",
-						"maximum": 9223372036854775807,
+						"maximum": 9223372036854776000,
 						"minimum": 0
 					},
 					"formType": {
@@ -7304,13 +7446,13 @@
 					"horizOffset": {
 						"type": "number",
 						"format": "float",
-						"default": 0.0,
+						"default": 0,
 						"description": "The horizontal offset in relation to the backgrounds bas position."
 					},
 					"opacity": {
 						"type": "number",
 						"format": "float",
-						"default": 1.0,
+						"default": 1,
 						"description": "The opacity of the background, as a percentage in the range 0.0 (fully transparent) to 1.0 (fully opaque).",
 						"maximum": 1,
 						"minimum": 0
@@ -7338,7 +7480,7 @@
 					"vertOffset": {
 						"type": "number",
 						"format": "float",
-						"default": 0.0,
+						"default": 0,
 						"description": "The vertical offset in relation to the backgrounds bas position."
 					}
 				}
@@ -9450,6 +9592,9 @@
 						"description": "Sets the maximum recursions, that may occur when converting a document's attachments.\n\n**Important:** This parameter is intended for internal use only. Please only use this, if you really are sure you need to do so.",
 						"minimum": 1
 					},
+					"office": {
+						"$ref": "#/components/schemas/Operation_ConverterOffice"
+					},
 					"officeBridge": {
 						"$ref": "#/components/schemas/Operation_OfficeBridge"
 					},
@@ -9692,6 +9837,35 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If \"true\", then a background defined in the e-mail (in the HTML content) is also output in the PDF document. If \"false\", the background will be hidden."
+					}
+				}
+			},
+			"Operation_ConverterOffice": {
+				"type": "object",
+				"description": "Defines the settings to be used when converting Office documents (e.g., docx documents).\n\n**Important:** Currently only the integrated Word document converter for docx files is supported",
+				"properties": {
+					"word": {
+						"$ref": "#/components/schemas/Operation_ConverterOfficeWord"
+					}
+				}
+			},
+			"Operation_ConverterOfficeForm": {
+				"type": "object",
+				"description": "Defines the settings that are used when converting documents that have content that can be converted to an AcroForm.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" content elements that define forms are converted into an AcroForm. Otherwise, the elements are converted as normal content."
+					}
+				}
+			},
+			"Operation_ConverterOfficeWord": {
+				"type": "object",
+				"description": "Defines the settings to be used when converting Word (docx) documents.",
+				"properties": {
+					"form": {
+						"$ref": "#/components/schemas/Operation_ConverterOfficeForm"
 					}
 				}
 			},
@@ -11531,9 +11705,9 @@
 					"gammaCorrectionValue": {
 						"type": "number",
 						"format": "float",
-						"default": 0.0,
+						"default": 0,
 						"description": "Allows in combination with the gammaCorrection mode \"value\" the free choice of a value for this optimization. A comma value greater than 0 specifies the value to be applied to the image as gamma correction. The predefined values range between 1.5 (low) and 2.5 (high).",
-						"minimum": 0.0
+						"minimum": 0
 					},
 					"increaseContrast": {
 						"type": "string",
@@ -11598,9 +11772,9 @@
 					"noiseReductionValue": {
 						"type": "number",
 						"format": "float",
-						"default": 1.0,
+						"default": 1,
 						"description": "Allows in combination with the noiseReduction mode \"value\" the free choice of a value for this optimization. A decimal value greater than 0 indicates the intensity with which the effect is to be applied to the image. The predefined values range between 1.0 (low) and 3.0 (high).",
-						"minimum": 0.0
+						"minimum": 0
 					},
 					"reduceDithering": {
 						"type": "boolean",
@@ -11625,9 +11799,9 @@
 					"sharpenValue": {
 						"type": "number",
 						"format": "float",
-						"default": 1.0,
+						"default": 1,
 						"description": "Allows in combination with the sharpen mode \"value\" the free choice of a value for this optimization. A comma value greater than 0 indicates the intensity with which the effect is to be applied to the image. The predefined values range between 1.0 (low) and 3.0 (high).",
-						"minimum": 0.0
+						"minimum": 0
 					}
 				}
 			},
@@ -17478,7 +17652,7 @@
 					"version": {
 						"type": "string",
 						"default": "v10Comfort",
-						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions 1.0, 2.0, 2.1.x and 2.2 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRECHNUNG\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung",
+						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions from 1.0 to 2.3 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRECHNUNG\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical, and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung\n*   v23Minimum\n*   v23BasicWL\n*   v23Basic\n*   v23EN16931\n*   v23Extended\n*   v23XRechnung",
 						"enum": [
 							"v10Comfort",
 							"v20Minimum",
@@ -17497,7 +17671,13 @@
 							"v22Basic",
 							"v22EN16931",
 							"v22Extended",
-							"v22XRechnung"
+							"v22XRechnung",
+							"v23Minimum",
+							"v23BasicWL",
+							"v23Basic",
+							"v23EN16931",
+							"v23Extended",
+							"v23XRechnung"
 						],
 						"x-webpdf-codegen": {
 							"enumName": "Operation_ZugferdVersion"
@@ -17737,12 +17917,7 @@
 						}
 					},
 					"serverMode": {
-						"type": "string",
-						"default": "",
-						"enum": [
-							"SINGLE",
-							"CLUSTER"
-						]
+						"$ref": "#/components/schemas/Cluster_Mode"
 					},
 					"serverStart": {
 						"type": "integer",
@@ -17957,12 +18132,12 @@
 			},
 			"ServerConfig_Connector": {
 				"type": "object",
-				"description": "A [connector](https://tomcat.apache.org/tomcat-9.0-doc/config/http.html) defines the properties of a port the server can be accessed by.",
+				"description": "A [connector](https://tomcat.apache.org/tomcat-10.1-doc/config/http.html) defines the properties of a port the server can be accessed by.",
 				"properties": {
 					"address": {
 						"type": "string",
 						"default": "",
-						"description": "The IP address to which the port should listen."
+						"description": "The IP address to which the connector should bind. If not defined, all IP addresses are used."
 					},
 					"compressibleMimeType": {
 						"type": "string",
@@ -18006,7 +18181,7 @@
 					"protocol": {
 						"type": "string",
 						"default": "HTTP/1.1",
-						"description": "The protocol to use for a connector.\n\n*   HTTP/1.1 = Non blocking java NIO connector.\n*   HTTP/2.0 = Non blocking java NIO2 connector.\n*   AJP/1.3 = The APR/native connector.",
+						"description": "The protocol to use for the connector.\n\n*   HTTP/1.1 = Non blocking java NIO connector.\n*   HTTP/2.0 = Non blocking java NIO2 connector.\n*   AJP/1.3 = The APR/native connector.",
 						"enum": [
 							"HTTP/1.1",
 							"HTTP/2.0",
@@ -18201,7 +18376,7 @@
 					"type": {
 						"type": "string",
 						"default": "JKS",
-						"description": "The format of the keystore file containing the certificate (or certificate chain) and private key (optionally encrypted) to be used for SSL encryption.\n\n*   JKS = A Java keystore (file based with an extension like \".jks\").\n*   PKCS12 = A PKCS12 keystore (file based with the extensions like \".p12\" or \".pfx\").\n*   PEM = A PEM-encoded keystore (files with \".pem\" or \".cabundle\" extensions).\n*   WINDOWS\\_MACHINE = The Windows certificate store of the machine on which the server is running.\n*   WINDOWS\\_USER = The Windows certificate store of the user account under which the server is running.",
+						"description": "The format of the keystore file containing the certificate (or certificate chain) and private key (optionally encrypted) to be used for SSL encryption.\n\n*   JKS = A Java keystore (file based with an extension like \".jks\").\n*   PKCS12 = A PKCS12 keystore (file based with the extensions like \".p12\" or \".pfx\").\n*   PEM = A PEM-encoded keystore (file based with extensions like \".pem\" or \".cabundle\").\n*   WINDOWS\\_MACHINE = The Windows certificate store of the machine on which the server is running.\n*   WINDOWS\\_USER = The Windows certificate store of the user account under which the server is running.",
 						"enum": [
 							"JKS",
 							"PKCS12",
@@ -18217,12 +18392,12 @@
 			},
 			"ServerConfig_KeystoreSSL": {
 				"type": "object",
-				"description": "Sets the keystore information for the server key and certificate to be used to cipher the connection. This keystore may only contain exactly one certificate or certificate chain with one private key.",
+				"description": "Defines the keystore with the private server key and the certificate used to encrypt the connection. This keystore may only contain exactly one certificate or certificate chain with one private key.",
 				"properties": {
 					"alias": {
 						"type": "string",
 						"default": "",
-						"description": "The alias used for the server key and certificate in the keystore."
+						"description": "The alias used for the private server key and certificate in the keystore. Can be empty if the keystore only contains a single certificate."
 					},
 					"file": {
 						"type": "string",
@@ -18237,7 +18412,7 @@
 					"type": {
 						"type": "string",
 						"default": "JKS",
-						"description": "The format of the keystore file containing the certificate (or certificate chain) and private key (optionally encrypted) to be used for SSL encryption.\n\n*   JKS = A Java keystore (file based with an extension like \".jks\").\n*   PKCS12 = A PKCS12 keystore (file based with the extensions like \".p12\" or \".pfx\").\n*   PEM = A PEM-encoded keystore (files with \".pem\" or \".cabundle\" extensions).\n*   WINDOWS\\_MACHINE = The Windows certificate store of the machine on which the server is running.\n*   WINDOWS\\_USER = The Windows certificate store of the user account under which the server is running.",
+						"description": "The format of the keystore file containing the certificate (or certificate chain) and private key (optionally encrypted) to be used for SSL encryption.\n\n*   JKS = A Java keystore (file based with an extension like \".jks\").\n*   PKCS12 = A PKCS12 keystore (file based with the extensions like \".p12\" or \".pfx\").\n*   PEM = A PEM-encoded keystore (file based with extensions like \".pem\" or \".cabundle\").\n*   WINDOWS\\_MACHINE = The Windows certificate store of the machine on which the server is running.\n*   WINDOWS\\_USER = The Windows certificate store of the user account under which the server is running.",
 						"enum": [
 							"JKS",
 							"PKCS12",
@@ -18457,7 +18632,7 @@
 				"properties": {
 					"protocol": {
 						"type": "array",
-						"description": "Selects a TLS protocol for the connector.",
+						"description": "Selects the TLS protocols for the connector.",
 						"items": {
 							"type": "string",
 							"default": "TLSv1.2",
@@ -18502,7 +18677,7 @@
 			},
 			"ServerConfig_SSL": {
 				"type": "object",
-				"description": "Defines settings for an SSL (TLS) connector.",
+				"description": "Defines the settings for a TLS connector.",
 				"properties": {
 					"ciphers": {
 						"$ref": "#/components/schemas/ServerConfig_CiphersSSL"
@@ -19146,7 +19321,10 @@
 				"required": [
 					"errorCode",
 					"errorMessage"
-				]
+				],
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Webservice_Result": {
 				"type": "object",
