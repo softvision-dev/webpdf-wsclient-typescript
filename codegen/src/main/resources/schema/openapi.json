@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.0.3615 (2024-12-12T13:36:25Z)"
+		"version": "webPDF 10.0.0.3624 (2025-01-03T08:36:55Z)"
 	},
 	"servers": [
 		{
@@ -1018,6 +1018,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -1076,6 +1079,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -1134,6 +1140,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2065,6 +2074,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2123,6 +2135,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2206,6 +2221,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2273,6 +2291,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2331,6 +2352,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2389,6 +2413,9 @@
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"429": {
+						"$ref": "#/components/responses/429TooManyRequests"
 					}
 				},
 				"security": [
@@ -2425,7 +2452,7 @@
 						}
 					}
 				},
-				"description": "Invalid data: The specified data has incorrect content, structure or invalid value. Check the specified exception for more information."
+				"description": "Invalid data: The specified data has incorrect content, structure or invalid value.Check the specified exception for more information."
 			},
 			"401Unauthorized": {
 				"content": {
@@ -2436,6 +2463,16 @@
 					}
 				},
 				"description": "Unauthorized access: Token not found (wrong header or format) or token is invalid (e.g. expired, wrong format or type)."
+			},
+			"429TooManyRequests": {
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Webservice_Exception"
+						}
+					}
+				},
+				"description": "Too many requests: The web service request was rejected because the server is overloaded or no server instance is free or no entry is available in the waiting queue."
 			}
 		},
 		"schemas": {
@@ -3863,14 +3900,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4024,14 +4073,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4167,14 +4228,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4283,14 +4356,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4743,14 +4828,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4774,14 +4871,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					}
 				}
 			},
@@ -4842,14 +4951,26 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum time in seconds allowed for the execution of a web service before the request is aborted. When time is expired the execution is aborted.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
 						"minimum": 0
+					},
+					"queueMode": {
+						"type": "string",
+						"default": "AUTO",
+						"description": "Defines how the size of the queue is determined.\n\nWith `AUTO`, it is calculated automatically by the server based on the number of configured instances.",
+						"enum": [
+							"AUTO",
+							"MANUAL"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_QueueMode"
+						}
 					},
 					"queueSize": {
 						"type": "integer",
 						"format": "int32",
 						"default": 100,
-						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly."
+						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					},
 					"timeout": {
 						"type": "integer",
@@ -19346,6 +19467,10 @@
 						"format": "int32",
 						"default": 0,
 						"description": "The exit code of an external application, if such an application was used for the operation."
+					},
+					"hideException": {
+						"type": "boolean",
+						"default": false
 					},
 					"stackTrace": {
 						"type": "object",
