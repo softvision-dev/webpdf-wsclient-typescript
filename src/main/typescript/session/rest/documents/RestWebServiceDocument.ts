@@ -3,7 +3,6 @@ import {RestDocument} from "./RestDocument";
 import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState";
 import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
-import {Blob} from "buffer";
 
 /**
  * <p>

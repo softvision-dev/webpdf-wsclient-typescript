@@ -18,6 +18,7 @@ import {
 	ApplicationConfigKeystoreInterface,
 	ApplicationConfigPortalUserInterface,
 	ApplicationConfigPortalUserInterfaceInterface,
+	ClusterMode,
 	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
@@ -45,14 +46,7 @@ import {
 	Webservice,
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
-import {
-	ClusterSettings,
-	ModeEnum,
-	SupportEntryGroup,
-	Tsa,
-	TsaHashAlgorithm,
-	TsaInterface
-} from "../../../lib/generated-sources";
+import {ClusterSettings, Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
 
 require("./bootstrap");
 
@@ -733,8 +727,8 @@ describe("RestAdministrationIntegrationTest", function () {
 		expect(clusterConfig, "cluster configuration should exist.").to.exist;
 		expect(clusterConfig.mode, "mode should exist.").to.exist;
 
-		clusterConfig.mode = ModeEnum.CLUSTER;
-		expect(clusterConfig.mode, "DisplayDiskSpace should be cluster.").to.equal(ModeEnum.CLUSTER);
+		clusterConfig.mode = ClusterMode.Cluster;
+		expect(clusterConfig.mode, "DisplayDiskSpace should be cluster.").to.equal(ClusterMode.Cluster);
 
 		try {
 			await session.getAdministrationManager().updateClusterConfiguration(clusterConfig);
@@ -744,78 +738,11 @@ describe("RestAdministrationIntegrationTest", function () {
 
 		clusterConfig = await session.getAdministrationManager().fetchClusterConfiguration();
 		expect(clusterConfig, "Cluster configuration should exist.").to.exist;
-		expect(clusterConfig.mode, "mode should be cluster.").to.equal(ModeEnum.CLUSTER);
+		expect(clusterConfig.mode, "mode should be cluster.").to.equal(ClusterMode.Cluster);
 
 		// reset cluster mode
-		clusterConfig.mode = ModeEnum.SINGLE;
+		clusterConfig.mode = ClusterMode.Single;
 		await session.getAdministrationManager().updateClusterConfiguration(clusterConfig);
-
-		await session.close();
-	});
-
-	it('validateCluster', async function (): Promise<void> {
-		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
-			this.skip();
-			return;
-		}
-
-		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
-			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
-		);
-
-		let clusterConfig: ClusterSettings = await session.getAdministrationManager().getClusterConfiguration();
-		expect(clusterConfig, "Cluster configuration should exist.").to.exist;
-
-		// TODO Validate cluster
-		// clusterConfig.tsa = Tsa.fromJson({
-		// 	url: "http://timestamp.comodoca.com",
-		// 	hashAlgorithm: TsaHashAlgorithm.SHA256
-		// } as TsaInterface)
-		//
-		// try {
-		// 	let result: ConfigurationResult = await session.getAdministrationManager().validateApplicationConfiguration(
-		// 		clusterConfig, [
-		// 			ApplicationCheck.fromJson({
-		// 				checkType: ApplicationCheckMode.Tsa
-		// 			} as ApplicationCheck)
-		// 		]);
-		//
-		// 	expect(result.error!.code, "No error expected").to.equal(0);
-		// } catch (ex: any) {
-		// 	expect(ex, "The server validation did not work").to.be.undefined;
-		// }
-
-		await session.close();
-	});
-
-	it('validateApplicationException', async function () {
-		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
-			this.skip();
-			return;
-		}
-
-		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
-			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
-			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
-		);
-
-		let clusterConfig: ClusterSettings = await session.getAdministrationManager().getClusterConfiguration();
-		expect(clusterConfig, "Cluster configuration should exist.").to.exist;
-
-		// TODO Validate cluster with exception
-		// try {
-		// 	let result: ConfigurationResult = await session.getAdministrationManager().validateApplicationConfiguration(
-		// 		applicationConfig, [
-		// 			ApplicationCheck.fromJson({
-		// 				checkType: ApplicationCheckMode.Tsa
-		// 			} as ApplicationCheck)
-		// 		]);
-		//
-		// 	expect(result.error!.code, "Tsa error expected").to.equal(-34);
-		// } catch (ex: any) {
-		// 	expect(ex, "The server validation did not work").to.be.undefined;
-		// }
 
 		await session.close();
 	});
@@ -834,7 +761,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		try {
 			let clusterStatus: ClusterStatus = await session.getAdministrationManager().fetchClusterStatus();
 			expect(clusterStatus.settings, "settings should exist.").to.exist;
-			expect(clusterStatus.settings!.mode, "mode should be single.").to.equal(ModeEnum.SINGLE);
+			expect(clusterStatus.settings!.mode, "mode should be single.").to.equal(ClusterMode.Single);
 		} catch (ex: any) {
 			expect(ex, "The server request did not work").to.be.undefined;
 		}

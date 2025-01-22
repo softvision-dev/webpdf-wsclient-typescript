@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.0.3624 (2025-01-03T08:36:55Z)"
+		"version": "webPDF 10.0.0.3647 (2025-01-22T11:44:31Z)"
 	},
 	"servers": [
 		{
@@ -713,7 +713,7 @@
 		},
 		"/authentication/user/certificates": {
 			"get": {
-				"description": "Returns information about the key stores available in the user session and the certificates they contain. Certificates can be provided via user authentication (e.g. LDAP) or from the server's local file system (e.g. user or global keystores). The keystore may be locked and can be unlocked with `PUT /authentication/user/certificates/passwords/...`.",
+				"description": "Returns information about the keystores available in the user session and the certificates they contain. Certificates can be provided via user authentication (e.g. LDAP) or from the server's local file system (e.g. user or global keystores). The keystore may be locked and can be unlocked with `PUT /authentication/user/certificates/passwords/...`.",
 				"operationId": "readCertificates",
 				"responses": {
 					"200": {
@@ -7132,7 +7132,7 @@
 						"format": "int64",
 						"default": 0,
 						"description": "The byte size of the document.",
-						"maximum": 9223372036854776000,
+						"maximum": 9223372036854775807,
 						"minimum": 0
 					},
 					"formType": {
@@ -7567,13 +7567,13 @@
 					"horizOffset": {
 						"type": "number",
 						"format": "float",
-						"default": 0,
+						"default": 0.0,
 						"description": "The horizontal offset in relation to the backgrounds bas position."
 					},
 					"opacity": {
 						"type": "number",
 						"format": "float",
-						"default": 1,
+						"default": 1.0,
 						"description": "The opacity of the background, as a percentage in the range 0.0 (fully transparent) to 1.0 (fully opaque).",
 						"maximum": 1,
 						"minimum": 0
@@ -7601,7 +7601,7 @@
 					"vertOffset": {
 						"type": "number",
 						"format": "float",
-						"default": 0,
+						"default": 0.0,
 						"description": "The vertical offset in relation to the backgrounds bas position."
 					}
 				}
@@ -11826,9 +11826,9 @@
 					"gammaCorrectionValue": {
 						"type": "number",
 						"format": "float",
-						"default": 0,
+						"default": 0.0,
 						"description": "Allows in combination with the gammaCorrection mode \"value\" the free choice of a value for this optimization. A comma value greater than 0 specifies the value to be applied to the image as gamma correction. The predefined values range between 1.5 (low) and 2.5 (high).",
-						"minimum": 0
+						"minimum": 0.0
 					},
 					"increaseContrast": {
 						"type": "string",
@@ -11893,9 +11893,9 @@
 					"noiseReductionValue": {
 						"type": "number",
 						"format": "float",
-						"default": 1,
+						"default": 1.0,
 						"description": "Allows in combination with the noiseReduction mode \"value\" the free choice of a value for this optimization. A decimal value greater than 0 indicates the intensity with which the effect is to be applied to the image. The predefined values range between 1.0 (low) and 3.0 (high).",
-						"minimum": 0
+						"minimum": 0.0
 					},
 					"reduceDithering": {
 						"type": "boolean",
@@ -11920,9 +11920,9 @@
 					"sharpenValue": {
 						"type": "number",
 						"format": "float",
-						"default": 1,
+						"default": 1.0,
 						"description": "Allows in combination with the sharpen mode \"value\" the free choice of a value for this optimization. A comma value greater than 0 indicates the intensity with which the effect is to be applied to the image. The predefined values range between 1.0 (low) and 3.0 (high).",
-						"minimum": 0
+						"minimum": 0.0
 					}
 				}
 			},
@@ -12726,7 +12726,7 @@
 			},
 			"Operation_OfficeBridge": {
 				"type": "object",
-				"description": "Used to specify whether \"Office Bridge\" should be used when converting Word, Excel, and PowerPoint documents. If this element is set (and Office Bridge is enabled), the document will be converted using the Office software installed on the server."
+				"description": "Used to specify whether \"Office Bridge\" should be used when converting Word, Excel and PowerPoint documents. If this element is set (and Office Bridge is enabled in the server configuration), the document will be converted using the Office software installed on the server."
 			},
 			"Operation_OptionsFont": {
 				"type": "object",
@@ -14694,7 +14694,7 @@
 			},
 			"Operation_SharePointBridge": {
 				"type": "object",
-				"description": "Used to specify whether \"SharePoint Bridge\" should be used when converting a Word document. If the element is set, the Word document will be converted using the SharePoint service (if SharePoint Bridge is enabled)."
+				"description": "Used to specify whether \"SharePoint Bridge\" should be used when converting Word, Excel and PowerPoint documents. If the element is set, the document will be converted using the SharePoint Online service (if SharePoint Bridge is enabled in the server configuration)."
 			},
 			"Operation_Signature": {
 				"type": "object",

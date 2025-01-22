@@ -1,9 +1,9 @@
 import {RestDocument} from "./RestDocument";
 import {RestSession} from "../RestSession";
 import {
-	DocumentFile, FileCompress,
+	DocumentFile,
+	FileCompress,
 	FileExtract,
-	FileFilter,
 	HistoryEntry,
 	Info,
 	InfoType,

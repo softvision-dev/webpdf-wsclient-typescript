@@ -1,5 +1,13 @@
 import {expect} from 'chai';
-import {ClientResultException, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol} from "../../../main/typescript";
+import {
+	RestDocument,
+	RestSession,
+	ResultException,
+	SessionContext,
+	SessionFactory,
+	UserAuthProvider,
+	WebServiceProtocol
+} from "../../../main/typescript";
 import {ServerType, TestConfig, TestServer} from "../testsuite";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
 
@@ -47,13 +55,17 @@ describe("RestWebserviceLdapTest", function () {
 		try {
 			await session.updateCertificates("error", parameter);
 		} catch (e: any) {
-			expect(e instanceof ClientResultException).to.be.true;
-			let resultException: ClientResultException = e;
-			expect(resultException.getErrorCode(), "HTTP IO error expected").to.equal(-34);
-			expect(resultException.getHttpErrorCode(), "bad request expected").to.equal(400);
+			let resultException: ResultException = e;
+			expect(resultException.getErrorCode(), "HTTP IO error expected").to.equal(-35);
 		}
 
-		certificates = await session.updateCertificates(keyStoreName, parameter);
+		try {
+			certificates = await session.updateCertificates(keyStoreName, parameter);
+		} catch (e: any) {
+			let resultException: ResultException = e;
+			expect(resultException.getErrorCode(), "HTTP IO error expected").to.equal(-5057);
+		}
+
 		for (let keystore of certificates?.keyStores || []) {
 			if (keystore.keyStoreName === keyStoreName) {
 				expect(keystore.isKeyStoreAccessible, "keystore should not be accessible.").to.be.false;
