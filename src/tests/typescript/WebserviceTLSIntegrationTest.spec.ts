@@ -11,15 +11,13 @@ import {
 	WebServiceTypes
 } from "../../main/typescript";
 import {Agent, AgentOptions} from "https";
-import {it} from "mocha";
+import {it, suite} from "mocha";
 import {DetailedPeerCertificate} from "tls";
-
-require("./bootstrap");
 
 const fs = require('fs');
 const tmp = require('tmp');
 
-describe("WebserviceTLSIntegrationTest", function () {
+suite("WebserviceTLSIntegrationTest", function () {
 	const CERT_START: string = '-----BEGIN CERTIFICATE-----\n';
 	const CERT_END: string = '\n-----END CERTIFICATE-----';
 	let testResources: TestResources = new TestResources('integration/files');

@@ -2,13 +2,12 @@ import {Auth0Config, Auth0Provider, AzureConfig, AzureProvider, ServerType, Test
 import {expect} from "chai";
 import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
-
-require("./bootstrap");
+import {it, suite} from "mocha";
 
 const fs = require('fs');
 const tmp = require('tmp');
 
-describe("Oauth2TokenIntegrationTest", function () {
+suite("Oauth2TokenIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 

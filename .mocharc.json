@@ -1,0 +1,9 @@
+{
+	"recursive": true,
+	"timeout": 30000,
+	"parallel": false,
+	"require": [
+		"ts-node/register",
+		"./src/tests/typescript/bootstrap.ts"
+	]
+}

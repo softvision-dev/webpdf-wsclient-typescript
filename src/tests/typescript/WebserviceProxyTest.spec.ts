@@ -13,13 +13,12 @@ import {
 import {AxiosProxyConfig} from "axios";
 import {UrlConverter, UrlConverterInterface} from "../../main/typescript/generated-sources";
 import {Agent} from "https";
-
-require("./bootstrap");
+import {it, suite} from "mocha";
 
 const fs = require('fs');
 const tmp = require('tmp');
 
-describe("WebserviceProxyTest", function () {
+suite("WebserviceProxyTest", function () {
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 	const testConfig: IntegrationTestConfig =  TestConfig.instance.getIntegrationTestConfig();

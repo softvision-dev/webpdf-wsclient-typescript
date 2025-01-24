@@ -28,10 +28,9 @@ import {
 	PdfPasswordInterface
 } from "../../../main/typescript/generated-sources";
 import AdmZip = require("adm-zip");
+import {it, suite} from "mocha";
 
-require("../bootstrap");
-
-describe("DocumentManagerIntegrationTest", function (): void {
+suite("DocumentManagerIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('documents');
 	let testServer: TestServer = new TestServer();
 

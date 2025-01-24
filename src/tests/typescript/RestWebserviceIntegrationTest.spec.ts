@@ -52,13 +52,12 @@ import {
 	UserCredentials,
 	MetadataPdf
 } from "../../main/typescript/generated-sources";
-
-require("./bootstrap");
+import {it, suite} from "mocha";
 
 const fs = require('fs');
 const tmp = require('tmp');
 
-describe("RestWebserviceIntegrationTest", function () {
+suite("RestWebserviceIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();

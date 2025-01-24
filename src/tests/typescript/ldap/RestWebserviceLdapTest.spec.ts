@@ -10,10 +10,9 @@ import {
 } from "../../../main/typescript";
 import {ServerType, TestConfig, TestServer} from "../testsuite";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
+import {it, suite} from "mocha";
 
-require("../bootstrap");
-
-describe("RestWebserviceLdapTest", function () {
+suite("RestWebserviceLdapTest", function () {
 	let testServer: TestServer = new TestServer();
 
 	it('testHandleRestSessionLdapCertificates', async function () {

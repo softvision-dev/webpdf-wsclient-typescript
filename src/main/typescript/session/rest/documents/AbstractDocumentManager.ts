@@ -498,11 +498,6 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 		}
 
-		let archiveParts: Array<string> = archivePath.split("/");
-		for (let part of archiveParts) {
-			part = encodeURI(part);
-		}
-
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
 			.buildRequest(

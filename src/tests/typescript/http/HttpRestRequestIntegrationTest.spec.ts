@@ -3,10 +3,9 @@ import {expect} from "chai";
 import {ClientResultException, HttpMethod, HttpRestRequest, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol, wsclientConfiguration, WsclientErrors} from "../../../main/typescript";
 import {DocumentFile} from "../../../main/typescript/generated-sources";
 import {AxiosResponse} from "axios";
+import {it, suite} from "mocha";
 
-require("../bootstrap");
-
-describe("HttpRestRequestIntegrationTest", function () {
+suite("HttpRestRequestIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('http');
 	let testServer: TestServer = new TestServer();
 

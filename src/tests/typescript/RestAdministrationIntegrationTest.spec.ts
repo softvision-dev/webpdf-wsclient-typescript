@@ -47,14 +47,13 @@ import {
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
 import {ClusterSettings, Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
-
-require("./bootstrap");
+import {it, suite} from "mocha";
 
 const atob = function (data: string) {
 	return Buffer.from(data, "base64").toString("ascii");
 };
 
-describe("RestAdministrationIntegrationTest", function () {
+suite("RestAdministrationIntegrationTest", function () {
 	let testServer: TestServer = new TestServer();
 	let testResources: TestResources = new TestResources('documents');
 	let testKeystores: TestResources = new TestResources('keystore');
@@ -728,7 +727,7 @@ describe("RestAdministrationIntegrationTest", function () {
 		expect(clusterConfig.mode, "mode should exist.").to.exist;
 
 		clusterConfig.mode = ClusterMode.Cluster;
-		expect(clusterConfig.mode, "DisplayDiskSpace should be cluster.").to.equal(ClusterMode.Cluster);
+		expect(clusterConfig.mode, "mode should be cluster.").to.equal(ClusterMode.Cluster);
 
 		try {
 			await session.getAdministrationManager().updateClusterConfiguration(clusterConfig);

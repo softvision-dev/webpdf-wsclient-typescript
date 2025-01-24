@@ -40,10 +40,9 @@ import {
 	ToolboxWatermark,
 	UrlConverterOperation
 } from "../../../main/typescript/generated-sources";
+import {it, suite} from "mocha";
 
-require("../bootstrap");
-
-describe("RestWebserviceFactoryTest", function () {
+suite("RestWebserviceFactoryTest", function () {
 	let testResources: TestResources = new TestResources('webservicefactory');
 	let testServer: TestServer = new TestServer();
 
