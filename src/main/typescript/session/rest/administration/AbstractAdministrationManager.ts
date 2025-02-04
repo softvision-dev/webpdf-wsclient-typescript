@@ -7,6 +7,10 @@ import {
 	ApplicationCheckMode,
 	ApplicationConfiguration,
 	ApplicationConfigurationInterface,
+	ClusterCheck,
+	ClusterConfiguration,
+	ClusterConfigurationInterface,
+	ClusterSettings, ClusterStatus,
 	ConfigurationMode,
 	ConfigurationResult,
 	ConfigurationType,
@@ -22,6 +26,10 @@ import {
 	LogConfigurationInterface,
 	LogFileConfiguration,
 	Parameter,
+	ProviderCheck,
+	ProviderConfiguration,
+	ProviderConfigurationInterface,
+	ProviderSettings,
 	Server,
 	ServerCheck,
 	ServerConfiguration,
@@ -33,7 +41,8 @@ import {
 	TrustStoreKeyStore,
 	UserCheck,
 	UserConfiguration,
-	UserConfigurationInterface, UserCredentials,
+	UserConfigurationInterface,
+	UserCredentials,
 	Users,
 	Webservice
 } from "../../../generated-sources";
@@ -55,6 +64,8 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	private serverConfiguration?: Server;
 	private userConfiguration?: Users;
 	private logConfiguration?: LogFileConfiguration;
+	private clusterConfiguration?: ClusterSettings;
+	private providerConfiguration?: ProviderSettings;
 	private globalKeyStore?: GlobalKeyStore;
 	private connectorKeyStore?: { [key: string]: ConnectorKeyStore; };
 	private trustStoreKeyStore?: TrustStoreKeyStore;
@@ -1038,5 +1049,260 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 		} catch (ex: any) {
 			throw new ClientResultException(WsclientErrors.XML_OR_JSON_CONVERSION_FAILURE, ex);
 		}
+	}
+
+	/**
+	 * Gets the {@link ClusterSettings} configuration from the server updating the cached configuration.
+	 *
+	 * @return {@link ClusterSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async fetchClusterConfiguration(): Promise<ClusterSettings> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/configuration/cluster"));
+
+		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson(
+			await request.executeRequest()
+		);
+
+		this.clusterConfiguration = clusterConfiguration.configuration;
+
+		return this.clusterConfiguration;
+	}
+
+	/**
+	 * Gets the cached {@link ClusterSettings} configuration of the server or fetches via
+	 * {@link AdministrationManager#fetchClusterConfiguration} if cache is empty
+	 *
+	 * @return {@link ClusterSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async getClusterConfiguration(): Promise<ClusterSettings> {
+		await this.validateUser();
+
+		if (typeof this.clusterConfiguration === "undefined") {
+			return await this.fetchClusterConfiguration()
+		}
+
+		return this.clusterConfiguration;
+	}
+
+	/**
+	 * <p>
+	 * Updates the {@link ClusterSettings} configuration if no {@link ConfigurationResult#error} occured.
+	 * </p>
+	 * <p>
+	 * Optionally also validates the {@link ClusterSettings} configuration with additional {@link ClusterCheck}s.
+	 * </p>
+	 * <p>
+	 * <b>Be Aware:</b> Some of these changes might require a server restart to take effect.
+	 * </p>
+	 *
+	 * @param configuration The {@link ClusterSettings} configuration defines settings for server clusters.
+	 * @param checks 		An optional list of {@link ClusterCheck}s to validate the configuration.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ClusterSettings} configuration is updated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async updateClusterConfiguration(
+		configuration: ClusterSettings, checks?: Array<ClusterCheck>
+	): Promise<ConfigurationResult> {
+		await this.validateUser();
+
+		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson({
+			configuration: configuration,
+			configurationChecks: checks,
+			configurationMode: ConfigurationMode.Write,
+			configurationType: ConfigurationType.Cluster
+		} as ClusterConfigurationInterface)
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/configuration/"),
+				this.prepareHttpEntity(clusterConfiguration),
+				DataFormats.JSON.getMimeType()
+			);
+
+		let configurationResult: ConfigurationResult = ConfigurationResult.fromJson(
+			await request.executeRequest()
+		);
+
+		if (configurationResult.error?.code === 0) {
+			this.clusterConfiguration = configuration;
+		}
+
+		return configurationResult;
+	}
+
+	/**
+	 * <p>
+	 * Validates the {@link ClusterSettings} configuration with the given {@link ClusterCheck}s.
+	 * </p>
+	 *
+	 * @param configuration The {@link ClusterSettings} configuration defines settings for server clusters.
+	 * @param checks 		The list of {@link ClusterCheck}s to validate the configuration with.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ClusterSettings} configuration is validated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async validateClusterConfiguration(
+		configuration: ClusterSettings, checks: Array<ClusterCheck>,
+	): Promise<ConfigurationResult> {
+		await this.validateUser();
+
+		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson({
+			configuration: configuration,
+			configurationChecks: checks,
+			configurationMode: ConfigurationMode.Validate,
+			configurationType: ConfigurationType.Cluster
+		} as ClusterConfigurationInterface);
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/configuration/"),
+				this.prepareHttpEntity(clusterConfiguration),
+				DataFormats.JSON.getMimeType()
+			);
+
+		return ConfigurationResult.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * Gets the {@link ProviderSettings} configuration from the server updating the cached configuration.
+	 *
+	 * @return {@link ProviderSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async fetchProviderConfiguration(): Promise<ProviderSettings> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/configuration/provider"));
+
+		let providerConfiguration: ProviderConfiguration = ProviderConfiguration.fromJson(
+			await request.executeRequest()
+		);
+
+		this.providerConfiguration = providerConfiguration.configuration;
+
+		return this.providerConfiguration;
+	}
+
+	/**
+	 * Gets the cached {@link ProviderSettings} configuration of the server or fetches via
+	 * {@link AdministrationManager#fetchProviderConfiguration} if cache is empty
+	 *
+	 * @return {@link ProviderSettings} the requested configuration.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async getProviderConfiguration(): Promise<ProviderSettings> {
+		await this.validateUser();
+
+		if (typeof this.providerConfiguration === "undefined") {
+			return await this.fetchProviderConfiguration()
+		}
+
+		return this.providerConfiguration;
+	}
+
+	/**
+	 * <p>
+	 * Updates the {@link ProviderSettings} configuration if no {@link ConfigurationResult#error} occured.
+	 * </p>
+	 * <p>
+	 * Optionally also validates the {@link ProviderSettings} configuration with additional {@link ProviderCheck}s.
+	 * </p>
+	 * <p>
+	 * <b>Be Aware:</b> Some of these changes might require a server restart to take effect.
+	 * </p>
+	 *
+	 * @param configuration The {@link ProviderSettings} configuration defines settings for providers.
+	 * @param checks 		An optional list of {@link ProviderCheck}s to validate the configuration.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ProviderSettings} configuration is updated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async updateProviderConfiguration(
+		configuration: ProviderSettings, checks?: Array<ProviderCheck>
+	): Promise<ConfigurationResult> {
+		await this.validateUser();
+
+		let providerConfiguration: ProviderConfiguration = ProviderConfiguration.fromJson({
+			configuration: configuration,
+			configurationChecks: checks,
+			configurationMode: ConfigurationMode.Write,
+			configurationType: ConfigurationType.Provider
+		} as ProviderConfigurationInterface)
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/configuration/"),
+				this.prepareHttpEntity(providerConfiguration),
+				DataFormats.JSON.getMimeType()
+			);
+
+		let configurationResult: ConfigurationResult = ConfigurationResult.fromJson(
+			await request.executeRequest()
+		);
+
+		if (configurationResult.error?.code === 0) {
+			this.providerConfiguration = configuration;
+		}
+
+		return configurationResult;
+	}
+
+	/**
+	 * <p>
+	 * Validates the {@link ProviderSettings} configuration with the given {@link ProviderCheck}s.
+	 * </p>
+	 *
+	 * @param configuration The {@link ProviderSettings} configuration defines settings for server providers.
+	 * @param checks 		The list of {@link ProviderCheck}s to validate the configuration with.
+	 * @return defines an extended {@link ConfigurationResult} for administrative configuration operations
+	 * 			when the {@link ProviderSettings} configuration is validated.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async validateProviderConfiguration(
+		configuration: ProviderSettings, checks: Array<ProviderCheck>,
+	): Promise<ConfigurationResult> {
+		await this.validateUser();
+
+		let providerConfiguration: ProviderConfiguration = ProviderConfiguration.fromJson({
+			configuration: configuration,
+			configurationChecks: checks,
+			configurationMode: ConfigurationMode.Validate,
+			configurationType: ConfigurationType.Provider
+		} as ProviderConfigurationInterface);
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/configuration/"),
+				this.prepareHttpEntity(providerConfiguration),
+				DataFormats.JSON.getMimeType()
+			);
+
+		return ConfigurationResult.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * Returns the cluster status from server.
+	 *
+	 * @return The requested {@link ClusterStatus}.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async fetchClusterStatus(): Promise<ClusterStatus> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/cluster/status"));
+
+		return ClusterStatus.fromJson(await request.executeRequest());
 	}
 }

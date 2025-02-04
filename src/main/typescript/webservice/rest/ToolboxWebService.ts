@@ -41,7 +41,7 @@ export class ToolboxWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Toolbox} operation parameters.
 	 */
-	public setOperationParameters(operation: Array<BaseToolbox> | undefined) {
+	public setOperationParameters(operation: Array<BaseToolbox> | undefined): void {
 		if (typeof operation === "undefined" || operation.length === 0) {
 			return;
 		}

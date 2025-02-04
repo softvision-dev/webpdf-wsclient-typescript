@@ -2,10 +2,9 @@ import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
 import {expect} from "chai";
 import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {BaseToolbox, Signature, SignatureInterface} from "../../main/typescript/generated-sources";
+import {it, suite} from "mocha";
 
-require("./bootstrap");
-
-describe("RestFailureIntegrationTest", function () {
+suite("RestFailureIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 

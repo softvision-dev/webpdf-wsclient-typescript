@@ -73,7 +73,6 @@ export class SessionContext {
      * </p>
      *
      * @param tlsContext The {@link Agent}, that shall be used.
-     * @return This {@link SessionFactory} itself.
      */
     public setTlsContext(tlsContext: Agent | undefined): void {
         this._tlsContext = tlsContext;
@@ -98,9 +97,8 @@ export class SessionContext {
      * </p>
      *
      * @param proxy The {@link AxiosProxyConfig}, that shall be used.
-     * @return This {@link SessionFactory} itself.
      */
-    public setProxy(proxy: AxiosProxyConfig | undefined) {
+    public setProxy(proxy: AxiosProxyConfig | undefined): void {
         this._proxy = proxy;
     }
 
@@ -126,9 +124,8 @@ export class SessionContext {
      * </p>
      *
      * @param skewTime The skew time in seconds, that shall be used.
-     * @return This {@link SessionFactory} itself.
      */
-    public setSkewTime(skewTime: number) {
+    public setSkewTime(skewTime: number): void {
         this._skewTime = skewTime;
     }
 

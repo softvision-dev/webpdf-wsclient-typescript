@@ -55,7 +55,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Billing} settings for this {@link RestOperationData}.
 	 */
-	public setBilling(value: Billing | undefined) {
+	public setBilling(value: Billing | undefined): void {
 		this.billing = value;
 	}
 
@@ -82,7 +82,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link PdfPassword} settings for this {@link RestOperationData}.
 	 */
-	public setPassword(value: PdfPassword | undefined) {
+	public setPassword(value: PdfPassword | undefined): void {
 		this.password = value;
 	}
 
@@ -109,7 +109,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Settings} settings for this {@link RestOperationData}.
 	 */
-	public setSettings(value: Settings | undefined) {
+	public setSettings(value: Settings | undefined): void {
 		this.settings = value;
 	}
 
@@ -136,7 +136,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Barcode} for this {@link RestOperationData}.
 	 */
-	public setBarcode(value: Barcode | undefined) {
+	public setBarcode(value: Barcode | undefined): void {
 		this.barcode = value;
 	}
 
@@ -163,7 +163,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Converter} for this {@link RestOperationData}.
 	 */
-	public setConverter(value: Converter | undefined) {
+	public setConverter(value: Converter | undefined): void {
 		this.converter = value;
 	}
 
@@ -190,7 +190,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Ocr} for this {@link RestOperationData}.
 	 */
-	public setOcr(value: Ocr | undefined) {
+	public setOcr(value: Ocr | undefined): void {
 		this.ocr = value;
 	}
 
@@ -217,7 +217,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Pdfa} for this {@link RestOperationData}.
 	 */
-	public setPdfa(value: Pdfa | undefined) {
+	public setPdfa(value: Pdfa | undefined): void {
 		this.pdfa = value;
 	}
 	
@@ -244,7 +244,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link Signature} for this {@link RestOperationData}.
 	 */
-	public setSignature(value: Signature | undefined) {
+	public setSignature(value: Signature | undefined): void {
 		this.signature = value;
 	}
 	
@@ -333,7 +333,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link BaseToolbox} Array for this {@link RestOperationData}.
 	 */
-	public setToolbox(value: Array<BaseToolbox> | undefined) {
+	public setToolbox(value: Array<BaseToolbox> | undefined): void {
 		this.toolbox = value;
 	}
 	
@@ -360,7 +360,7 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @param value The {@link UrlConverter} for this {@link RestOperationData}.
 	 */
-	public setUrlconverter(value: UrlConverter | undefined) {
+	public setUrlconverter(value: UrlConverter | undefined): void {
 		this.urlconverter = value;
 	}
 	

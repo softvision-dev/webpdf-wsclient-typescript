@@ -126,4 +126,23 @@ export interface RestDocument extends Document {
 	 * @throws ResultException Shall be thrown, should the extraction have failed.
 	 */
 	extractDocument(fileExtract: FileExtract): Promise<Array<RestDocument>>;
+
+	/**
+	 * This is a shortcut for {@link DocumentManager#extractArchiveFile} and extracts and downloads the given archive
+	 * path of the {@link RestDocument}.
+	 *
+	 * @param archivePath  The path of the file to extract in the given archive.
+	 * @return The {@link Buffer} of the extracted and downloaded archive file.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	extractArchiveFile(archivePath: string): Promise<Buffer>;
+
+	/**
+	 * This is a shortcut for {@link DocumentManager#extractDocument} and updates the {@link RestDocument}.
+	 *
+	 * @param data The data {@link Blob} to update the document with.
+	 * @return The updated {@link RestDocument}.
+	 * @throws ResultException Shall be thrown, should the update have failed.
+	 */
+	updateDocument(data: Blob): Promise<RestDocument>;
 }

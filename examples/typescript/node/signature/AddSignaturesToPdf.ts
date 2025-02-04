@@ -131,6 +131,6 @@ class AddSignaturesToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await AddSignaturesToPdf.main();
 })();

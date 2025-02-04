@@ -2,13 +2,12 @@ import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
 import {expect} from "chai";
 import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
 import {Converter, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
-
-require("./bootstrap");
+import {it, suite} from "mocha";
 
 const fs = require('fs');
 const tmp = require('tmp');
 
-describe("RestCredentialsIntegrationTest", function () {
+suite("RestCredentialsIntegrationTest", function () {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();

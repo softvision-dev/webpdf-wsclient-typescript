@@ -161,7 +161,7 @@ export class HttpRestRequest {
 	 * @param signal The {@link AbortSignal} object used in an {@link AbortController}
 	 * @return The {@link HttpRestRequest} instance itself.
 	 */
-	public setAbortSignal(signal?: AbortSignal) {
+	public setAbortSignal(signal?: AbortSignal): HttpRestRequest {
 		this.requestConfig.signal = signal;
 
 		return this;
@@ -173,7 +173,7 @@ export class HttpRestRequest {
 	 * @param callback The function to be called when the upload progresses
 	 * @return The {@link HttpRestRequest} instance itself.
 	 */
-	public setOnUploadProgress(callback?: (progressEvent: AxiosProgressEvent) => void) {
+	public setOnUploadProgress(callback?: (progressEvent: AxiosProgressEvent) => void): HttpRestRequest {
 		this.requestConfig.onUploadProgress = callback;
 
 		return this;
@@ -185,7 +185,7 @@ export class HttpRestRequest {
 	 * @param callback The function to be called when the download progresses
 	 * @return The {@link HttpRestRequest} instance itself.
 	 */
-	public setOnDownloadProgress(callback?: (progressEvent: AxiosProgressEvent) => void) {
+	public setOnDownloadProgress(callback?: (progressEvent: AxiosProgressEvent) => void): HttpRestRequest {
 		this.requestConfig.onDownloadProgress = callback;
 
 		return this;

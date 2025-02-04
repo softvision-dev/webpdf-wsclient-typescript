@@ -117,6 +117,6 @@ class ChangeEncryptionAndPasswordOfPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ChangeEncryptionAndPasswordOfPdf.main();
 })();

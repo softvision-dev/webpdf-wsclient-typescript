@@ -67,6 +67,6 @@ class GetServerLog {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await GetServerLog.main();
 })();

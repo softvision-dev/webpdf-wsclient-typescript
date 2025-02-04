@@ -8,7 +8,11 @@
       "adminName": "jdo",
       "adminPassword": "johndoe",
       "userName": "bmi",
-      "userPassword": "billymiller"
+      "userPassword": "billymiller",
+      "ldapAdminName": "jdo",
+      "ldapAdminPassword": "johndoe",
+      "ldapUserName": "bmi",
+      "ldapUserPassword": "billymiller"
     },
     "public": {
       "url": "https://portal.webpdf.de",

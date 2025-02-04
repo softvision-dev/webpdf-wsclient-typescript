@@ -65,6 +65,6 @@ class GetServerStatus {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await GetServerStatus.main();
 })();

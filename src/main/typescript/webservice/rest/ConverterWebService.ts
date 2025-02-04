@@ -37,7 +37,7 @@ export class ConverterWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Converter} operation parameters.
 	 */
-	public setOperationParameters(operation: Converter | undefined) {
+	public setOperationParameters(operation: Converter | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

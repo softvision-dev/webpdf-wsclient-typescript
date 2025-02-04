@@ -98,6 +98,6 @@ class ChangePdfDisplayOptions {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ChangePdfDisplayOptions.main();
 })();

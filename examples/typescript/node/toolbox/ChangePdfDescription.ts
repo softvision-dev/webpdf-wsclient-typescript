@@ -104,6 +104,6 @@ class ChangePdfDescription {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ChangePdfDescription.main();
 })();

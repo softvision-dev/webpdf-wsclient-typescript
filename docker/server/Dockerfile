@@ -1,4 +1,4 @@
-FROM softvisiondev/webpdf:9.0
+FROM softvisiondev/webpdf:10.0
 
 USER root
 

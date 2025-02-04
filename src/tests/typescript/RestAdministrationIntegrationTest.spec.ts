@@ -1,6 +1,14 @@
 import {expect} from 'chai';
 import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
-import {AuthMaterial, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol} from "../../main/typescript";
+import {
+	AuthMaterial,
+	RestDocument,
+	RestSession,
+	SessionContext,
+	SessionFactory,
+	UserAuthProvider,
+	WebServiceProtocol
+} from "../../main/typescript";
 import {
 	AggregationServerState,
 	Application,
@@ -10,6 +18,8 @@ import {
 	ApplicationConfigKeystoreInterface,
 	ApplicationConfigPortalUserInterface,
 	ApplicationConfigPortalUserInterfaceInterface,
+	ClusterMode,
+	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
 	DataSourceServerState,
@@ -18,7 +28,6 @@ import {
 	GlobalKeyStore,
 	GlobalKeystoreFormat,
 	KeystoreSSL,
-	License,
 	LogConfigurationMode,
 	LogFileConfiguration,
 	LogoFileDataStore,
@@ -37,15 +46,14 @@ import {
 	Webservice,
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
-import {Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
-
-require("./bootstrap");
+import {ClusterSettings, Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
+import {it, suite} from "mocha";
 
 const atob = function (data: string) {
 	return Buffer.from(data, "base64").toString("ascii");
 };
 
-describe("RestAdministrationIntegrationTest", function () {
+suite("RestAdministrationIntegrationTest", function () {
 	let testServer: TestServer = new TestServer();
 	let testResources: TestResources = new TestResources('documents');
 	let testKeystores: TestResources = new TestResources('keystore');
@@ -592,7 +600,9 @@ describe("RestAdministrationIntegrationTest", function () {
 		expect(serverConfig, "Server configuration should exist.").to.exist;
 		expect(serverConfig.connectors.connector![1].ssl!.keystore.file, "Keystore should be default.").to.equal("ssl.jks");
 
-		let connectorKeyStores: { [key: string]: ConnectorKeyStore; } = await session.getAdministrationManager().getConnectorKeyStore();
+		let connectorKeyStores: {
+			[key: string]: ConnectorKeyStore;
+		} = await session.getAdministrationManager().getConnectorKeyStore();
 		expect(connectorKeyStores["ssl.jks"], "Default keystore should exist.").to.exist;
 		expect(connectorKeyStores["ssl.jks"].certificates?.length, "Keystore certificates should exist.").to.be.greaterThan(0);
 
@@ -694,6 +704,63 @@ describe("RestAdministrationIntegrationTest", function () {
 		// close own session via administration
 		try {
 			await session.getAdministrationManager().closeSession(sessionId!);
+		} catch (ex: any) {
+			expect(ex, "The server request did not work").to.be.undefined;
+		}
+
+		await session.close();
+	});
+
+	it('testClusterConfig', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		let clusterConfig: ClusterSettings = await session.getAdministrationManager().getClusterConfiguration();
+		expect(clusterConfig, "cluster configuration should exist.").to.exist;
+		expect(clusterConfig.mode, "mode should exist.").to.exist;
+
+		clusterConfig.mode = ClusterMode.Cluster;
+		expect(clusterConfig.mode, "mode should be cluster.").to.equal(ClusterMode.Cluster);
+
+		try {
+			await session.getAdministrationManager().updateClusterConfiguration(clusterConfig);
+		} catch (ex: any) {
+			expect(ex, "The server update did not work").to.be.undefined;
+		}
+
+		clusterConfig = await session.getAdministrationManager().fetchClusterConfiguration();
+		expect(clusterConfig, "Cluster configuration should exist.").to.exist;
+		expect(clusterConfig.mode, "mode should be cluster.").to.equal(ClusterMode.Cluster);
+
+		// reset cluster mode
+		clusterConfig.mode = ClusterMode.Single;
+		await session.getAdministrationManager().updateClusterConfiguration(clusterConfig);
+
+		await session.close();
+	});
+
+	it('testClusterStatus', async function () {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		try {
+			let clusterStatus: ClusterStatus = await session.getAdministrationManager().fetchClusterStatus();
+			expect(clusterStatus.settings, "settings should exist.").to.exist;
+			expect(clusterStatus.settings!.mode, "mode should be single.").to.equal(ClusterMode.Single);
 		} catch (ex: any) {
 			expect(ex, "The server request did not work").to.be.undefined;
 		}

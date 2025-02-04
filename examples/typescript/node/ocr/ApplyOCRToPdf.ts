@@ -105,6 +105,6 @@ class ApplyOCRToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await ApplyOCRToPdf.main();
 })();

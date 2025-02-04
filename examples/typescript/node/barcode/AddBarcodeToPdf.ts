@@ -126,6 +126,6 @@ class AddBarcodeToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await AddBarcodeToPdf.main();
 })();

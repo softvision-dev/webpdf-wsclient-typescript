@@ -23,18 +23,18 @@ import {
 	FileFilterType,
 	HistoryEntry,
 	InfoForm,
-	InfoType,
+	InfoType, MetadataPdf,
 	PdfPassword,
 	PdfPasswordInterface
 } from "../../../main/typescript/generated-sources";
+import AdmZip = require("adm-zip");
+import {it, suite} from "mocha";
 
-require("../bootstrap");
-
-describe("DocumentManagerIntegrationTest", function () {
+suite("DocumentManagerIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('documents');
 	let testServer: TestServer = new TestServer();
 
-	it('testHandleDocument', async function () {
+	it('testHandleDocument', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -59,6 +59,14 @@ describe("DocumentManagerIntegrationTest", function () {
 		let downloadedFile: any = await uploadedFile.downloadDocument();
 		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
 
+		let downloadedFileArchive: Buffer = await session.getDocumentManager().downloadArchive(
+			[uploadedFile.getDocumentId()]
+		);
+		let zipFile: AdmZip = new AdmZip(downloadedFileArchive);
+		let zipEntries: Array<AdmZip.IZipEntry> = zipFile.getEntries();
+		expect(zipEntries.length, "archive should contain 1 document.").to.equal(1);
+		expect(zipEntries[0].entryName, "names should be equal.").to.equal(sourceFilename);
+
 		let fileList: Array<RestDocument> = await session.getDocumentManager().getDocuments();
 		expect(fileList.length, "file list should contain 1 document.").to.equal(1);
 
@@ -70,7 +78,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentRename', async function () {
+	it('testDocumentRename', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -96,7 +104,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentList', async function () {
+	it('testDocumentList', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -129,7 +137,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentHistory', async function () {
+	it('testDocumentHistory', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -180,7 +188,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testHandleDocumentByID', async function () {
+	it('testHandleDocumentByID', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -203,7 +211,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentSecurityTextPassword', async function () {
+	it('testDocumentSecurityTextPassword', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -232,7 +240,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentSecurityCertificate', async function () {
+	it('testDocumentSecurityCertificate', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -273,7 +281,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentListFromSession', async function () {
+	it('testDocumentListFromSession', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -311,7 +319,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await resumedSession.close();
 	});
 
-	it('testDocumentPasswordHandling', async function () {
+	it('testDocumentPasswordHandling', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -349,7 +357,7 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let encryptedDocument: RestDocument | undefined = await toolboxWebService.process(uploadedFile);
 		expect(encryptedDocument!.getDocumentFile().error!.errorCode, "The document password should be set").to.equal(0);
-		expect(encryptedDocument!.getDocumentFile().metadata?.information, "The metadata should be readable").to.exist;
+		expect((encryptedDocument!.getDocumentFile().metadata as MetadataPdf).information, "The metadata should be readable").to.exist;
 
 		// rotate pages with initially set password
 		let rotationParameter: Array<BaseToolbox> = [
@@ -370,7 +378,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		} as PdfPassword);
 		let openedDocument: RestDocument | undefined = await encryptedDocument?.updateDocumentSecurity(passwordType);
 		expect(openedDocument!.getDocumentFile().error!.errorCode, "The document password should be wrong.").to.equal(-5008);
-		expect(openedDocument!.getDocumentFile().metadata?.information, "The metadata should not be readable.").to.not.exist;
+		expect(openedDocument!.getDocumentFile().metadata, "The metadata should not be readable.").to.not.exist;
 
 		// rotate pages with wrong password
 		toolboxWebService = WebServiceFactory.createInstance(session, WebServiceTypes.TOOLBOX);
@@ -409,7 +417,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentInfo', async function () {
+	it('testDocumentInfo', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -434,7 +442,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentExtractAll', async function () {
+	it('testDocumentExtractAll', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -459,7 +467,7 @@ describe("DocumentManagerIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testDocumentExtractWithFilter', async function () {
+	it('testDocumentExtractWithFilter', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -481,7 +489,7 @@ describe("DocumentManagerIntegrationTest", function () {
 			fileFilter: {
 				includeRules: [
 					{
-						rulePattern: "logo.png",
+						rulePattern: "{logo.png,form.pdf}",
 						ruleType: FileFilterType.Glob
 					}
 				]
@@ -490,12 +498,37 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let unzippedFiles: Array<RestDocument> = await uploadedFile.extractDocument(fileExtract);
 		expect(unzippedFiles, "Valid documents should have been returned.").to.exist;
-		expect(unzippedFiles.length, "There should be 1 result document.").to.equal(1);
+		expect(unzippedFiles.length, "There should be 2 result document.").to.equal(2);
 
 		await session.close();
 	});
 
-	it('testDocumentCompress', async function () {
+	it('testDocumentExtractFile', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "files.zip";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+		expect(uploadedFile.getDocumentId()).to.exist;
+
+		let downloadedFile: Buffer = await uploadedFile.extractArchiveFile("logo.png");
+		let compareFile: any = testResources.getResource("logo.png");
+		expect(downloadedFile.equals(compareFile), "Content of output file should be identical to test file.").to.be.true;
+
+		await session.close();
+	});
+
+	it('testDocumentCompress', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -520,12 +553,42 @@ describe("DocumentManagerIntegrationTest", function () {
 
 		let fileCompress: FileCompress = new FileCompress({
 			documentIdList: documentIdList,
-			archiveFileName: "archive"
+			archiveFileName: "archive",
+			storeArchive: true
 		} as FileCompressInterface);
 
 		let resultDocument: RestDocument = await session.getDocumentManager().compressDocuments(fileCompress);
 		expect(resultDocument, "Valid document should have been returned.").to.exist;
 		expect(resultDocument.getDocumentFile().mimeType).to.equal("application/zip");
+
+		await session.close();
+	});
+
+	it('testDocumentUpdate', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "lorem-ipsum.txt";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(uploadedFile, "Valid document should have been returned.").to.exist;
+
+		let fileContent: string = "This is test content";
+		let newData: any = Buffer.from(fileContent);
+
+		let updatedFile: RestDocument = await uploadedFile.updateDocument(newData);
+		expect(updatedFile, "Valid document should have been returned.").to.exist;
+
+		let downloadedFile: Buffer = await updatedFile.downloadDocument();
+		expect(downloadedFile.toString(), "content should equal \"" + fileContent + "\"").to.equal(fileContent);
 
 		await session.close();
 	});

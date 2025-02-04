@@ -38,88 +38,63 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	}
 
 	/**
-	 * Returns the document ID of the managed {@link RestDocument}.
-	 *
-	 * @return The document ID of the managed {@link RestDocument}.
+	 * @inheritDoc
 	 */
 	public getDocumentId(): string {
 		return this.accessInternalState().getDocumentId();
 	}
 
 	/**
-	 * Returns the {@link DocumentFile} of the managed {@link RestDocument}.
-	 *
-	 * @return The {@link DocumentFile} of the managed {@link RestDocument}.
+	 * @inheritDoc
 	 */
 	public getDocumentFile(): DocumentFile {
 		return this.accessInternalState().getDocumentFile();
 	}
 
 	/**
-	 * Returns the {@link HistoryEntry}s of the managed {@link RestDocument}.
-	 *
-	 * @return The {@link HistoryEntry}s of the managed {@link RestDocument}.
+	 * @inheritDoc
 	 */
 	public getHistory(): Array<HistoryEntry> {
 		return this.accessInternalState().getHistory();
 	}
 
 	/**
-	 * Returns a {@link HistoryEntry} from the internal history map, by given history ID.
-	 *
-	 * @param historyId The history ID of the {@link HistoryEntry} that shall be returned.
-	 * @return A {@link HistoryEntry} representing a historic state of the uploaded resource.
-	 * @throws ResultException Shall be thrown, should accessing the document history fail.
+	 * @inheritDoc
 	 */
 	public getHistoryEntry(historyId: number): HistoryEntry {
 		return this.accessInternalState().getHistoryEntry(historyId);
 	}
 
 	/**
-	 * Returns the currently active {@link HistoryEntry}.
-	 *
-	 * @return The currently active {@link HistoryEntry}.
-	 * @throws ResultException Shall be thrown, when updating the document history failed.
+	 * @inheritDoc
 	 */
 	public activeHistory(): HistoryEntry {
 		return this.accessInternalState().activeHistory();
 	}
 
 	/**
-	 * Updates the given {@link HistoryEntry} in the internally managed document history.
-	 *
-	 * @param historyEntry The {@link HistoryEntry} containing the values to be set.
-	 * @throws ResultException Shall be thrown, when updating the document history failed.
+	 * @inheritDoc
 	 */
 	public updateHistoryEntry(historyEntry: HistoryEntry): void {
 		this.accessInternalState().updateHistoryEntry(historyEntry);
 	}
 
 	/**
-	 * Returns the most recent {@link HistoryEntry}.
-	 *
-	 * @return The most recent {@link HistoryEntry}.
-	 * @throws ResultException Shall be thrown, when updating the document history failed.
+	 * @inheritDoc
 	 */
 	public lastHistory(): HistoryEntry {
 		return this.accessInternalState().lastHistory();
 	}
 
 	/**
-	 * Returns the number of known {@link HistoryEntry}s for this {@link RestWebServiceDocument}.
-	 *
-	 * @return The number of known {@link HistoryEntry}s for this {@link RestWebServiceDocument}.
+	 * @inheritDoc
 	 */
 	public getHistorySize(): number {
 		return this.accessInternalState().getHistorySize();
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#downloadDocument} and attempts to download and write the
-	 * {@link RestDocument} to the returned {@link Buffer}.
-	 *
-	 * @param options  Additional request options - see {@link HttpRestRequest}.
-	 * @throws ResultException Shall be thrown, should writing the result document fail.
+	 * @inheritDoc
 	 */
 	public downloadDocument(options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
@@ -129,32 +104,21 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#deleteDocument} and deletes the {@link RestDocument}.
-	 *
-	 * @throws ResultException Shall be thrown, should deleting the document fail.
+	 * @inheritDoc
 	 */
 	public async deleteDocument(): Promise<void> {
 		await this.accessInternalState().getDocumentManager().deleteDocument(this.getDocumentId());
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#renameDocument} and renames the {@link RestDocument}.
-	 *
-	 * @param fileName   The new name for the {@link RestDocument}.
-	 * @return The resulting {@link RestDocument} handle.
-	 * @throws ResultException Shall be thrown, should renaming the document have failed.
+	 * @inheritDoc
 	 */
 	public async renameDocument(fileName: string): Promise<RestDocument> {
 		return await this.accessInternalState().getDocumentManager().renameDocument(this.getDocumentId(), fileName);
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#renameDocument} and updates the security information the
-	 * {@link RestDocument}.
-	 *
-	 * @param passwordType The security information to update the document with
-	 * @return The updated {@link RestDocument}.
-	 * @throws ResultException Shall be thrown, should updating the document security have failed.
+	 * @inheritDoc
 	 */
 	public async updateDocumentSecurity(passwordType: PdfPassword): Promise<RestDocument> {
 		return await this.accessInternalState().getDocumentManager().updateDocumentSecurity(
@@ -163,26 +127,32 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#renameDocument} and returns {@link Info} about the
-	 * {@link RestDocument}.
-	 *
-	 * @param infoType     Detailed information for the document referenced by the unique documentId
-	 *                     in the server´s document storage.
-	 * @return The requested document {@link Info}
-	 * @throws ResultException Shall be thrown, should fetching the document info have failed.
+	 * @inheritDoc
 	 */
 	public async getDocumentInfo(infoType: InfoType): Promise<Info> {
 		return await this.accessInternalState().getDocumentManager().getDocumentInfo(this.getDocumentId(), infoType);
 	}
 
 	/**
-	 * This is a shortcut for {@link DocumentManager#extractDocument} and extracts the {@link RestDocument}.
-	 *
-	 * @param fileExtract   {@link FileExtract} settings for unpacking the archive document.
-	 * @return A list of the extracted {@link RestDocument}s.
-	 * @throws ResultException Shall be thrown, should the extraction have failed.
+	 * @inheritDoc
 	 */
 	public async extractDocument(fileExtract: FileExtract): Promise<Array<RestDocument>> {
 		return await this.accessInternalState().getDocumentManager().extractDocument(this.getDocumentId(), fileExtract);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async extractArchiveFile(archivePath: string): Promise<Buffer> {
+		return await this.accessInternalState().getDocumentManager().extractArchiveFile(
+			this.getDocumentId(), archivePath
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async updateDocument(data: Blob): Promise<RestDocument> {
+		return await this.accessInternalState().getDocumentManager().updateDocument(this.getDocumentId(), data);
 	}
 }

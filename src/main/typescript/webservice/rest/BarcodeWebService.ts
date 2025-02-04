@@ -37,7 +37,7 @@ export class BarcodeWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Barcode} operation parameters.
 	 */
-	public setOperationParameters(operation: Barcode | undefined) {
+	public setOperationParameters(operation: Barcode | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

@@ -87,6 +87,10 @@ export class WSClientSessionToken extends AbstractJWTToken {
 }
 
 export function instanceOfSessionToken(object: any): boolean {
+	if (object === undefined || object === null) {
+		return false;
+	}
+
 	return 'getCredentials' in object &&
 		'getRawAuthHeader' in object &&
 		'getAuthHeader' in object &&

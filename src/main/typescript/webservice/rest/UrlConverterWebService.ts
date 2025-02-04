@@ -37,7 +37,7 @@ export class UrlConverterWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link UrlConverter} operation parameters.
 	 */
-	public setOperationParameters(operation: UrlConverter | undefined) {
+	public setOperationParameters(operation: UrlConverter | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

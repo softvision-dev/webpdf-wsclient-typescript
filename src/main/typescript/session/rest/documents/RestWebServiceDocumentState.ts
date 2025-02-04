@@ -58,7 +58,7 @@ export class RestWebServiceDocumentState implements RestDocumentState<RestWebSer
      *
      * @param documentFile the new {@link DocumentFile} of the managed {@link RestWebServiceDocument}.
      */
-    public setDocumentFile(documentFile: DocumentFile) {
+    public setDocumentFile(documentFile: DocumentFile): void {
         this._documentFile = documentFile;
     }
 
@@ -77,7 +77,7 @@ export class RestWebServiceDocumentState implements RestDocumentState<RestWebSer
      * @param historyEntries The new {@link HistoryEntry}s to be set.
      * @throws ResultException Shall be thrown, when updating the document history failed.
      */
-    public setHistory(historyEntries: Array<HistoryEntry>) {
+    public setHistory(historyEntries: Array<HistoryEntry>): void {
         this.historyMap.clear();
 
         for (let historyEntry of historyEntries) {

@@ -136,6 +136,6 @@ class AddWatermarkToPdf {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await AddWatermarkToPdf.main();
 })();

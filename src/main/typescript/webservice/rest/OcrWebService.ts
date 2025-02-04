@@ -37,7 +37,7 @@ export class OcrWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Ocr} operation parameters.
 	 */
-	public setOperationParameters(operation: Ocr | undefined) {
+	public setOperationParameters(operation: Ocr | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

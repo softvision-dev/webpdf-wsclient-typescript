@@ -130,6 +130,6 @@ class UseDocumentManager {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await UseDocumentManager.main();
 })();

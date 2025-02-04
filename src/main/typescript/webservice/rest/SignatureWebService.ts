@@ -37,7 +37,7 @@ export class SignatureWebService<T_REST_DOCUMENT extends RestDocument>
 	 *
 	 * @param operation Sets the {@link Signature} operation parameters.
 	 */
-	public setOperationParameters(operation: Signature | undefined) {
+	public setOperationParameters(operation: Signature | undefined): void {
 		if (typeof operation === "undefined") {
 			return;
 		}

@@ -62,6 +62,6 @@ class RestartServer {
 	}
 }
 
-(async function () {
+(async function (): Promise<void> {
 	await RestartServer.main();
 })();

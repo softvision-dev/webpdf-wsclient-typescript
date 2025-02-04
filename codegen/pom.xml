@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <groupId>net.webpdf.codegen</groupId>
     <artifactId>wsclient-codegen-typescript</artifactId>
-    <version>9.0.0</version>
+    <version>10.0.0</version>
     <name>webPDF OpenAPI - code generator for the Web service typescript client library</name>
     <description>OpenAPI code generator for usage by the webPDF Web service typescript client library.</description>
     <url>https://www.webpdf.de</url>
@@ -154,7 +154,7 @@
                         <artifactId>typescript-fetch-enhanced-swagger-codegen</artifactId>
                         <version>1.0.0</version>
                         <scope>system</scope>
-                        <systemPath>${project.basedir}/build/wsclient-codegen-typescript-9.0.0.jar</systemPath>
+                        <systemPath>${project.basedir}/build/wsclient-codegen-typescript-10.0.0.jar</systemPath>
                     </dependency>
                 </dependencies>
                 <executions>
