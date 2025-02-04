@@ -11,7 +11,7 @@ The library implements the required stubs and session management in ready-to-use
 ## Download
 > **Note:** The version 10.0.0 requires at least webPDF server version **10.0.0.3669**.
 
-> **Note:** Starting with wsclient 10.x the wsclient´s and webPDF server´s version numbers have been synchronized, to simplify finding the proper wsclient for your webPDF server.
+> **Note:** Starting with wsclient 9.x the wsclient´s and webPDF server´s version numbers have been synchronized, to simplify finding the proper wsclient for your webPDF server.
 
 You can use this library, by adding this dependency to your project:
 ```
