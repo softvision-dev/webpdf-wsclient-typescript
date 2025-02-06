@@ -13,7 +13,6 @@
                     <protocol>TLSv1</protocol>
                     <protocol>TLSv1.1</protocol>
                     <protocol>TLSv1.2</protocol>
-                    <protocol>TLSv1.3</protocol>
                 </protocols>
                 <ciphers>
                     <cipher>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</cipher>
@@ -40,8 +39,44 @@
               roleField="cn"
               certificatesTrustMode="validate"
               followReferral="false">
-        <userCertificates enabled="true" attributeName="userCertificate"/>
-        <userPKCS12 enabled="true" attributeName="userPKCS12"/>
+            <userCertificates enabled="true" attributeName="userCertificate"/>
+            <userPKCS12 enabled="true" attributeName="userPKCS12"/>
         </ldap>
     </user>
+    <oauth>
+        <providers>
+            <!-- BOF AZURE OAUTH -->
+            <provider name="azureAd"
+                      displayName="Microsoft"
+                      flow="clientCredentials"
+                      id="azure_client"
+                      tenantId="#azure_tenant_id#"
+                      clientId="#azure_client_id#"
+                      applicationId="#azure_application_id#"
+                      scope=""
+                      discoveryUrl="https://login.microsoftonline.com/#azure_tenant_id#/v2.0/.well-known/openid-configuration"
+                      claimSessionId="sub"
+                      claimClientId="azp"
+                      claimRoles="roles"
+                      roleNameAdmin="admin"
+                      roleNameUser="user"/>
+            <!-- EOF AZURE OAUTH -->
+            <!-- BOF AUTH0 OAUTH -->
+            <provider name="auth0"
+                      displayName="Auth0"
+                      flow="clientCredentials"
+                      id="auth0_client"
+                      tenantId=""
+                      clientId="#auth0_client_id#"
+                      applicationId="#auth0_application_id#"
+                      scope=""
+                      discoveryUrl="https://#auth0_tenant_id#.eu.auth0.com/.well-known/openid-configuration"
+                      claimSessionId="sub"
+                      claimClientId="azp"
+                      claimRoles="permissions"
+                      roleNameAdmin="admin"
+                      roleNameUser="user"/>
+            <!-- EOF AUTH0 OAUTH -->
+        </providers>
+    </oauth>
 </server>
