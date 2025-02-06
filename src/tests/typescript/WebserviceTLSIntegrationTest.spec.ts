@@ -40,7 +40,8 @@ suite("WebserviceTLSIntegrationTest", function () {
 					CERT_START + currentCertificate.raw.toString('base64') + CERT_END
 				);
 
-				if (typeof currentCertificate.issuerCertificate === "undefined") {
+				if (typeof currentCertificate.issuerCertificate === "undefined" ||
+					currentCertificate.fingerprint === currentCertificate.issuerCertificate.fingerprint) {
 					break;
 				}
 

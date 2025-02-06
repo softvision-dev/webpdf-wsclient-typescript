@@ -13,3 +13,4 @@
 /config/testConfig.json
 /config/buildConfig.json
 /src/main/typescript/generated-sources/
+/docker/.env
