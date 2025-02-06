@@ -8,7 +8,6 @@ ENV PORT 10389
 RUN mkdir /ldap
 WORKDIR /ldap
 
-ADD ldap-1 /ldap
 ADD resources /ldap
 ADD certificates /ldap
 

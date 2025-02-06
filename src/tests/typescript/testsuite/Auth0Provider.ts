@@ -30,10 +30,9 @@ export class Auth0Provider implements OAuth2Provider {
 				clientId: this.clientId,
 				clientSecret: this.clientSecret
 			});
-
 			let token: JSONApiResponse<TokenSet> = await auth.oauth.clientCredentialsGrant({
 				audience: this.audience
-			})
+			});
 
 			this.token = new OAuth2Token(token.data.access_token);
 		} catch (e: any) {
