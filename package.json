@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "10.0.2-beta.0",
+	"version": "10.0.2-beta.1",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -35,31 +35,34 @@
 		"url": "git+https://github.com/softvision-dev/webpdf-wsclient-typescript"
 	},
 	"dependencies": {
-		"axios": "^1.7.9",
-		"typescript": "^5.7.3"
+		"axios": "^1.9.0",
+		"typescript": "^5.8.3"
 	},
 	"devDependencies": {
-		"@azure/msal-node": "^3.2.1",
+		"@azure/msal-node": "^3.5.3",
 		"@types/auth0": "^3.3.10",
-		"@types/chai": "^5.0.1",
+		"@types/chai": "^5.2.2",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^22.13.1",
+		"@types/node": "^22.15.16",
 		"@types/adm-zip": "^0.5.7",
-		"auth0": "^4.18.0",
-		"chai": "^5.1.2",
+		"auth0": "^4.23.0",
+		"chai": "^5.2.0",
 		"child_process": "^1.0.2",
-		"form-data": "^4.0.1",
-		"mocha": "^11.1.0",
+		"form-data": "^4.0.2",
+		"mocha": "^11.2.2",
 		"node-fetch": "^3.3.2",
-		"parcel": "^2.13.3",
-		"shx": "^0.3.4",
+		"parcel": "^2.14.4",
+		"shx": "^0.4.0",
+		"testcontainers": "^10.25.0",
 		"tmp": "^0.2.3",
 		"ts-node": "^10.9.2",
-		"testcontainers": "^10.17.2",
 		"adm-zip": "^0.5.16"
 	},
 	"files": [
 		"lib/**/*"
 	],
-	"packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+	"engines": {
+		"node": "22.x.x",
+		"yarn": "1.22.x"
+	}
 }
