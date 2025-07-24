@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.2 (2025-06-16T11:18:31Z)"
+		"version": "webPDF 10.0.2 (2025-07-24T10:43:19Z)"
 	},
 	"servers": [
 		{
@@ -5799,9 +5799,6 @@
 					},
 					"propertyName": "metadataType"
 				},
-				"x-webpdf-codegen": {
-					"isReadOnly": "true"
-				},
 				"properties": {
 					"metadataType": {
 						"$ref": "#/components/schemas/Document_MetadataType"
@@ -5810,7 +5807,10 @@
 				"readOnly": true,
 				"required": [
 					"metadataType"
-				]
+				],
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_MetadataArchive": {
 				"type": "object",
@@ -5915,22 +5915,22 @@
 							"additionalProperties": {
 								"type": "string",
 								"description": "Metadata dictionary of the image file format",
+								"readOnly": true,
 								"x-webpdf-codegen": {
 									"isReadOnly": "true"
-								},
-								"readOnly": true
+								}
 							},
 							"description": "Metadata dictionary of the image file format",
+							"readOnly": true,
 							"x-webpdf-codegen": {
 								"isReadOnly": "true"
-							},
-							"readOnly": true
+							}
 						},
 						"description": "Metadata dictionary of the image file format",
+						"readOnly": true,
 						"x-webpdf-codegen": {
 							"isReadOnly": "true"
-						},
-						"readOnly": true
+						}
 					},
 					"orientation": {
 						"$ref": "#/components/schemas/Document_MetadataImageOrientation"
@@ -5976,10 +5976,10 @@
 					"rightBottom",
 					"leftBottom"
 				],
+				"readOnly": true,
 				"x-webpdf-codegen": {
 					"isReadOnly": "true"
-				},
-				"readOnly": true
+				}
 			},
 			"Document_MetadataImageResolutionUnit": {
 				"type": "string",
@@ -5990,10 +5990,10 @@
 					"inch",
 					"centimeter"
 				],
+				"readOnly": true,
 				"x-webpdf-codegen": {
 					"isReadOnly": "true"
-				},
-				"readOnly": true
+				}
 			},
 			"Document_MetadataPdf": {
 				"type": "object",
@@ -6056,17 +6056,14 @@
 					"archive",
 					"image"
 				],
+				"readOnly": true,
 				"x-webpdf-codegen": {
 					"isReadOnly": "true"
-				},
-				"readOnly": true
+				}
 			},
 			"Document_Password": {
 				"type": "object",
 				"description": "Contains password information if it is a PDF document",
-				"x-webpdf-codegen": {
-					"isReadOnly": "true"
-				},
 				"properties": {
 					"isCertificateSet": {
 						"type": "boolean",
@@ -6095,7 +6092,10 @@
 						"readOnly": true
 					}
 				},
-				"readOnly": true
+				"readOnly": true,
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Document_Recipient": {
 				"type": "object",
@@ -6293,9 +6293,6 @@
 			},
 			"Metadata_AnnotationPoint": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Metadata_Positions"
-				},
 				"properties": {
 					"point": {
 						"type": "object",
@@ -6315,13 +6312,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Metadata_Positions"
 				}
 			},
 			"Metadata_AnnotationRectangle": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Metadata_Positions"
-				},
 				"properties": {
 					"rectangle": {
 						"type": "object",
@@ -6353,6 +6350,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Metadata_Positions"
 				}
 			},
 			"Metadata_AnnotationsDocument": {
@@ -10957,9 +10957,6 @@
 			},
 			"Operation_FitBoundingBoxDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitBoundingBox": {
 						"type": "object",
@@ -10974,13 +10971,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FitBoundingBoxWidthDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitBoundingBoxWidth": {
 						"type": "object",
@@ -11016,13 +11013,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FitHeightDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitHeight": {
 						"type": "object",
@@ -11058,13 +11055,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FitPageDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitPage": {
 						"type": "object",
@@ -11079,13 +11076,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FitRectangleDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitRectangle": {
 						"type": "object",
@@ -11139,13 +11136,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FitWidthDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"fitWidth": {
 						"type": "object",
@@ -11181,6 +11178,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_FormFieldSelection": {
@@ -11206,7 +11206,7 @@
 					"format": {
 						"type": "string",
 						"default": "xml",
-						"description": "Used to set the format for exporting the data in a PDF form:\n\n*   xml = XML\n*   fdf = FDF\n*   xfdf = XFDF\n*   xdp = XDP (only for PDF documents that contain XFA data)\n\nThe exported data will be returned with the web service call as per the selected format.\n\n**Tip:**The format of this is described by the http://schema.webpdf.de/1.0/form/data.xsd schema.",
+						"description": "Used to set the format for exporting the data in a PDF form:\n\n*   xml = XML\n*   fdf = FDF\n*   xfdf = XFDF\n*   xdp = XDP (only for PDF documents that contain XFA data)\n\nThe exported data will be returned with the web service call as per the selected format.\n\n**Tip:** The format of this is described by the http://schema.webpdf.de/1.0/form/data.xsd schema.",
 						"enum": [
 							"xml",
 							"fdf",
@@ -11265,7 +11265,7 @@
 					"format": {
 						"type": "string",
 						"default": "xml",
-						"description": "Used to set the format for exporting the data in a PDF form:\n\n*   xml = XML\n*   fdf = FDF\n*   xfdf = XFDF\n*   xdp = XDP (only for PDF documents that contain XFA data)\n\nThe exported data will be returned with the web service call as per the selected format.\n\n**Tip:**The format of this is described by the http://schema.webpdf.de/1.0/form/data.xsd schema.",
+						"description": "Used to set the format for exporting the data in a PDF form:\n\n*   xml = XML\n*   fdf = FDF\n*   xfdf = XFDF\n*   xdp = XDP (only for PDF documents that contain XFA data)\n\nThe exported data will be returned with the web service call as per the selected format.\n\n**Tip:** The format of this is described by the http://schema.webpdf.de/1.0/form/data.xsd schema.",
 						"enum": [
 							"xml",
 							"fdf",
@@ -11472,9 +11472,6 @@
 			},
 			"Operation_GoTo3DViewAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"goTo3DView": {
 						"type": "object",
@@ -11515,13 +11512,13 @@
 							"annotation"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_GoToDestinationAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"goTo": {
 						"type": "object",
@@ -11532,6 +11529,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_HeaderFooter": {
@@ -11633,9 +11633,6 @@
 			},
 			"Operation_HideAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"hideAnnotation": {
 						"type": "object",
@@ -11654,6 +11651,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_HtmlTranscribe": {
@@ -11972,9 +11972,6 @@
 			},
 			"Operation_ImportDataAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"importSchema": {
 						"type": "object",
@@ -11988,6 +11985,9 @@
 							"file"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_Item": {
@@ -12100,9 +12100,6 @@
 			},
 			"Operation_JavaScriptAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"executeJavaScript": {
 						"type": "object",
@@ -12115,6 +12112,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_Jpeg": {
@@ -12189,9 +12189,6 @@
 			},
 			"Operation_LaunchApplicationAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"launchApplication": {
 						"type": "object",
@@ -12218,6 +12215,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_LaunchParameter": {
@@ -12552,9 +12552,6 @@
 			},
 			"Operation_NamedAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"executeNamed": {
 						"type": "object",
@@ -12567,13 +12564,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_NamedDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"goToNamed": {
 						"type": "object",
@@ -12586,6 +12583,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_OCGSelection": {
@@ -13438,6 +13438,39 @@
 					}
 				}
 			},
+			"Operation_PortfolioSort": {
+				"type": "object",
+				"description": "Used to define a sorting schema for the portfolio.\n\n**Important:** The order of the sorting criteria does matter and the sorting precedence will follow the given sequence.\n\n**Important:** Should an old sorting schema be found, it will be removed and replaced.",
+				"properties": {
+					"namedCriteria": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Operation_PortfolioSortPredefinedCriterion"
+						}
+					}
+				}
+			},
+			"Operation_PortfolioSortPredefinedCriterion": {
+				"type": "object",
+				"description": "Selects a predefined sorting criterion to apply to entries of the portfolio, when determining display order.",
+				"properties": {
+					"ascending": {
+						"type": "boolean",
+						"default": true,
+						"description": "Sets whether the schema criterion shall be applied in ascending or descending order."
+					},
+					"displayName": {
+						"type": "string",
+						"default": "",
+						"description": "Selects the display name for the sorting criterion."
+					},
+					"key": {
+						"type": "string",
+						"default": "order",
+						"description": "Selects a predefined sorting criterion."
+					}
+				}
+			},
 			"Operation_PositionBackgroundBaseSettings": {
 				"type": "object",
 				"description": "Used to define the position of the background layer.",
@@ -14225,9 +14258,6 @@
 			},
 			"Operation_ResetFormAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"resetForm": {
 						"type": "object",
@@ -14246,6 +14276,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_ResizeBoxes": {
@@ -14695,9 +14728,6 @@
 			},
 			"Operation_SetOCGStateAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"setLayerState": {
 						"type": "object",
@@ -14716,6 +14746,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_Settings": {
@@ -15011,9 +15044,6 @@
 			},
 			"Operation_SoundAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"playSound": {
 						"type": "object",
@@ -15087,6 +15117,9 @@
 							"sound"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_SquareAnnotation": {
@@ -15208,9 +15241,6 @@
 			},
 			"Operation_SubmitFormAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"submitForm": {
 						"type": "object",
@@ -15294,6 +15324,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_Svg": {
@@ -15764,9 +15797,6 @@
 			},
 			"Operation_ThreadAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"goToThread": {
 						"type": "object",
@@ -15800,6 +15830,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_Tiff": {
@@ -15892,9 +15925,6 @@
 			},
 			"Operation_ToolboxAnnotation": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"annotation": {
 						"type": "object",
@@ -15917,13 +15947,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxAttachment": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"attachment": {
 						"type": "object",
@@ -15940,13 +15970,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxCompress": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"compress": {
 						"type": "object",
@@ -15957,13 +15987,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxDelete": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"delete": {
 						"type": "object",
@@ -15979,13 +16009,13 @@
 							"pages"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxDescription": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"description": {
 						"type": "object",
@@ -16034,13 +16064,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxExtraction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"extraction": {
 						"type": "object",
@@ -16066,13 +16096,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxForms": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"forms": {
 						"type": "object",
@@ -16089,13 +16119,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxImage": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"image": {
 						"type": "object",
@@ -16131,13 +16161,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxMerge": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"merge": {
 						"type": "object",
@@ -16185,20 +16215,20 @@
 							"sourceIsZip": {
 								"type": "boolean",
 								"default": false,
-								"description": "If this parameter is enabled, a ZIP archive\n\n*   containing the documents to merge - will be expected as the webservice's source document. Also - in that case, the \"data\" parameter is not required. The first element in the ZIP archive will be used as a base document to which all following entries will be appended.\n\n**Important:**The usage of this parameter is expected to be used for the \"portfolio\" mode. All the documents in the ZIP archive will be added to the portfolio receiving identical permission settings."
+								"description": "If this parameter is enabled, a ZIP archive\n\n*   containing the documents to merge - will be expected as the webservice's source document. Also - in that case, the \"data\" parameter is not required. The first element in the ZIP archive will be used as a base document to which all following entries will be appended.\n\n**Important:** The usage of this parameter is expected to be used for the \"portfolio\" mode. All the documents in the ZIP archive will be added to the portfolio receiving identical permission settings."
 							}
 						},
 						"required": [
 							"data"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxMove": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"move": {
 						"type": "object",
@@ -16242,6 +16272,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxOperation": {
@@ -16266,9 +16299,6 @@
 			},
 			"Operation_ToolboxOptions": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"options": {
 						"type": "object",
@@ -16360,13 +16390,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxOutline": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"outline": {
 						"type": "object",
@@ -16383,13 +16413,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxPortfolio": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"portfolio": {
 						"type": "object",
@@ -16403,16 +16433,19 @@
 							},
 							"remove": {
 								"$ref": "#/components/schemas/Operation_PortfolioRemove"
+							},
+							"sort": {
+								"$ref": "#/components/schemas/Operation_PortfolioSort"
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxPrint": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"print": {
 						"type": "object",
@@ -16481,13 +16514,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxRedact": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"redact": {
 						"type": "object",
@@ -16501,13 +16534,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxRotate": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"rotate": {
 						"type": "object",
@@ -16566,13 +16599,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxScale": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"scale": {
 						"type": "object",
@@ -16583,13 +16616,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxSecurity": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"security": {
 						"type": "object",
@@ -16606,13 +16639,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxSplit": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"split": {
 						"type": "object",
@@ -16659,13 +16692,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxTranscribe": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"transcribe": {
 						"type": "object",
@@ -16715,13 +16748,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxWatermark": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"watermark": {
 						"type": "object",
@@ -16748,13 +16781,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_ToolboxXmp": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_BaseToolbox"
-				},
 				"properties": {
 					"xmp": {
 						"type": "object",
@@ -16784,6 +16817,9 @@
 							"namespace"
 						]
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_BaseToolbox"
 				}
 			},
 			"Operation_Transition": {
@@ -16867,9 +16903,6 @@
 			},
 			"Operation_TransitionAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"setTransition": {
 						"type": "object",
@@ -16952,13 +16985,13 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_URIAction": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_ActionEvent"
-				},
 				"properties": {
 					"resolveURI": {
 						"type": "object",
@@ -16971,6 +17004,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_ActionEvent"
 				}
 			},
 			"Operation_UpcaBarcode": {
@@ -17016,7 +17052,7 @@
 			},
 			"Operation_UrlConverter": {
 				"type": "object",
-				"description": "The \"URLConverter\" web service van be used to convert URL resources (websites) to a PDF document.\n\n**Important:** Please keep the limitations of HTML conversion in mind (see chapter \"HTML conversion\").",
+				"description": "The \"URLConverter\" web service van be used to convert URL resources (e.g., websites) to a PDF document.\n\n**Important:** Please keep the limitations of HTML conversion in mind (see chapter \"HTML Converter\").",
 				"properties": {
 					"basicAuth": {
 						"$ref": "#/components/schemas/Operation_HttpBasicAuth"
@@ -17030,13 +17066,13 @@
 					"url": {
 						"type": "string",
 						"default": "",
-						"description": "The URL for the resource to be converted."
+						"description": "The URL for the resource to be converted.\n\n**Note:**The \"file\" protocol is not supported; this applies to the resource URL itself and all resources referenced in the content."
 					}
 				}
 			},
 			"Operation_UrlConverterFooter": {
 				"type": "object",
-				"description": "Defines the content that will be used as a footer. The content is passed in BASE64 encoded and contains HTML and (embedded) CSS code to position and format the footer.\n\nThe footer can contain the variables `${html.pageNumber}` (page number), `${html.totalPages}` (total number of pages) and `${html.title}` (HTML head meta tag `<title>`).\n\n**Important:**The footer is not used for all file format conversions. The footer is not supported for file formats that already contain their own footer definition, such as Office formats. The footer defined here works only for HTML-based formats such as HTML files, emails, or template-based conversions (e.g. text formats).\n\nExample:\n\n```html                    \n<p>\n  <span style=\"font-size: 12px\">Page ${html.pageNumber} of ${html.totalPages} pages</span>\n</p>\n```",
+				"description": "Defines the content that will be used as a footer. The content is passed in BASE64 encoded and contains HTML and (embedded) CSS code to position and format the footer.\n\nThe footer can contain the variables `${html.pageNumber}` (page number), `${html.totalPages}` (total number of pages) and `${html.title}` (HTML head meta tag `<title>`).\n\n**Important:**The footer is not used for all file format conversions. The footer is not supported for file formats that already contain their own footer definition, such as Office formats. The footer defined here works only for HTML-based formats such as HTML files, emails, or template-based conversions (e.g., text formats).\n\nExample:\n\n```html                    \n<p>\n  <span style=\"font-size: 12px\">Page ${html.pageNumber} of ${html.totalPages} pages</span>\n</p>\n```",
 				"properties": {
 					"source": {
 						"type": "string",
@@ -17063,7 +17099,7 @@
 			},
 			"Operation_UrlConverterHeader": {
 				"type": "object",
-				"description": "Defines the content that will be used as a header. The content is passed in BASE64 encoded and contains HTML and (embedded) CSS code to position and format the header.\n\nThe header can contain the variables `${html.pageNumber}` (page number), `${html.totalPages}` (total number of pages) and `${html.title}` (HTML head meta tag `<title>`).\n\n**Important:**The header is not used for all file format conversions. The header is not supported for file formats that already contain their own header definition, such as Office formats. The header defined here works only for HTML-based formats such as HTML files, emails, or template-based conversions (e.g. text formats).\n\nExample:\n\n```html                    \n<p>\n  <span style=\"font-size: 12px\">Page ${html.pageNumber} of ${html.totalPages} pages</span>\n</p>\n```",
+				"description": "Defines the content that will be used as a header. The content is passed in BASE64 encoded and contains HTML and (embedded) CSS code to position and format the header.\n\nThe header can contain the variables `${html.pageNumber}` (page number), `${html.totalPages}` (total number of pages) and `${html.title}` (HTML head meta tag `<title>`).\n\n**Important:**The header is not used for all file format conversions. The header is not supported for file formats that already contain their own header definition, such as Office formats. The header defined here works only for HTML-based formats such as HTML files, emails, or template-based conversions (e.g., text formats).\n\nExample:\n\n```html                    \n<p>\n  <span style=\"font-size: 12px\">Page ${html.pageNumber} of ${html.totalPages} pages</span>\n</p>\n```",
 				"properties": {
 					"source": {
 						"type": "string",
@@ -17723,9 +17759,6 @@
 			},
 			"Operation_ZoomDestination": {
 				"type": "object",
-				"x-webpdf-codegen": {
-					"extends": "Operation_DestinationEvent"
-				},
 				"properties": {
 					"zoomPage": {
 						"type": "object",
@@ -17775,6 +17808,9 @@
 							}
 						}
 					}
+				},
+				"x-webpdf-codegen": {
+					"extends": "Operation_DestinationEvent"
 				}
 			},
 			"Operation_Zugferd": {
@@ -19458,9 +19494,6 @@
 			"Webservice_Exception": {
 				"type": "object",
 				"description": "Defines the error object that is returned in the response to a REST web service call when an error has occurred.\n\n* The error message will summarize why the execution of the selected operation has not been possible or failed and will possibly contain further instructions.\n* This does not necessarily indicate an error of the server and possibly rather indicates, that the intended operation is not fit to be executed for the given document, using the given parameters. (e.g. accessing a password protected document without required decryption material)\n* Should the error message not be helpful, please refer to the user manual and search for the given error code there, for a more detailed description.\n* When contacting our support, please provide the hereby given error code, stacktrace and optimally the document and parameters, that lead to this error object being returned.",
-				"x-webpdf-codegen": {
-					"isReadOnly": "true"
-				},
 				"properties": {
 					"errorCode": {
 						"type": "integer",
@@ -19489,7 +19522,10 @@
 				"required": [
 					"errorCode",
 					"errorMessage"
-				]
+				],
+				"x-webpdf-codegen": {
+					"isReadOnly": "true"
+				}
 			},
 			"Webservice_Result": {
 				"type": "object",

@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "10.0.2-beta.1",
+	"version": "10.0.2-beta.2",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -50,7 +50,6 @@
 		"child_process": "^1.0.2",
 		"form-data": "^4.0.2",
 		"mocha": "^11.2.2",
-		"node-fetch": "^3.3.2",
 		"parcel": "^2.14.4",
 		"shx": "^0.4.0",
 		"testcontainers": "^10.25.0",

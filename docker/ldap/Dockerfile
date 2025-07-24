@@ -1,9 +1,9 @@
-FROM openjdk:11-jre-slim-buster
+FROM openjdk:11-jre-slim
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=nointeractive apt-get install -y --no-install-recommends \
   openssl dumb-init procps wget htop joe ldap-utils
 
-ENV PORT 10389
+ENV PORT=10389
 
 RUN mkdir /ldap
 WORKDIR /ldap
