@@ -4,7 +4,8 @@
       "prefix": "Admin_",
       "location": "admin/",
       "preservePrefix": [
-        "Admin_WebserviceStatus"
+        "Admin_WebserviceStatus",
+		"Admin_ClusterConfiguration"
       ]
     },
     {

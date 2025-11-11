@@ -37,13 +37,13 @@ const configPath = Path.join(__dirname, "config", "buildConfig.json");
                 }
             });
 
-            if (response.status >= 200 && response.status < 300) {
+            if (response.status >= 300 || response.status < 200) {
                 let error = new Error(response.statusText);
                 error.code = response.status;
                 error.stack = await response.data;
                 throw error;
             }
-        } else {
+        } else if (config.publish === "public") {
             // public publish needs .npmrc file with: //registry.npmjs.org/:_authToken=<TOKEN>
             let version = process.env.npm_package_version;
 

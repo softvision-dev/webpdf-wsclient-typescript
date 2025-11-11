@@ -1,6 +1,8 @@
 import {RestDocument} from "../documents";
 import {RestSession} from "../RestSession";
 import {
+	AdminClusterConfiguration,
+	AdminClusterConfigurationInterface,
 	AggregationServerState,
 	Application,
 	ApplicationCheck,
@@ -8,9 +10,8 @@ import {
 	ApplicationConfiguration,
 	ApplicationConfigurationInterface,
 	ClusterCheck,
-	ClusterConfiguration,
-	ClusterConfigurationInterface,
-	ClusterSettings, ClusterStatus,
+	ClusterSettings,
+	ClusterStatus,
 	ConfigurationMode,
 	ConfigurationResult,
 	ConfigurationType,
@@ -1063,7 +1064,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(HttpMethod.GET, this.session.getURL("admin/configuration/cluster"));
 
-		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson(
+		let clusterConfiguration: AdminClusterConfiguration = AdminClusterConfiguration.fromJson(
 			await request.executeRequest()
 		);
 
@@ -1111,12 +1112,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	): Promise<ConfigurationResult> {
 		await this.validateUser();
 
-		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson({
+		let clusterConfiguration: AdminClusterConfiguration = AdminClusterConfiguration.fromJson({
 			configuration: configuration,
 			configurationChecks: checks,
 			configurationMode: ConfigurationMode.Write,
 			configurationType: ConfigurationType.Cluster
-		} as ClusterConfigurationInterface)
+		} as AdminClusterConfigurationInterface)
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(
@@ -1153,12 +1154,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	): Promise<ConfigurationResult> {
 		await this.validateUser();
 
-		let clusterConfiguration: ClusterConfiguration = ClusterConfiguration.fromJson({
+		let clusterConfiguration: AdminClusterConfiguration = AdminClusterConfiguration.fromJson({
 			configuration: configuration,
 			configurationChecks: checks,
 			configurationMode: ConfigurationMode.Validate,
 			configurationType: ConfigurationType.Cluster
-		} as ClusterConfigurationInterface);
+		} as AdminClusterConfigurationInterface);
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(

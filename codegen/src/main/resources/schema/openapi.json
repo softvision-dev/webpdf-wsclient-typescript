@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.2 (2025-07-24T10:43:19Z)"
+		"version": "webPDF 10.0.3 (2025-11-11T10:36:07Z)"
 	},
 	"servers": [
 		{
@@ -5317,6 +5317,24 @@
 				},
 				"readOnly": true
 			},
+			"Cluster_Configuration": {
+				"type": "object",
+				"description": "Defines settings for configuring the nodes in the cluster",
+				"properties": {
+					"source": {
+						"$ref": "#/components/schemas/Cluster_ConfigurationSource"
+					}
+				}
+			},
+			"Cluster_ConfigurationSource": {
+				"type": "string",
+				"default": "coordinator",
+				"description": "Defines the source of the cluster configuration",
+				"enum": [
+					"coordinator",
+					"node"
+				]
+			},
 			"Cluster_Mode": {
 				"type": "string",
 				"default": "single",
@@ -5378,11 +5396,14 @@
 				"type": "object",
 				"description": "Settings for the cluster",
 				"properties": {
+					"configuration": {
+						"$ref": "#/components/schemas/Cluster_Configuration"
+					},
 					"connectTimeout": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Defines the number of milliseconds that a server node waits when it joins the cluster (e.g. when waiting for a coordinator server node)"
+						"description": "Defines the number of milliseconds that a server node waits when it joins the cluster (e.g. when waiting for a coordinator server node)."
 					},
 					"mode": {
 						"$ref": "#/components/schemas/Cluster_Mode"
@@ -5391,6 +5412,9 @@
 						"type": "string",
 						"default": "",
 						"description": "Defines the name of the cluster. If the server node has a coordinator role, the cluster is created under this name. If the server node has the role of a member, the node attempts to join the cluster with this name."
+					},
+					"namespace": {
+						"$ref": "#/components/schemas/Namespace_Settings"
 					},
 					"nodeName": {
 						"type": "string",
@@ -6031,6 +6055,9 @@
 					"pages": {
 						"$ref": "#/components/schemas/Metadata_PagesDocument"
 					},
+					"portfolio": {
+						"$ref": "#/components/schemas/Metadata_PortfolioDocument"
+					},
 					"security": {
 						"$ref": "#/components/schemas/Metadata_Security"
 					},
@@ -6375,6 +6402,13 @@
 				"type": "object",
 				"description": "This type is used to describe an attachment, that has been embedded in a PDF file. The attachment itself may have connected document information, in that case the \"document\" element will be set.",
 				"properties": {
+					"compressedSize": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "The compressed byte size of the attachment.",
+						"minimum": 0
+					},
 					"description": {
 						"type": "string",
 						"default": "",
@@ -6424,6 +6458,30 @@
 						"default": 0,
 						"description": "The byte size of the attachment.",
 						"minimum": 0
+					},
+					"sort": {
+						"$ref": "#/components/schemas/Metadata_SortAttachment"
+					}
+				}
+			},
+			"Metadata_AttachmentSortEntry": {
+				"type": "object",
+				"description": "Defines a collection item for an attachment or folder.",
+				"properties": {
+					"key": {
+						"type": "string",
+						"default": "",
+						"description": "The key of the collection item."
+					},
+					"prefix": {
+						"type": "string",
+						"default": "",
+						"description": "An optional prefix that (if not empty) shall precede the value in a viewer. This however shall not influence the order of this entry during sorting and otherwise behaves neutral."
+					},
+					"value": {
+						"type": "string",
+						"default": "",
+						"description": "The value of the collection item."
 					}
 				}
 			},
@@ -6696,6 +6754,9 @@
 					"pages": {
 						"$ref": "#/components/schemas/Metadata_PagesDocument"
 					},
+					"portfolio": {
+						"$ref": "#/components/schemas/Metadata_PortfolioDocument"
+					},
 					"security": {
 						"$ref": "#/components/schemas/Metadata_Security"
 					},
@@ -6875,6 +6936,9 @@
 						"type": "string",
 						"default": "",
 						"description": "The path the folder is positioned at."
+					},
+					"sort": {
+						"$ref": "#/components/schemas/Metadata_SortFolder"
 					}
 				}
 			},
@@ -7667,6 +7731,18 @@
 					"rectangle"
 				]
 			},
+			"Metadata_PortfolioDocument": {
+				"type": "object",
+				"description": "Describes the properties of a PDF collection (portfolio). (Should the document be a PDF collection.)",
+				"properties": {
+					"schema": {
+						"$ref": "#/components/schemas/Metadata_SchemaPortfolio"
+					},
+					"sort": {
+						"$ref": "#/components/schemas/Metadata_SortPortfolio"
+					}
+				}
+			},
 			"Metadata_Positions": {
 				"type": "object",
 				"description": "Used to define some sort of position on a PDF page.",
@@ -7750,6 +7826,74 @@
 						"x-webpdf-codegen": {
 							"enumName": "Metadata_ReplyState"
 						}
+					}
+				}
+			},
+			"Metadata_SchemaEntry": {
+				"type": "object",
+				"description": "Defines a sort schema for a PDF collection (portfolio).",
+				"properties": {
+					"key": {
+						"type": "string",
+						"default": "",
+						"description": "The key of the sort schema."
+					},
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the sort schema."
+					},
+					"order": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The order number of the sort schema."
+					},
+					"type": {
+						"type": "string",
+						"default": "string",
+						"description": "The type of the sort schemas value.",
+						"enum": [
+							"string",
+							"date",
+							"number"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Metadata_SchemaValue"
+						}
+					},
+					"visible": {
+						"type": "boolean",
+						"default": true,
+						"description": "If this sort schema shall be visible in views."
+					}
+				}
+			},
+			"Metadata_SchemaPortfolio": {
+				"type": "object",
+				"description": "Lists sort schemas for a PDF collection (portfolio).",
+				"properties": {
+					"entry": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Metadata_SchemaEntry"
+						}
+					}
+				}
+			},
+			"Metadata_SchemaSortEntry": {
+				"type": "object",
+				"description": "Defines a sort entry for a PDF collection (portfolio).",
+				"properties": {
+					"ascending": {
+						"type": "boolean",
+						"default": true,
+						"description": "Whether sorting should be in ascending or descending order."
+					},
+					"key": {
+						"type": "string",
+						"default": "",
+						"description": "The key of the sort entry."
 					}
 				}
 			},
@@ -7856,6 +8000,42 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/Metadata_Signature"
+						}
+					}
+				}
+			},
+			"Metadata_SortAttachment": {
+				"type": "object",
+				"description": "Lists the collection items of this attachment.",
+				"properties": {
+					"entry": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Metadata_AttachmentSortEntry"
+						}
+					}
+				}
+			},
+			"Metadata_SortFolder": {
+				"type": "object",
+				"description": "Lists the collection items of this folder.",
+				"properties": {
+					"entry": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Metadata_AttachmentSortEntry"
+						}
+					}
+				}
+			},
+			"Metadata_SortPortfolio": {
+				"type": "object",
+				"description": "Lists sort types for a PDF collection (portfolio).",
+				"properties": {
+					"entry": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Metadata_SchemaSortEntry"
 						}
 					}
 				}
@@ -8122,6 +8302,52 @@
 						}
 					}
 				}
+			},
+			"Namespace_Settings": {
+				"type": "object",
+				"description": "Namespace parts used to build prefixes",
+				"properties": {
+					"app": {
+						"type": "string",
+						"default": "",
+						"description": "Application identifier",
+						"example": "webpdf"
+					},
+					"cluster": {
+						"type": "string",
+						"default": "",
+						"description": "Optional cluster discriminator for blue/green or canary",
+						"example": "blue"
+					},
+					"env": {
+						"type": "string",
+						"default": "",
+						"description": "Optional environment name",
+						"example": "prod"
+					},
+					"org": {
+						"type": "string",
+						"default": "webpdf",
+						"description": "Optional organization/vendor identifier",
+						"example": "acme"
+					},
+					"region": {
+						"type": "string",
+						"default": "",
+						"description": "Optional region identifier",
+						"example": "eu1"
+					},
+					"version": {
+						"type": "string",
+						"default": "v10.0",
+						"description": "Key schema version",
+						"example": "v10.0"
+					}
+				},
+				"required": [
+					"app",
+					"version"
+				]
 			},
 			"OAuth_OIDCMetadata": {
 				"type": "object",
@@ -10194,6 +10420,11 @@
 						"default": "utf-8",
 						"description": "Used to specify the character set in which the barcode contents should be stored."
 					},
+					"compact": {
+						"type": "boolean",
+						"default": false,
+						"description": "Specifies whether to use compact mode for Data Matrix. The compact encoding mode also supports the encoding of characters that are not in the ISO-8859-1 character set via Extended Channel Interpretation (ECIs).\n\n*   Character encoding is chosen for characters in the input that are not in the ISO-8859-1 character set.\n*   The encoding used can be enforced using the parameter `charset`, e.g. to UTF-8.\n*   Compact encoding also provides GS1-FNC1 support (when `GS1` enabled)."
+					},
 					"errorCorrection": {
 						"type": "integer",
 						"format": "int32",
@@ -10201,6 +10432,11 @@
 						"description": "Used to adjust the error correction level for generated Data Matrix codes. The higher the level, the more error-resistant the barcode, ensuring that damaged codes will still be readable. A level of 1 to 8 can be specified.",
 						"maximum": 8,
 						"minimum": 1
+					},
+					"gs1": {
+						"type": "boolean",
+						"default": false,
+						"description": "Specifies whether the data should be encoded to the [GS1](https://www.gs1.org/standards/gs1-datamatrix-guideline/25#1-Introduction-to-GS1-DataMatrix) standard.\n\nIn this case group-separator character (ASCII 29 decimal) can be used to encode the positions of FNC1 codewords."
 					},
 					"margin": {
 						"type": "integer",
@@ -10227,7 +10463,7 @@
 					"shape": {
 						"type": "string",
 						"default": "default",
-						"description": "Can be used to force a specific shape for generated Data Matrix codes.\n\n*   default = Select an appropriate shape.\n*   rectangle = Force a rectangular shape.\n*   square = Force a square shape.",
+						"description": "Can be used to force a specific shape for generated Data Matrix codes.\n\n*   default = The appropriate shape is selected automatically based on the content, character set, and other parameters.\n*   rectangle = Force a rectangular shape.\n*   square = Force a square shape.",
 						"enum": [
 							"default",
 							"rectangle",
@@ -13080,7 +13316,7 @@
 					"shape": {
 						"type": "string",
 						"default": "default",
-						"description": "Can be used to force a specific shape for generated Data Matrix codes.\n\n*   default = Select an appropriate shape.\n*   rectangle = Force a rectangular shape.\n*   square = Force a square shape.",
+						"description": "Can be used to force a specific shape for generated Data Matrix codes.\n\n*   default = The appropriate shape is selected automatically based on the content, character set, and other parameters.\n*   rectangle = Force a rectangular shape.\n*   square = Force a square shape.",
 						"enum": [
 							"default",
 							"rectangle",
@@ -13466,8 +13702,20 @@
 					},
 					"key": {
 						"type": "string",
-						"default": "order",
-						"description": "Selects a predefined sorting criterion."
+						"default": "fileName",
+						"description": "Selects a predefined sorting criterion. The following values are available:\n\n*   fileName = The name of the portfolio entry.\n*   description = The description of the portfolio entry.\n*   size = The actual size of the file.\n*   creationDate = The creation date of the portfolio entry.\n*   modificationDate = The date of the last modification of the portfolio entry.\n*   compressedSize = The compressed size of the portfolio entry.\n*   order = The order of addition of the portfolio entry.",
+						"enum": [
+							"fileName",
+							"description",
+							"size",
+							"creationDate",
+							"modificationDate",
+							"compressedSize",
+							"order"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_PortfolioSortPredefinedCriterionKey"
+						}
 					}
 				}
 			},
@@ -14099,6 +14347,11 @@
 				"type": "object",
 				"description": "Used to select annotations for removal.",
 				"properties": {
+					"flatten": {
+						"type": "boolean",
+						"default": false,
+						"description": "Set to true to flatten the selected annotations.\n\n**Important:** flattening means, the interactive annotation objects will be removed and only their visual representation will remain in the page content of the resulting document."
+					},
 					"selection": {
 						"$ref": "#/components/schemas/Operation_SelectionRemove"
 					}
