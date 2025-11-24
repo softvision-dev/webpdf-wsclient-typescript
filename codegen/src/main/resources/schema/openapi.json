@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.3 (2025-11-11T10:36:07Z)"
+		"version": "webPDF 10.0.4 (2025-11-24T15:23:00Z)"
 	},
 	"servers": [
 		{
@@ -7687,8 +7687,8 @@
 						"minimum": 0
 					},
 					"rotation": {
-						"type": "integer",
-						"format": "int32",
+						"type": "number",
+						"format": "float",
 						"default": 0,
 						"description": "The rotation of the background.",
 						"maximum": 360,
@@ -8309,7 +8309,7 @@
 				"properties": {
 					"app": {
 						"type": "string",
-						"default": "",
+						"default": "webpdf",
 						"description": "Application identifier",
 						"example": "webpdf"
 					},
@@ -8327,7 +8327,7 @@
 					},
 					"org": {
 						"type": "string",
-						"default": "webpdf",
+						"default": "",
 						"description": "Optional organization/vendor identifier",
 						"example": "acme"
 					},
