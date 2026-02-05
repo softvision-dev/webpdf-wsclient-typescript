@@ -31,7 +31,10 @@ export class DataFormat {
      * @return true should the given MIME-type match the selected {@link DataFormat}.
      */
     public matches(mimeType: string): boolean {
-        return this.getMimeType() === mimeType;
+        // Remove parameters like charset=utf-8
+        const cleanMimeType: string = mimeType.split(';')[0].trim();
+
+        return this.getMimeType() === cleanMimeType;
     }
 
     /**

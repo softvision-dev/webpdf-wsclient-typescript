@@ -221,6 +221,14 @@ export class HttpRestRequest {
 
 		// is this a webPDF server response or a general server error?
 		let contentType = httpResponse.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
+
+		// If data is an ArrayBuffer and content type is JSON, parse it
+		if (data instanceof ArrayBuffer && DataFormats.JSON.matches(contentType)) {
+			const decoder = new TextDecoder('utf-8');
+			const jsonString: string = decoder.decode(data);
+			data = JSON.parse(jsonString);
+		}
+
 		if (DataFormats.JSON.matches(contentType)) {
 			let wsException: ServerResultException = ServerResultException.createWebserviceException(
 				data.errorMessage,

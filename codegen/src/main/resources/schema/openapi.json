@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.4 (2025-11-24T15:23:00Z)"
+		"version": "webPDF 10.0.4 (2025-12-05T13:57:42Z)"
 	},
 	"servers": [
 		{
@@ -1266,6 +1266,9 @@
 						"headers": {
 							"content-type": {
 								"description": "The content type of the response body is selected depending on the `accept` header.",
+								"schema": {
+									"type": "string"
+								},
 								"style": "simple"
 							}
 						}
@@ -4732,6 +4735,11 @@
 						"items": {
 							"$ref": "#/components/schemas/ApplicationConfig_Proxy"
 						}
+					},
+					"useSystemProxies": {
+						"type": "boolean",
+						"default": false,
+						"description": "When enabled, proxy settings are automatically read from the operating system instead of using manually configured proxies.\n\nSupported sources:\n\n*   **Windows:** System proxy settings (Internet Settings via Java ProxySelector)\n*   **Linux:** Environment variables (HTTP\\_PROXY, HTTPS\\_PROXY, NO\\_PROXY)\n*   **All platforms:** Java system properties (http.proxyHost, http.proxyPort, etc.)\n\n**Important:**\n\n*   When useSystemProxies is enabled, all manually configured proxy entries in this section are ignored. This is an exclusive setting - either system proxies OR manual proxies are used, not both.\n*   To read the settings from the Windows registry, the JVM option `-Djava.net.useSystemProxies=true` must be set.\n\n**Limitations:** PAC (Proxy Auto-Config) files and WPAD (Web Proxy Auto-Discovery) are not supported. Only basic proxy configurations (host, port, bypass list) are read from the system."
 					}
 				}
 			},
@@ -4739,6 +4747,16 @@
 				"type": "object",
 				"description": "Defines a proxy server that shall be known to and used by the server to access external resources.",
 				"properties": {
+					"bypassProxyOnLocal": {
+						"type": "boolean",
+						"default": true,
+						"description": "When enabled, the proxy will be bypassed for local addresses such as localhost, 127.0.0.1, \\[::1\\], and addresses without a dot (e.g., \"intranet\")."
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables this proxy configuration. When disabled, the proxy will not be used even if configured."
+					},
 					"host": {
 						"type": "string",
 						"default": "",
@@ -4776,12 +4794,12 @@
 			},
 			"ApplicationConfig_ProxyNonHost": {
 				"type": "object",
-				"description": "This setting is currently unused.",
+				"description": "A list of host entries for which the proxy should be bypassed. Wildcards ('\\*') are supported for pattern matching.",
 				"properties": {
 					"host": {
 						"type": "string",
 						"default": "",
-						"description": "This setting is currently unused."
+						"description": "A single host entry for which the proxy should be bypassed. Wildcards ('\\*') are supported for pattern matching."
 					}
 				}
 			},
