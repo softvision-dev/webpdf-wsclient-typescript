@@ -17,7 +17,8 @@
         "ApplicationConfig_OfficeBridge",
         "ApplicationConfig_SharePointBridge",
         "ApplicationConfig_PortalSettings",
-        "ApplicationConfig_PortalUserInterface"
+        "ApplicationConfig_PortalUserInterface",
+        "ApplicationConfig_Metrics"
       ]
     },
     {

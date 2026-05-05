@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.4 (2025-12-05T13:57:42Z)"
+		"version": "webPDF 10.0.5 (2026-05-05T07:21:32Z)"
 	},
 	"servers": [
 		{
@@ -68,6 +68,29 @@
 		}
 	],
 	"paths": {
+		"/": {
+			"get": {
+				"description": "Returns metrics in Prometheus text exposition format",
+				"operationId": "getMetrics",
+				"responses": {
+					"200": {
+						"content": {
+							"text/plain; version=0.0.4": {}
+						},
+						"description": "Prometheus metrics in text format"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Get Prometheus metrics",
+				"tags": [
+					"administration"
+				]
+			}
+		},
 		"/admin/cluster/status": {
 			"get": {
 				"description": "Returns the the status information about the cluster and all members in the cluster.",
@@ -325,6 +348,174 @@
 					}
 				],
 				"summary": "Gets a file from the datastore",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/dlq/failed": {
+			"delete": {
+				"description": "Purges FAILED_PERMANENT entries older than provided threshold.",
+				"operationId": "purgeFailedDlqEntries",
+				"parameters": [
+					{
+						"in": "query",
+						"name": "olderThanMillis",
+						"schema": {
+							"type": "integer",
+							"format": "int64",
+							"default": 86400000
+						}
+					},
+					{
+						"in": "query",
+						"name": "archiveBeforeDelete",
+						"schema": {
+							"type": "boolean",
+							"default": true
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DLQ_CleanUpResponse"
+								}
+							}
+						},
+						"description": "Entries purged."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Purges old failed permanent DLQ entries",
+				"tags": [
+					"administration"
+				]
+			},
+			"get": {
+				"description": "Returns replay entries currently marked as FAILED_PERMANENT.",
+				"operationId": "listFailedDlqEntries",
+				"parameters": [
+					{
+						"description": "Maximum number of entries to return.",
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"type": "integer",
+							"format": "int32",
+							"default": 100
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Failed DLQ entries."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Lists failed permanent DLQ entries",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/dlq/failed/{id}": {
+			"delete": {
+				"description": "Deletes one FAILED_PERMANENT entry from replay store.",
+				"operationId": "deleteFailedDlqEntry",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Entry deleted."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Deletes one failed permanent DLQ entry",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/dlq/failed/{id}/requeue": {
+			"post": {
+				"description": "Moves one FAILED_PERMANENT entry back to PENDING for replay.",
+				"operationId": "requeueFailedDlqEntry",
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "reason",
+						"schema": {
+							"type": "string",
+							"default": "manual admin requeue"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Entry requeued."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Requeues a failed permanent DLQ entry",
 				"tags": [
 					"administration"
 				]
@@ -3908,6 +4099,9 @@
 					"license": {
 						"$ref": "#/components/schemas/ApplicationConfig_License"
 					},
+					"metrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_Metrics"
+					},
 					"portal": {
 						"$ref": "#/components/schemas/ApplicationConfig_Portal"
 					},
@@ -3972,7 +4166,7 @@
 			},
 			"ApplicationConfig_BridgesApplication": {
 				"type": "object",
-				"description": "The bridges element defines settings for the bridges (to other applications) used by the server. Such bridges are mostly used, to provide the Converter web service with instruments for a native and more accurate PDF conversion of specific file formats.\n\n**Important:** Be aware, that activating such a bridge requires the application to be installed and correctly configured on the server side. (Refer to the user manual for further information.)",
+				"description": "The bridges element defines settings for the bridges (to other applications) used by the server. Such bridges are mostly used, to provide the Converter web service with instruments for a native and more accurate PDF conversion of specific file formats.\n\n**Important:** Be aware that activating such a bridge requires the application to be installed and correctly configured on the server side. (Refer to the user manual for further information.)",
 				"properties": {
 					"chromium": {
 						"$ref": "#/components/schemas/ApplicationConfig_ChromiumBridge"
@@ -4225,6 +4419,228 @@
 					}
 				}
 			},
+			"ApplicationConfig_Metrics": {
+				"type": "object",
+				"description": "Defines the configuration for collecting and exporting application metrics using the Micrometer framework.\n\nMetrics are collected across multiple architectural layers:\n\n*   **HTTP Layer**: Measures complete HTTP request lifecycle including authentication and routing\n*   **API Layer**: Tracks REST endpoint execution time and request counts\n*   **Service Layer**: Monitors the execution of business logic (web service operation) in terms of duration and invocations\n*   **Thread Pool Layer**: Tracks thread pool (web service instances) utilization and queue depth\n*   **JVM Layer**: Collects Java Virtual Machine metrics (memory, GC, threads)\n*   **System Layer**: Monitors system resources (CPU, disk, file descriptors)\n\nMetrics can be exported to Prometheus and/or JMX for monitoring and visualization in tools like Grafana.",
+				"properties": {
+					"apiMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsApi"
+					},
+					"application": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsApplication"
+					},
+					"auth": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsAuth"
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Master switch for the complete metrics subsystem.\n\nWhen set to `false`, no metrics are collected, exported, or exposed via endpoint/filter integrations.\n\nThis setting has precedence over all other metrics options and layer flags.\n\nDefault: `true`"
+					},
+					"httpMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsHttp"
+					},
+					"jmx": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsJmx"
+					},
+					"jvmMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsJvm"
+					},
+					"preset": {
+						"type": "string",
+						"default": "",
+						"description": "Predefined metric configuration presets optimized for different deployment environments.\n\nPresets provide sensible defaults that can be overridden by explicit element configurations.",
+						"enum": [
+							"production",
+							"development",
+							"minimal",
+							"custom"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ApplicationConfig_MetricsPreset"
+						}
+					},
+					"prometheus": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsPrometheus"
+					},
+					"serviceMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsService"
+					},
+					"systemMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsSystem"
+					},
+					"threadPoolMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsThreadPool"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsApi": {
+				"type": "object",
+				"description": "Configuration for REST API layer metrics (Layer 2).\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsApplication": {
+				"type": "object",
+				"description": "Defines application-wide metrics configuration including percentiles, cardinality limits, and common tags.\n\nThese settings affect memory usage and metric granularity across all metric types.",
+				"properties": {
+					"endpointEnabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables the HTTP metrics endpoint at `/metrics`.\n\nWhen disabled, metrics are still collected but not exposed via HTTP.\n\nThis is useful when using only JMX export or when metrics should not be accessible externally.\n\nDefault: `true`"
+					},
+					"maxEndpoints": {
+						"type": "integer",
+						"format": "int32",
+						"default": -1,
+						"description": "Maximum number of unique REST endpoints to track separately.\n\nLimits metric cardinality to prevent memory exhaustion from dynamic URLs.\n\nWhen limit is reached, additional endpoints share a common metric with tag `endpoint=\"overflow\"`.\n\nValue `-1` means unlimited (not recommended for production).\n\nDefault: `-1` (unlimited)\n\n**Recommendation**: Set to 100-500 in production environments."
+					},
+					"maxStatusCodes": {
+						"type": "integer",
+						"format": "int32",
+						"default": -1,
+						"description": "Maximum number of unique HTTP status codes to track separately.\n\nLimits metric cardinality for HTTP status code tags.\n\nValue `-1` means unlimited.\n\nDefault: `-1` (unlimited)\n\n**Note**: Status codes are typically limited (~60 standard codes), so this rarely needs adjustment."
+					},
+					"maxUris": {
+						"type": "integer",
+						"format": "int32",
+						"default": -1,
+						"description": "Maximum number of unique URI paths to track separately in HTTP metrics.\n\nPrevents cardinality explosion from dynamic URI segments or query parameters.\n\nWhen limit is reached, additional URIs share a common metric with tag `uri=\"overflow\"`.\n\nValue `-1` means unlimited (not recommended for production).\n\nDefault: `-1` (unlimited)\n\n**Recommendation**: Set to 100-500 in production environments."
+					},
+					"metricCountWarningThreshold": {
+						"type": "integer",
+						"format": "int32",
+						"default": 10000,
+						"description": "Threshold for logging a warning when total metric count exceeds this value.\n\nHigh metric counts indicate potential cardinality explosion and memory issues.\n\nUse this to detect unbounded metric growth in production.\n\nDefault: `10000`\n\n**Guideline**: Typical deployments should have <5000 metrics. Over 10000 indicates configuration issues."
+					},
+					"percentiles": {
+						"$ref": "#/components/schemas/ApplicationConfig_PercentilesMetricsApplication"
+					},
+					"percentilesEnabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables percentile calculation for timer metrics.\n\nWhen enabled, percentile distributions (p50, p95, p99) are calculated and exported.\n\n**Memory Impact**: Each timer with percentiles consumes approximately 1MB of memory.\n\n**Recommendation**: Disable in production to reduce memory footprint (~560MB savings for typical deployment).\n\nDefault: `true`"
+					},
+					"tag": {
+						"type": "string",
+						"default": "webPDF",
+						"description": "Common tag value applied to all metrics as `application=\"...\"`.\n\nThis tag identifies the application in multi-tenant monitoring systems like Prometheus.\n\nUseful when multiple applications export metrics to the same monitoring infrastructure.\n\nDefault: `webPDF`\n\nExample metric: `http_server_requests{application=\"webPDF\",method=\"POST\"}`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsAuth": {
+				"type": "object",
+				"description": "Configures authentication requirements for accessing the `/metrics` endpoint.\n\nWhen enabled, prevents unauthorized access to application metrics which may contain sensitive information.\n\nPrimary credentials are configured via XML attributes `username`, `password` and `token`.\n\nEnvironment variables and system properties are optional runtime overrides and take precedence over XML values.\n\nIf both Basic Auth credentials (`username`/`password`) and a Bearer token (`token`) are configured, both authentication methods are active at the same time. At request runtime, the method is selected by the HTTP `Authorization` scheme (`Basic` or `Bearer`).",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables authentication for the metrics endpoint.\n\nWhen enabled, requests must include valid credentials:\n\n*   **Basic Auth**: Configure in XML with `username`/`password` or override via `WEBPDF_METRICS_AUTH_USERNAME` / `webpdf.metrics.auth.username` and `WEBPDF_METRICS_AUTH_PASSWORD` / `webpdf.metrics.auth.password`\n*   **Bearer Token**: Configure in XML with `token` or override via `WEBPDF_METRICS_AUTH_TOKEN` / `webpdf.metrics.auth.token`\n\nWhen disabled, metrics endpoint is publicly accessible (suitable for development only).\n\nDefault: `true`\n\n**Security**: Always enable in production environments to protect sensitive operational data."
+					},
+					"password": {
+						"type": "string",
+						"default": "",
+						"description": "Password used for Basic Auth on the metrics endpoint.\n\nPrimary source: XML attribute `password`.\n\nCan be overridden via `WEBPDF_METRICS_AUTH_PASSWORD` or `webpdf.metrics.auth.password`."
+					},
+					"token": {
+						"type": "string",
+						"default": "",
+						"description": "Bearer token used as alternative authentication on the metrics endpoint.\n\nPrimary source: XML attribute `token`.\n\nCan be overridden via `WEBPDF_METRICS_AUTH_TOKEN` or `webpdf.metrics.auth.token`."
+					},
+					"username": {
+						"type": "string",
+						"default": "prometheus",
+						"description": "Username used for Basic Auth on the metrics endpoint.\n\nDefault: `prometheus`\n\nPrimary source: XML attribute `username`.\n\nCan be overridden via `WEBPDF_METRICS_AUTH_USERNAME` or `webpdf.metrics.auth.username`."
+					}
+				}
+			},
+			"ApplicationConfig_MetricsHttp": {
+				"type": "object",
+				"description": "Configuration for HTTP transport layer metrics (Layer 1).\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsJmx": {
+				"type": "object",
+				"description": "Configuration for Java Management Extensions (JMX) metrics export.\n\nJMX allows metrics to be accessed via standard Java management tools like JConsole, VisualVM, and JMC.",
+				"properties": {
+					"domain": {
+						"type": "string",
+						"default": "webpdf.metrics",
+						"description": "Specifies the JMX domain name under which metrics are registered.\n\nThe domain groups related MBeans together in JMX management tools.\n\nDefault: `webpdf.metrics`\n\nExample ObjectName: `webpdf.metrics:name=http_server_requests,type=timers`"
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables JMX metrics export.\n\nWhen enabled, metrics are registered as MBeans and can be viewed in JMX-compatible tools.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsJvm": {
+				"type": "object",
+				"description": "Configuration for Java Virtual Machine internal metrics.\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsPrometheus": {
+				"type": "object",
+				"description": "Configuration for Prometheus metrics export.\n\nPrometheus is a time-series monitoring system that scrapes metrics from HTTP endpoints.\n\nWhen enabled, metrics are exposed at `/metrics` endpoint in Prometheus text format.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables Prometheus metrics export.\n\nWhen enabled, metrics are available at the `/metrics` HTTP endpoint.\n\nPrometheus server should be configured to scrape this endpoint periodically.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsService": {
+				"type": "object",
+				"description": "Configuration for business logic layer metrics (Layer 3).\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsSystem": {
+				"type": "object",
+				"description": "Configuration for operating system and hardware resource metrics.\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
+			"ApplicationConfig_MetricsThreadPool": {
+				"type": "object",
+				"description": "Configuration for thread pool and worker execution layer metrics (Layer 4).\n\nInherits `enabled` attribute from `MetricsBasicType`.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
+					}
+				}
+			},
 			"ApplicationConfig_NewsPanel": {
 				"type": "object",
 				"description": "Defines whether the portal displays a news page and where the content is loaded from.",
@@ -4423,6 +4839,21 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					}
+				}
+			},
+			"ApplicationConfig_PercentilesMetricsApplication": {
+				"type": "object",
+				"description": "Defines custom percentile values for timer metrics (e.g., p50, p95, p99).\n\nPercentiles provide statistical distribution data but consume significant memory (~1MB per timer).\n\nIf not specified and `percentilesEnabled=\"true\"`, defaults to \\[0.5, 0.95, 0.99\\].",
+				"properties": {
+					"percentile": {
+						"type": "array",
+						"description": "A single percentile value between 0.0 and 1.0.\n\nCommon values: 0.5 (median), 0.95 (95th percentile), 0.99 (99th percentile), 0.999 (99.9th percentile)",
+						"items": {
+							"type": "number",
+							"format": "double",
+							"description": "A single percentile value between 0.0 and 1.0.\n\nCommon values: 0.5 (median), 0.95 (95th percentile), 0.99 (99th percentile), 0.999 (99.9th percentile)"
+						}
 					}
 				}
 			},
@@ -5493,6 +5924,17 @@
 					}
 				},
 				"readOnly": true
+			},
+			"DLQ_CleanUpResponse": {
+				"type": "object",
+				"description": "Number of entries removed",
+				"properties": {
+					"removed": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0
+					}
+				}
 			},
 			"Document_File": {
 				"type": "object",
@@ -18711,6 +19153,26 @@
 					}
 				}
 			},
+			"ServerConfig_Health": {
+				"type": "object",
+				"description": "Configures health endpoint management settings.\n\nIf this element is absent, all management operations on health endpoints are disabled (fail-closed).",
+				"properties": {
+					"shutdown": {
+						"$ref": "#/components/schemas/ServerConfig_HealthShutdown"
+					}
+				}
+			},
+			"ServerConfig_HealthShutdown": {
+				"type": "object",
+				"description": "Configures Bearer Token authentication for the `POST /health/shutdown` management endpoint (Two-Phase Shutdown Phase 1).\n\nThe endpoint is activated by setting a non-empty token. If no token is configured, the endpoint returns `404 Not Found`.\n\nPrimary token source: XML attribute `token`.\n\nOverride via environment variable `WEBPDF_HEALTH_SHUTDOWN_TOKEN` or system property `webpdf.health.shutdown.token` (takes precedence over XML value).",
+				"properties": {
+					"token": {
+						"type": "string",
+						"default": "",
+						"description": "The Bearer token required to access the `POST /health/shutdown` endpoint.\n\nSetting a non-empty token activates the endpoint. Without a token the endpoint returns `404 Not Found`.\n\nCan be overridden via environment variable `WEBPDF_HEALTH_SHUTDOWN_TOKEN` or system property `webpdf.health.shutdown.token`.\n\nUse a strong random token (e.g., 32+ characters) in production environments."
+					}
+				}
+			},
 			"ServerConfig_Host": {
 				"type": "object",
 				"description": "Defines the host name and context path of the server.",
@@ -19212,6 +19674,9 @@
 					},
 					"connectors": {
 						"$ref": "#/components/schemas/ServerConfig_ConnectorsServer"
+					},
+					"health": {
+						"$ref": "#/components/schemas/ServerConfig_Health"
 					},
 					"host": {
 						"$ref": "#/components/schemas/ServerConfig_Host"
@@ -19867,6 +20332,53 @@
 												},
 												"nativeMethod": {
 													"type": "boolean"
+												}
+											}
+										}
+									},
+									"suppressed": {
+										"type": "array",
+										"items": {
+											"type": "object",
+											"properties": {
+												"localizedMessage": {
+													"type": "string"
+												},
+												"message": {
+													"type": "string"
+												},
+												"stackTrace": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"classLoaderName": {
+																"type": "string"
+															},
+															"className": {
+																"type": "string"
+															},
+															"fileName": {
+																"type": "string"
+															},
+															"lineNumber": {
+																"type": "integer",
+																"format": "int32"
+															},
+															"methodName": {
+																"type": "string"
+															},
+															"moduleName": {
+																"type": "string"
+															},
+															"moduleVersion": {
+																"type": "string"
+															},
+															"nativeMethod": {
+																"type": "boolean"
+															}
+														}
+													}
 												}
 											}
 										}

@@ -1,7 +1,5 @@
 import {AuthResultException, OAuth2Provider, OAuth2Token, Session} from "../../../main/typescript";
 import {AuthenticationClient} from "auth0";
-import {JSONApiResponse} from "auth0/dist/esm/lib/runtime";
-import {TokenSet} from "auth0/dist/esm/auth/oauth";
 
 export class Auth0Provider implements OAuth2Provider {
 	private token?: OAuth2Token;
@@ -30,7 +28,7 @@ export class Auth0Provider implements OAuth2Provider {
 				clientId: this.clientId,
 				clientSecret: this.clientSecret
 			});
-			let token: JSONApiResponse<TokenSet> = await auth.oauth.clientCredentialsGrant({
+			let token = await auth.oauth.clientCredentialsGrant({
 				audience: this.audience
 			});
 
