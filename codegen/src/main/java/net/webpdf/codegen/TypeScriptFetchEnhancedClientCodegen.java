@@ -372,6 +372,7 @@ public class TypeScriptFetchEnhancedClientCodegen extends DefaultCodegenConfig {
     protected void postProcessAllCodegenModels(Map<String, CodegenModel> allModels) {
         Index index = getIndex();
         for (CodegenModel model : allModels.values()) {
+            Set<String> parentVarNames = getParentVarNames(allModels, model);
             TypeName type = new TypeName(model.getClassname());
             WebPDFExtension modelExtensions = WebPDFExtension.determineExtension(model, modelPackage());
             modelExtensions.setTypeRootLocation(type.getRootFileLocation());
@@ -396,6 +397,7 @@ public class TypeScriptFetchEnhancedClientCodegen extends DefaultCodegenConfig {
 
             for (CodegenProperty property : model.getVars()) {
                 WebPDFExtension propertyExtensions = WebPDFExtension.determineExtension(property, modelPackage());
+                propertyExtensions.setOverridesParent(parentVarNames.contains(property.getName()));
                 description = escapeDescription(property.getUnescapedDescription());
                 if (description != null) {
                     propertyExtensions.setDescription(description);
@@ -475,6 +477,25 @@ public class TypeScriptFetchEnhancedClientCodegen extends DefaultCodegenConfig {
         }
         index.sort();
         super.postProcessAllCodegenModels(allModels);
+    }
+
+    private Set<String> getParentVarNames(Map<String, CodegenModel> allModels, CodegenModel model) {
+        String parentClassName = model.getParent();
+        if (parentClassName == null || parentClassName.isBlank()) {
+            return Collections.emptySet();
+        }
+
+        for (CodegenModel candidate : allModels.values()) {
+            if (parentClassName.equals(candidate.getClassname())) {
+                Set<String> names = new HashSet<>();
+                for (CodegenProperty property : candidate.getVars()) {
+                    names.add(property.getName());
+                }
+                return names;
+            }
+        }
+
+        return Collections.emptySet();
     }
 
     @Override

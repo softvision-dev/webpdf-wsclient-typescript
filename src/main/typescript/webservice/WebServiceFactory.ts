@@ -27,7 +27,16 @@ import {
 	UrlConverterOperationInterface
 } from "../generated-sources";
 import {RestOperationData} from "../openapi";
-import {BarcodeWebService, ConverterWebService, OcrWebService, PdfaWebService, RestWebService, SignatureWebService, ToolboxWebService, UrlConverterWebService} from "./rest";
+import {
+	BarcodeWebService,
+	ConverterWebService,
+	OcrWebService,
+	PdfaWebService,
+	RestWebService,
+	SignatureWebService,
+	ToolboxWebService,
+	UrlConverterWebService
+} from "./rest";
 
 /**
  * An instance of {@link WebServiceFactory} produces {@link WebService} instances that establish connections to

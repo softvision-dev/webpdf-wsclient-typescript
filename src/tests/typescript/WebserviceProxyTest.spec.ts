@@ -15,15 +15,15 @@ import {UrlConverter, UrlConverterInterface} from "../../main/typescript/generat
 import {Agent} from "https";
 import {it, suite} from "mocha";
 
-const fs = require('fs');
-const tmp = require('tmp');
+const fs: any = require('fs');
+const tmp: any = require('tmp');
 
-suite("WebserviceProxyTest", function () {
+suite("WebserviceProxyTest", function (): void {
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 	const testConfig: IntegrationTestConfig =  TestConfig.instance.getIntegrationTestConfig();
 
-	it('testRESTProxyHTTP', async function () {
+	it('testRESTProxyHTTP', async function (): Promise<void> {
 		if (!testConfig.isProxyTestsActive()) {
 			this.skip();
 			return;
@@ -61,14 +61,14 @@ suite("WebserviceProxyTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process();
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testRESTProxyHTTPS', async function () {
+	it('testRESTProxyHTTPS', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isProxyTestsActive()) {
 			this.skip();
 			return;
@@ -111,7 +111,7 @@ suite("WebserviceProxyTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process();
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 

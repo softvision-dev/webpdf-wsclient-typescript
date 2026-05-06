@@ -37,7 +37,7 @@ export class Auth0Config extends OAuthConfig {
 	 * @return The value of the "authority" claim.
 	 */
 	public getAuthority(): string {
-		let authority = this.getString("authority", "");
+		let authority: string = this.getString("authority", "");
 		let authUrl: URL = new URL(authority);
 		return authUrl.host;
 	}

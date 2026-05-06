@@ -1,5 +1,5 @@
 import {Barcode, BaseToolbox, Converter, Ocr, Pdfa, Signature, UrlConverter} from "../generated-sources";
-import { WebService } from "./WebService";
+import {WebService} from "./WebService";
 
 /**
  * Represents a single Webservice type with its unique endpoint
@@ -47,7 +47,7 @@ export class WebServiceType {
  * @see #URLCONVERTER
  * @see #BARCODE
  */
-export const WebServiceTypes = {
+export const WebServiceTypes: Record<string, WebServiceType> = {
 	/**
 	 * The {@link Converter} webservice provides the means to convert different file formats to PDF.
 	 */

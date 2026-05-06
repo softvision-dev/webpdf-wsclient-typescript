@@ -30,7 +30,7 @@ export class AuthMethod {
  * @see #BASIC_AUTHORIZATION
  * @see #BEARER_AUTHORIZATION
  */
-export const AuthMethods = {
+export const AuthMethods: Record<string, AuthMethod> = {
     BASIC_AUTHORIZATION: new AuthMethod("Basic"),
     BEARER_AUTHORIZATION: new AuthMethod("Bearer")
 }

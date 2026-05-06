@@ -70,6 +70,15 @@ public class WebPDFExtension {
         return this;
     }
 
+    public boolean isOverridesParent() {
+        return getBool(OVERRIDES_PARENT);
+    }
+
+    public WebPDFExtension setOverridesParent(boolean value) {
+        set(OVERRIDES_PARENT, value);
+        return this;
+    }
+
     public WebPDFExtension setIsTypeReference(boolean value) {
         set(IS_TYPE_REFERENCE, value);
         return this;

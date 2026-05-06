@@ -5,7 +5,7 @@ import {DetailedPeerCertificate, TLSSocket} from "tls";
 import {DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait} from "testcontainers";
 import path from "path";
 
-const https = require('https');
+const https: any = require('https');
 
 export class TestServer {
 	private localServer: URL;
@@ -81,8 +81,8 @@ export class TestServer {
 	public async getDemoCertificate(): Promise<DetailedPeerCertificate> {
 		let serverUrl: URL = this.getServer(ServerType.PUBLIC, TransferProtocol.HTTPS);
 
-		return await new Promise<any>(function (resolve) {
-			var req = https.request(serverUrl.href, function (res: any) {
+		return await new Promise<any>(function (resolve: (value: any) => void): void {
+			var req: any = https.request(serverUrl.href, function (res: any): void {
 				let socket: TLSSocket = res.socket;
 				resolve(socket.getPeerCertificate(true));
 			});

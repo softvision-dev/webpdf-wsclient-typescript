@@ -1,6 +1,6 @@
 import {Credentials} from "./token";
 import {AxiosRequestHeaders} from "axios";
-import { Session } from "../../Session";
+import {Session} from "../../Session";
 
 /**
  * An instance of {@link AuthMaterial} provides information for the authentication {@link #getCredentials()} and

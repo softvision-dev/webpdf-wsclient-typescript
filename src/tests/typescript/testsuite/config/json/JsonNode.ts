@@ -4,8 +4,8 @@ export class JsonNode {
 			return;
 		}
 
-		let subpath: Array<string> = path.split("/").filter((n) => {
-			return n;
+		let subpath: Array<string> = path.split("/").filter((n: string): boolean => {
+			return n.length > 0;
 		}).reverse();
 		let key: string | undefined = subpath.pop();
 

@@ -27,7 +27,7 @@ import {
 	PdfPassword,
 	PdfPasswordInterface
 } from "../../../main/typescript/generated-sources";
-import AdmZip = require("adm-zip");
+import AdmZip from "adm-zip";
 import {it, suite} from "mocha";
 
 suite("DocumentManagerIntegrationTest", function (): void {

@@ -28,7 +28,7 @@ export class Auth0Provider implements OAuth2Provider {
 				clientId: this.clientId,
 				clientSecret: this.clientSecret
 			});
-			let token = await auth.oauth.clientCredentialsGrant({
+			let token: import("auth0").JSONApiResponse<import("auth0").TokenSet> = await auth.oauth.clientCredentialsGrant({
 				audience: this.audience
 			});
 

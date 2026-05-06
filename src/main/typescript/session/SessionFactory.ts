@@ -3,7 +3,7 @@ import {WebServiceProtocol} from "../webservice";
 import {RestWebServiceSession} from "./rest";
 import {ClientResultException, WsclientErrors} from "../exception";
 import {SessionContext} from "./connection";
-import {AuthenticationProvider, AnonymousAuthProvider} from "./auth";
+import {AnonymousAuthProvider, AuthenticationProvider} from "./auth";
 
 /**
  * <p>

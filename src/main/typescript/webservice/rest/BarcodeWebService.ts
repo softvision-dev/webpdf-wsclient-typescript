@@ -1,7 +1,14 @@
 import {RestDocument, RestSession} from "../../session";
 import {WebServiceTypes} from "../WebServiceType";
 import {RestWebService} from "./RestWebService";
-import {Barcode, BarcodeOperation, BarcodeOperationInterface, Billing, PdfPassword, Settings} from "../../generated-sources";
+import {
+	Barcode,
+	BarcodeOperation,
+	BarcodeOperationInterface,
+	Billing,
+	PdfPassword,
+	Settings
+} from "../../generated-sources";
 
 /**
  * An instance of {@link BarcodeWebService} wraps a wsclient connection to the webPDF webservice endpoint

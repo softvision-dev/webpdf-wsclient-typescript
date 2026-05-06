@@ -1,0 +1,16 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "..",
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"types": [
+			"node",
+			"mocha"
+		]
+	},
+	"include": [
+		"../main/typescript/**/*",
+		"./typescript/**/*"
+	]
+}

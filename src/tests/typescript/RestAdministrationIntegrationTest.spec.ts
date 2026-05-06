@@ -49,16 +49,16 @@ import {
 import {ClusterSettings, Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
 import {it, suite} from "mocha";
 
-const atob = function (data: string) {
+const atob: (data: string) => string = function (data: string): string {
 	return Buffer.from(data, "base64").toString("ascii");
 };
 
-suite("RestAdministrationIntegrationTest", function () {
+suite("RestAdministrationIntegrationTest", function (): void {
 	let testServer: TestServer = new TestServer();
 	let testResources: TestResources = new TestResources('documents');
 	let testKeystores: TestResources = new TestResources('keystore');
 
-	it('testUser', async function () {
+	it('testUser', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -106,7 +106,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testUserConfig', async function () {
+	it('testUserConfig', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -152,7 +152,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testLogsConfig', async function () {
+	it('testLogsConfig', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -185,7 +185,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testServerConfig', async function () {
+	it('testServerConfig', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -219,7 +219,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testApplicationConfig', async function () {
+	it('testApplicationConfig', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -262,7 +262,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('validateApplication', async function () {
+	it('validateApplication', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -297,7 +297,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('validateApplicationException', async function () {
+	it('validateApplicationException', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -327,7 +327,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('validateApplicationExecutables', async function () {
+	it('validateApplicationExecutables', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -367,7 +367,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testServerStatus', async function () {
+	it('testServerStatus', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -389,7 +389,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testStreamLog', async function () {
+	it('testStreamLog', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -412,7 +412,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationSupportInformation', async function () {
+	it('testAdministrationSupportInformation', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -434,7 +434,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationDatastore', async function () {
+	it('testAdministrationDatastore', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -478,7 +478,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationTruststore', async function () {
+	it('testAdministrationTruststore', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -529,7 +529,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationKeystore', async function () {
+	it('testAdministrationKeystore', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -582,7 +582,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testSslConnectionKeystore', async function () {
+	it('testSslConnectionKeystore', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -640,7 +640,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationStatistics', async function () {
+	it('testAdministrationStatistics', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -670,7 +670,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testAdministrationSessions', async function () {
+	it('testAdministrationSessions', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -697,7 +697,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		expect(sessions!.activeSessions, "There should be at least 1 active session").to.be.greaterThan(0);
 		expect(sessions!.sessionList, "There should be a session list").to.exist;
 
-		expect(sessions!.sessionList!.find((value) => {
+		expect(sessions!.sessionList!.find((value: import("../../main/typescript/generated-sources").SessionTableEntry): boolean => {
 			return value.sessionId === sessionId;
 		}), "The admin session should exist").to.exist;
 
@@ -711,7 +711,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testClusterConfig', async function () {
+	it('testClusterConfig', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -746,7 +746,7 @@ suite("RestAdministrationIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testClusterStatus', async function () {
+	it('testClusterStatus', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;

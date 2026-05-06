@@ -1,7 +1,14 @@
 import {RestWebService} from "./RestWebService";
 import {RestDocument, RestSession} from "../../session";
 import {WebServiceTypes} from "../WebServiceType";
-import {Billing, PdfPassword, Settings, UrlConverter, UrlConverterOperation, UrlConverterOperationInterface} from "../../generated-sources";
+import {
+	Billing,
+	PdfPassword,
+	Settings,
+	UrlConverter,
+	UrlConverterOperation,
+	UrlConverterOperationInterface
+} from "../../generated-sources";
 
 /**
  * An instance of {@link UrlConverterWebService} wraps a wsclient connection to the webPDF webservice endpoint

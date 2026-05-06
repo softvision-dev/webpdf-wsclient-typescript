@@ -12,7 +12,7 @@ const {execSync} = require('child_process');
         let volume = __dirname + ":" + workdir;
         let pomPath = workdir + "/codegen/pom.xml";
         let dockerCommand = [
-            "docker run", "-it", "--rm", "--name wsclient-maven", "-v " + volume, "-w " + workdir,
+            "docker run", "-i", "--rm", "--name wsclient-maven", "-v " + volume, "-w " + workdir,
             "maven:3.9.2-eclipse-temurin-11-alpine"
         ].join(" ");
         execSync(dockerCommand + ' mvn clean package -f ' + pomPath, {

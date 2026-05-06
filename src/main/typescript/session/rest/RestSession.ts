@@ -1,7 +1,7 @@
 import {Session} from "../Session";
 import {DocumentManager, RestDocument} from "./documents";
 import {RestWebService, WebServiceType} from "../../webservice";
-import {Axios, AxiosProgressEvent} from "axios";
+import {AxiosProgressEvent, AxiosInstance} from "axios";
 import {AdministrationManager} from "./administration";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources";
 
@@ -23,7 +23,7 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
      *
      * @return the {@link Axios} instance connected to the webPDF server via this {@link RestSession}.
      */
-    getHttpClient(): Axios;
+    getHttpClient(): AxiosInstance;
 
     /**
      * Returns the active {@link DocumentManager} of this {@link RestSession}.

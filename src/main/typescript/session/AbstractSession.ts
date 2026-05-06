@@ -89,7 +89,7 @@ export abstract class AbstractSession implements Session {
 	 * @throws ResultException a {@link ResultException}
 	 */
 	public getURL(subPath: string, parameters?: URLSearchParams): URL {
-		let url = new URL(this.baseUrl);
+		let url: URL = new URL(this.baseUrl);
 		url.pathname += this.basePath + subPath;
 
 		if (typeof parameters !== "undefined") {

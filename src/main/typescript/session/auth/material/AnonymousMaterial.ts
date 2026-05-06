@@ -16,7 +16,7 @@ export class AnonymousMaterial extends AbstractAuthMaterial implements AuthMater
      *
      * @return Always undefined.
      */
-    getCredentials(): Credentials | undefined {
+    public override getCredentials(): Credentials | undefined {
         return undefined;
     }
 
@@ -25,7 +25,7 @@ export class AnonymousMaterial extends AbstractAuthMaterial implements AuthMater
      *
      * @return Always undefined.
      */
-    public getAuthHeader(): AxiosRequestHeaders | undefined {
+    public override getAuthHeader(): AxiosRequestHeaders | undefined {
         return undefined;
     }
 
@@ -34,7 +34,7 @@ export class AnonymousMaterial extends AbstractAuthMaterial implements AuthMater
      *
      * @return Always undefined.
      */
-    getRawAuthHeader(): string | undefined {
+    public override getRawAuthHeader(): string | undefined {
         return undefined;
     }
 
@@ -43,7 +43,7 @@ export class AnonymousMaterial extends AbstractAuthMaterial implements AuthMater
      *
      * @return The raw String token, that shall be passed to the authorization {@link Headers}.
      */
-    getToken(): string {
+    public override getToken(): string {
         return "";
     }
 }

@@ -3,6 +3,9 @@
 	"timeout": 30000,
 	"_comment": "// parallel currently not supported by idea: https://youtrack.jetbrains.com/issue/WEB-46034/Add-support-for-mocha-parallel",
 	"parallel": false,
+	"node-option": [
+		"no-experimental-strip-types"
+	],
 	"require": [
 		"ts-node/register",
 		"./src/tests/typescript/bootstrap.ts"

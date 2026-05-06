@@ -74,7 +74,7 @@ export class WsclientError {
  * with the webPDF server´s error codes.
  * </p>
  */
-export const WsclientErrors = {
+export const WsclientErrors: Record<string, WsclientError> = {
     /**
      * An unexpected Exception has occurred, the wsclient does not define a matching fallback behaviour for the
      * situation.

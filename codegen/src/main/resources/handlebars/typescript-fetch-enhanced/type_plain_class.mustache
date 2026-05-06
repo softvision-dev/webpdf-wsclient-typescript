@@ -6,7 +6,7 @@ export class {{vendorExtensions.x-webpdf-codegen.typeClassName}}{{#if vendorExte
     * {{{description}}}
     */
     {{/description}}
-    {{#readOnly}}readonly {{/readOnly}}{{name}}{{^required}}?{{/required}}: {{{datatypeWithEnum}}};
+    {{#vendorExtensions.x-webpdf-codegen.overridesParent}}override {{/vendorExtensions.x-webpdf-codegen.overridesParent}}{{#readOnly}}readonly {{/readOnly}}{{name}}{{^required}}?{{/required}}: {{{datatypeWithEnum}}};
 {{/vars}}
 
     constructor(data: any) {
@@ -49,7 +49,7 @@ export class {{vendorExtensions.x-webpdf-codegen.typeClassName}}{{#if vendorExte
         {{/maximum}}
     {{/isNumeric}}
 {{/vars}}
-    public static fromJson(data: any): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
+    public static {{#if vendorExtensions.x-webpdf-codegen.extends}}override {{/if}}{{^vendorExtensions.x-webpdf-codegen.extends}}{{#vendorExtensions.x-webpdf-codegen.parentClassName}}override {{/vendorExtensions.x-webpdf-codegen.parentClassName}}{{/vendorExtensions.x-webpdf-codegen.extends}}fromJson(data: any): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
         if (data === undefined || data === null) {
             return data;
         }
@@ -72,7 +72,7 @@ export class {{vendorExtensions.x-webpdf-codegen.typeClassName}}{{#if vendorExte
         return new {{vendorExtensions.x-webpdf-codegen.typeClassName}}(data);
     }
 
-    public toJson(): any {
+    public {{#if vendorExtensions.x-webpdf-codegen.extends}}override {{/if}}{{^vendorExtensions.x-webpdf-codegen.extends}}{{#vendorExtensions.x-webpdf-codegen.parentClassName}}override {{/vendorExtensions.x-webpdf-codegen.parentClassName}}{{/vendorExtensions.x-webpdf-codegen.extends}}toJson(): any {
         return {
 {{#if vendorExtensions.x-webpdf-codegen.extends}}
             ...(super.toJson()),
@@ -102,7 +102,7 @@ export class {{vendorExtensions.x-webpdf-codegen.typeClassName}}{{#if vendorExte
         };
     }
 
-    public clone(): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
+    public {{#if vendorExtensions.x-webpdf-codegen.extends}}override {{/if}}{{^vendorExtensions.x-webpdf-codegen.extends}}{{#vendorExtensions.x-webpdf-codegen.parentClassName}}override {{/vendorExtensions.x-webpdf-codegen.parentClassName}}{{/vendorExtensions.x-webpdf-codegen.extends}}clone(): {{vendorExtensions.x-webpdf-codegen.typeClassName}} {
         return {{vendorExtensions.x-webpdf-codegen.typeClassName}}.fromJson(this.toJson());
     }
 

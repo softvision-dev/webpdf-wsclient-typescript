@@ -1,4 +1,4 @@
-import { Session } from "../../../Session";
+import {Session} from "../../../Session";
 import {AbstractAuthMaterial} from "../AbstractAuthMaterial";
 import {AuthMethods} from "../AuthMethod";
 import {Credentials} from "./Credentials";

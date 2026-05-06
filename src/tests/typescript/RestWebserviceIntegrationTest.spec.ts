@@ -54,15 +54,15 @@ import {
 } from "../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-const fs = require('fs');
-const tmp = require('tmp');
+const fs: any = require('fs');
+const tmp: any = require('tmp');
 
-suite("RestWebserviceIntegrationTest", function () {
+suite("RestWebserviceIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	it('testConverter', async function () {
+	it('testConverter', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -100,14 +100,14 @@ suite("RestWebserviceIntegrationTest", function () {
 
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testConverterTemplate', async function () {
+	it('testConverterTemplate', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -182,14 +182,14 @@ suite("RestWebserviceIntegrationTest", function () {
 
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testToolbox', async function () {
+	it('testToolbox', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -248,14 +248,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testToolboxSpecialStructures', async function () {
+	it('testToolboxSpecialStructures', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -300,14 +300,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testToolboxExtractionInfo', async function () {
+	it('testToolboxExtractionInfo', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -338,7 +338,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
@@ -348,7 +348,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testSignature', async function () {
+	it('testSignature', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -404,14 +404,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testPdfa', async function () {
+	it('testPdfa', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -445,14 +445,14 @@ suite("RestWebserviceIntegrationTest", function () {
 
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testOcr', async function () {
+	it('testOcr', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -487,14 +487,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testBarcode', async function () {
+	it('testBarcode', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -547,14 +547,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testUrlConverter', async function () {
+	it('testUrlConverter', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -585,14 +585,14 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process();
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testToolboxSwitchToOutputFile', async function () {
+	it('testToolboxSwitchToOutputFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -622,7 +622,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync({postfix: ".png"});
+		let fileOut: any = tmp.fileSync({postfix: ".png"});
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
@@ -633,7 +633,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		expect((downloadedFile).equals(expectedImage), "Content of output file should be identical to test file.").to.be.true;
 	});
 
-	it('testToolboxCreateOutputFile', async function () {
+	it('testToolboxCreateOutputFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -675,7 +675,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process();
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 		expect(resultDocument!.getDocumentId()).to.not.equal(uploadedFile.getDocumentId());
@@ -684,7 +684,7 @@ suite("RestWebserviceIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testHandleRestSession', async function () {
+	it('testHandleRestSession', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;

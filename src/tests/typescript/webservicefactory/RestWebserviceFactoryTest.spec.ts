@@ -42,11 +42,11 @@ import {
 } from "../../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-suite("RestWebserviceFactoryTest", function () {
+suite("RestWebserviceFactoryTest", function (): void {
 	let testResources: TestResources = new TestResources('webservicefactory');
 	let testServer: TestServer = new TestServer();
 
-	let getWebService = async function <T extends RestWebService<any, any, RestDocument>>(webServiceType: WebServiceType): Promise<T> {
+	let getWebService: <T extends RestWebService<any, any, RestDocument>>(webServiceType: WebServiceType) => Promise<T> = async function <T extends RestWebService<any, any, RestDocument>>(webServiceType: WebServiceType): Promise<T> {
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
 			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL))
 		);
@@ -55,7 +55,7 @@ suite("RestWebserviceFactoryTest", function () {
 		return WebServiceFactory.createInstance(session, webServiceType);
 	};
 
-	let getTypedWebservice = async function <T extends RestWebService<any, any, RestDocument>>(
+	let getTypedWebservice: <T extends RestWebService<any, any, RestDocument>>(expectedType: Function, webServiceType: WebServiceType, parameters: any) => Promise<T> = async function <T extends RestWebService<any, any, RestDocument>>(
 		expectedType: Function, webServiceType: WebServiceType, parameters: any
 	): Promise<T> {
 		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
@@ -69,7 +69,7 @@ suite("RestWebserviceFactoryTest", function () {
 		return webService;
 	};
 
-	it('testFactoryBarcodeFromFile', async function () {
+	it('testFactoryBarcodeFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -90,7 +90,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().add!.qrcode![0].margin, "Value of margin attribute is unexpected.").to.equal(1);
 	});
 
-	it('testFactoryConverterFromFile', async function () {
+	it('testFactoryConverterFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -117,7 +117,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().pdfa!.convert!.successReport, "Value of successReport attribute is unexpected.").is.equal(PdfaSuccessReport.Zip);
 	});
 
-	it('testFactoryOCRFromFile', async function () {
+	it('testFactoryOCRFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -138,7 +138,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().page!.metrics, "Value of metrics attribute is unexpected.").is.equal(Metrics.Mm);
 	});
 
-	it('testFactoryPDFAFromFile', async function () {
+	it('testFactoryPDFAFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -152,7 +152,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().analyze!.level, "Value of level attribute is unexpected.").is.equal(PdfaLevel._1a);
 	});
 
-	it('testFactorySignatureFromFile', async function () {
+	it('testFactorySignatureFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -177,7 +177,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().add!.appearance!.identifier, "Value of identifier attribute is unexpected.").is.equal("testIdentifier");
 	});
 
-	it('testFactoryToolboxFromFile', async function () {
+	it('testFactoryToolboxFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -208,7 +208,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(watermarkOptions.watermark!.text!.text, "Value of text attribute is unexpected.").is.equal("testText");
 	});
 
-	it('testFactoryUrlConverterFromFile', async function () {
+	it('testFactoryUrlConverterFromFile', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -237,7 +237,7 @@ suite("RestWebserviceFactoryTest", function () {
 		expect(webService.getOperationParameters().proxy!.port, "Value of port attribute is unexpected.").is.equal(1);
 	});
 
-	it('testFactoryCreateWebserviceInstance', async function () {
+	it('testFactoryCreateWebserviceInstance', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;

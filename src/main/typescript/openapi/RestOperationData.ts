@@ -1,4 +1,16 @@
-import {Barcode, BaseToolbox, Billing, Converter, Ocr, Parameter, Pdfa, PdfPassword, Settings, Signature, UrlConverter} from "../generated-sources";
+import {
+	Barcode,
+	BaseToolbox,
+	Billing,
+	Converter,
+	Ocr,
+	Parameter,
+	Pdfa,
+	PdfPassword,
+	Settings,
+	Signature,
+	UrlConverter
+} from "../generated-sources";
 
 /**
  * <p>
@@ -391,7 +403,7 @@ export class RestOperationData implements Parameter {
 			'ocr': this.ocr?.toJson(),
 			'pdfa': this.pdfa?.toJson(),
 			'signature': this.signature?.toJson(),
-			'toolbox': this.toolbox?.map((data) => data.toJson()),
+			'toolbox': this.toolbox?.map((data: BaseToolbox): any => data.toJson()),
 			'urlconverter': this.urlconverter?.toJson()
 		};
 	}
@@ -400,4 +412,3 @@ export class RestOperationData implements Parameter {
 		return RestOperationData.fromJson(this.toJson());
 	}
 }
-

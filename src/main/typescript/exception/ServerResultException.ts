@@ -48,7 +48,7 @@ export class ServerResultException extends ResultException {
 	 *
 	 * @return A {@link String} representation of this {@link ServerResultException}.
 	 */
-	public toString(): string {
+	public override toString(): string {
 		return "Server error: " + this.message +
 			" (" + this.getErrorCode() + ")\n" +
 			(

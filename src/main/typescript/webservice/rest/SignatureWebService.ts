@@ -1,7 +1,14 @@
 import {RestWebService} from "./RestWebService";
 import {RestDocument, RestSession} from "../../session";
 import {WebServiceTypes} from "../WebServiceType";
-import {Billing, PdfPassword, Settings, Signature, SignatureOperation, SignatureOperationInterface} from "../../generated-sources";
+import {
+	Billing,
+	PdfPassword,
+	Settings,
+	Signature,
+	SignatureOperation,
+	SignatureOperationInterface
+} from "../../generated-sources";
 
 /**
  * An instance of {@link SignatureWebService} wraps a wsclient connection to the webPDF webservice endpoint

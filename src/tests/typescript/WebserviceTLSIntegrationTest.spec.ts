@@ -14,17 +14,17 @@ import {Agent, AgentOptions} from "https";
 import {it, suite} from "mocha";
 import {DetailedPeerCertificate} from "tls";
 
-const fs = require('fs');
-const tmp = require('tmp');
+const fs: any = require('fs');
+const tmp: any = require('tmp');
 
-suite("WebserviceTLSIntegrationTest", function () {
+suite("WebserviceTLSIntegrationTest", function (): void {
 	const CERT_START: string = '-----BEGIN CERTIFICATE-----\n';
 	const CERT_END: string = '\n-----END CERTIFICATE-----';
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	let testRestSSL = async function (
+	let testRestSSL: (url: URL, peerCertificate: DetailedPeerCertificate | undefined, selfSigned: boolean) => Promise<void> = async function (
 		url: URL, peerCertificate: DetailedPeerCertificate | undefined, selfSigned: boolean
 	): Promise<void> {
 		let options: AgentOptions = {
@@ -63,14 +63,14 @@ suite("WebserviceTLSIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	};
 
-	let testRestSSLParameter = [
+	let testRestSSLParameter: { type: ServerType; protocol: TransferProtocol; hasError: boolean; setCertificate: boolean; selfSigned: boolean; }[] = [
 		{
 			"type": ServerType.LOCAL,
 			"protocol": TransferProtocol.HTTPS,
@@ -123,7 +123,7 @@ suite("WebserviceTLSIntegrationTest", function () {
 	];
 
 	for (let parameter of testRestSSLParameter) {
-		it('testRestSSL', async function () {
+		it('testRestSSL', async function (): Promise<void> {
 			if (!TestConfig.instance.getIntegrationTestConfig().isTlsTestsActive()) {
 				this.skip();
 				return;

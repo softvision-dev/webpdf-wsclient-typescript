@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs: any = require('fs');
+const path: any = require('path');
 
 export class TestResources {
 	private readonly resourcePath: string;

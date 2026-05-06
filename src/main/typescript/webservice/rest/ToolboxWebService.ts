@@ -1,7 +1,14 @@
 import {RestWebService} from "./RestWebService";
 import {RestDocument, RestSession} from "../../session";
 import {WebServiceTypes} from "../WebServiceType";
-import {BaseToolbox, Billing, PdfPassword, Settings, ToolboxOperation, ToolboxOperationInterface} from "../../generated-sources";
+import {
+	BaseToolbox,
+	Billing,
+	PdfPassword,
+	Settings,
+	ToolboxOperation,
+	ToolboxOperationInterface
+} from "../../generated-sources";
 
 /**
  * An instance of {@link ToolboxWebService} wraps a wsclient connection to the webPDF webservice endpoint

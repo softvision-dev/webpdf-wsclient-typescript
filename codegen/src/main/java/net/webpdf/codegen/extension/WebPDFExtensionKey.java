@@ -18,6 +18,7 @@ public enum WebPDFExtensionKey {
     IS_ENUM_TYPE("isEnumType"),
     IS_TYPE_REFERENCE("isTypeReference"),
     DEFAULT_VALUE("defaultValue"),
+    OVERRIDES_PARENT("overridesParent"),
     IMPORTS("imports"),
     RELATIVE_INDEX_LOCATION("relativeIndexLocation"),
 

@@ -4,11 +4,11 @@ import {ConverterWebService, RestDocument, RestSession, ServerResultException, S
 import {BaseToolbox, Signature, SignatureInterface} from "../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-suite("RestFailureIntegrationTest", function () {
+suite("RestFailureIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 
-	it('testConverterFailure', async function () {
+	it('testConverterFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -35,7 +35,7 @@ suite("RestFailureIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testSignatureFailure', async function () {
+	it('testSignatureFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -73,7 +73,7 @@ suite("RestFailureIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testPdfaFailure', async function () {
+	it('testPdfaFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -100,7 +100,7 @@ suite("RestFailureIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testToolboxFailure', async function () {
+	it('testToolboxFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -136,7 +136,7 @@ suite("RestFailureIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testUrlConverterFailure', async function () {
+	it('testUrlConverterFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -163,7 +163,7 @@ suite("RestFailureIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testOCRFailure', async function () {
+	it('testOCRFailure', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;

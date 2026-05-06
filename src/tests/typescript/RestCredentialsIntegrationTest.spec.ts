@@ -4,15 +4,15 @@ import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionF
 import {Converter, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-const fs = require('fs');
-const tmp = require('tmp');
+const fs: any = require('fs');
+const tmp: any = require('tmp');
 
-suite("RestCredentialsIntegrationTest", function () {
+suite("RestCredentialsIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 	tmp.setGracefulCleanup();
 
-	it('testWithUserCredentials', async function () {
+	it('testWithUserCredentials', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -44,14 +44,14 @@ suite("RestCredentialsIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
 		await session.close();
 	});
 
-	it('testWithSetOptions', async function () {
+	it('testWithSetOptions', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -81,7 +81,7 @@ suite("RestCredentialsIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 

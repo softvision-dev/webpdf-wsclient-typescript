@@ -2,8 +2,8 @@ import {ServerConfig} from "./server";
 import {IntegrationTestConfig} from "./integration";
 import {JsonNode} from "./json";
 
-const fs = require('fs');
-const path = require('path');
+const fs: any = require('fs');
+const path: any = require('path');
 
 export class TestConfig {
 	private static readonly TEST_CONFIG_LOCATION: string = "config/testConfig.json";

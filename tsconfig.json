@@ -1,22 +1,31 @@
 {
 	"compilerOptions": {
 		"target": "ES6",
-		"module": "CommonJS",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"sourceMap": true,
 		"declaration": true,
+		"declarationMap": true,
 		"removeComments": true,
 		"esModuleInterop": true,
 		"downlevelIteration": true,
-		"moduleResolution": "Node",
-		"rootDirs": [
-			"src/main/typescript"
-		],
+		"ignoreDeprecations": "6.0",
+		"rootDir": "src/main/typescript",
 		"outDir": "./lib",
+		"types": [
+			"node"
+		],
 		"lib": [
 			"DOM",
 			"ES2020"
 		],
-		"strict": true
+		"strict": true,
+		"noUncheckedIndexedAccess": false,
+		"exactOptionalPropertyTypes": false,
+		"noImplicitOverride": true,
+		"useUnknownInCatchVariables": true,
+		"noFallthroughCasesInSwitch": true,
+		"skipLibCheck": true
 	},
 	"include": [
 		"src/main/typescript/**/*"

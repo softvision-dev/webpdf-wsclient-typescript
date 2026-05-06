@@ -84,7 +84,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 				.buildRequest(HttpMethod.GET, this.session.getURL("documents/list"));
 			let requestData: Array<any> = await request.executeRequest();
 
-			documentFileList = requestData.map((data) => DocumentFile.fromJson(data));
+			documentFileList = requestData.map((data: any): DocumentFile => DocumentFile.fromJson(data));
 		} else {
 			documentFileList = fileList;
 		}
@@ -95,7 +95,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 
 		let currentDocumentFileList: Array<T_REST_DOCUMENT> = this.getDocuments();
 		for (let documentFile of currentDocumentFileList) {
-			if (documentFileList.find((compare: DocumentFile) => compare.documentId === documentFile.getDocumentId())) {
+			if (documentFileList.find((compare: DocumentFile): boolean => compare.documentId === documentFile.getDocumentId())) {
 				continue;
 			}
 
@@ -397,7 +397,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 
 		let requestData: Array<any> = await request.executeRequest();
 
-		let history: Array<HistoryEntry> = requestData.map((data) => HistoryEntry.fromJson(data));
+		let history: Array<HistoryEntry> = requestData.map((data: any): HistoryEntry => HistoryEntry.fromJson(data));
 
 		for (let historyEntry of history) {
 			this.accessInternalState(restDocument).updateHistoryEntry(historyEntry);
@@ -480,7 +480,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			);
 
 		let requestData: Array<any> = await request.executeRequest();
-		let documentFileList: Array<DocumentFile> = requestData.map((data) => DocumentFile.fromJson(data));
+		let documentFileList: Array<DocumentFile> = requestData.map((data: any): DocumentFile => DocumentFile.fromJson(data));
 
 		let resultDocuments: Array<T_REST_DOCUMENT> = [];
 		for (let documentFile of documentFileList) {

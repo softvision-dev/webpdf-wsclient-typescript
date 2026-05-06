@@ -35,7 +35,7 @@ export class AuthenticationMaterial extends AbstractAuthMaterial {
 	 *
 	 * @return The user´s {@link Credentials}.
 	 */
-	public getCredentials(): Credentials | undefined {
+	public override getCredentials(): Credentials | undefined {
 		return new Credentials(this.userName, this.password);
 	}
 
@@ -44,7 +44,7 @@ export class AuthenticationMaterial extends AbstractAuthMaterial {
 	 *
 	 * @return A new {@link AuthMethod#BASIC_AUTHORIZATION} header using the given {@link Credentials}.
 	 */
-	public getRawAuthHeader(): string | undefined {
+	public override getRawAuthHeader(): string | undefined {
 		return AuthMethods.BASIC_AUTHORIZATION.getKey() + " " + this.getToken();
 	}
 
@@ -53,7 +53,7 @@ export class AuthenticationMaterial extends AbstractAuthMaterial {
 	 *
 	 * @return The raw String token, that shall be passed to the authorization {@link Headers}.
 	 */
-	public getToken(): string {
+	public override getToken(): string {
 		return wsclientConfiguration.btoa(this.userName + ":" + this.password);
 	}
 }

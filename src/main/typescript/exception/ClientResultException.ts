@@ -63,7 +63,7 @@ export class ClientResultException extends ResultException {
 	 * @return the detail message string of this instance
 	 * (which may be null).
 	 */
-	public getMessage(): string {
+	public override getMessage(): string {
 		let errorMessage: string = this.getClientError().getMessage();
 
 		if (this.messages.length > 0 && errorMessage.length > 0) {
@@ -106,7 +106,7 @@ export class ClientResultException extends ResultException {
 	 *
 	 * @return A {@link string} representation of this {@link ClientResultException}.
 	 */
-	public toString(): string {
+	public override toString(): string {
 		return this.getMessage();
 	}
 }

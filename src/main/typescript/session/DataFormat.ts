@@ -1,4 +1,4 @@
-import { Session } from "./Session";
+import {Session} from "./Session";
 
 /**
  * A {@link DataFormat} for a {@link Session}´s data transfer objects.
@@ -56,7 +56,7 @@ export class DataFormat {
  * @see #PLAIN
  * @see #ANY
  */
-export const DataFormats = {
+export const DataFormats: Record<string, DataFormat> = {
     /**
      * Extensible Markup Language
      */

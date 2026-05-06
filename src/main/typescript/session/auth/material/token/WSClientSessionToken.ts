@@ -35,7 +35,7 @@ export class WSClientSessionToken extends AbstractJWTToken {
 	 *
 	 * @return The access token string value.
 	 */
-	public getToken(): string {
+	public override getToken(): string {
 		return this.token;
 	}
 

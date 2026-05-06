@@ -153,7 +153,7 @@ export class RestWebServiceDocumentState implements RestDocumentState<RestWebSer
             throw new ClientResultException(WsclientErrors.INVALID_HISTORY_DATA);
         }
 
-        return Array.from(this.historyMap.values()).find((entry: HistoryEntry) => {
+        return Array.from(this.historyMap.values()).find((entry: HistoryEntry): boolean => {
             return entry.active === true
         })!;
     }

@@ -4,10 +4,10 @@ import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactor
 import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-const fs = require('fs');
-const tmp = require('tmp');
+const fs: any = require('fs');
+const tmp: any = require('tmp');
 
-suite("Oauth2TokenIntegrationTest", function () {
+suite("Oauth2TokenIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');
 	let testServer: TestServer = new TestServer();
 
@@ -33,7 +33,7 @@ suite("Oauth2TokenIntegrationTest", function () {
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
 		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		let fileOut = tmp.fileSync();
+		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 	}
@@ -50,7 +50,7 @@ suite("Oauth2TokenIntegrationTest", function () {
 	 * - The hereby used Auth0 authorization provider must be known to your webPDF server. (server.xml)
 	 * </p>
 	 */
-	it('testRestAuth0TokenTest', async function () {
+	it('testRestAuth0TokenTest', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().getAuth0Config().isEnabled()) {
 			this.skip();
 			return;
@@ -86,7 +86,7 @@ suite("Oauth2TokenIntegrationTest", function () {
 	 * - The hereby used Azure authorization provider must be known to your webPDF server. (server.xml)
 	 * </p>
 	 */
-	it('testRestAzureTokenTest', async function () {
+	it('testRestAzureTokenTest', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().getAzureConfig().isEnabled()) {
 			this.skip();
 			return;

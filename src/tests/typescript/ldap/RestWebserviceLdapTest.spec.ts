@@ -12,10 +12,10 @@ import {ServerType, TestConfig, TestServer} from "../testsuite";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
 
-suite("RestWebserviceLdapTest", function () {
+suite("RestWebserviceLdapTest", function (): void {
 	let testServer: TestServer = new TestServer();
 
-	it('testHandleRestSessionLdapCertificates', async function () {
+	it('testHandleRestSessionLdapCertificates', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isLdapTestsActive()) {
 			this.skip();
 			return;

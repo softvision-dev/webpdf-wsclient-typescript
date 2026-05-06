@@ -1,4 +1,11 @@
-import {AxiosError, AxiosHeaders, AxiosProgressEvent, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse, RawAxiosRequestHeaders} from "axios";
+import {
+	AxiosError,
+	AxiosProgressEvent,
+	AxiosRequestConfig,
+	AxiosRequestHeaders,
+	AxiosResponse,
+	RawAxiosRequestHeaders
+} from "axios";
 import {RestSession} from "../../rest";
 import {DataFormats} from "../../DataFormat";
 import {HttpMethod} from "./HttpMethod";
@@ -26,8 +33,8 @@ export class HttpRestRequest {
 		this.session = session;
 		this.acceptHeader = DataFormats.JSON.getMimeType();
 		this.requestConfig = {
-			beforeRedirect: (options: Record<string, any>) => {
-				let requestHeaders: RawAxiosRequestHeaders | AxiosHeaders = this.requestConfig?.headers || {};
+			beforeRedirect: (options: Record<string, any>): void => {
+				const requestHeaders: RawAxiosRequestHeaders = (this.requestConfig?.headers || {}) as RawAxiosRequestHeaders;
 
 				if (typeof options.headers[HttpHeaders.AUTHORIZATION] === "undefined") {
 					options.headers[HttpHeaders.AUTHORIZATION] = requestHeaders[HttpHeaders.AUTHORIZATION];
@@ -220,11 +227,11 @@ export class HttpRestRequest {
 		let exceptionMessage: string = httpResponse.statusText;
 
 		// is this a webPDF server response or a general server error?
-		let contentType = httpResponse.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
+		let contentType: string = httpResponse.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
 
 		// If data is an ArrayBuffer and content type is JSON, parse it
 		if (data instanceof ArrayBuffer && DataFormats.JSON.matches(contentType)) {
-			const decoder = new TextDecoder('utf-8');
+			const decoder: TextDecoder = new TextDecoder('utf-8');
 			const jsonString: string = decoder.decode(data);
 			data = JSON.parse(jsonString);
 		}

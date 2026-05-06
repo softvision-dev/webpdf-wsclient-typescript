@@ -1,15 +1,16 @@
 import {TestConfig, TestServer} from "./testsuite";
 
-const testServer: TestServer = new TestServer();
+let testServer: TestServer | null = null;
 
-exports.mochaGlobalSetup = async function () {
+exports.mochaGlobalSetup = async function (): Promise<void> {
 	if (TestConfig.instance.getIntegrationTestConfig().isContainerActive()) {
+		testServer = new TestServer();
 		await testServer.start();
 	}
 }
 
-exports.mochaGlobalTeardown = async function () {
-	if (TestConfig.instance.getIntegrationTestConfig().isContainerActive()) {
+exports.mochaGlobalTeardown = async function (): Promise<void> {
+	if (TestConfig.instance.getIntegrationTestConfig().isContainerActive() && testServer) {
 		await testServer.stop();
 	}
 }

@@ -1,4 +1,4 @@
-const globals = global as any;
+const globals: any = global as any;
 
 type Btoa = WindowOrWorkerGlobalScope["btoa"];
 

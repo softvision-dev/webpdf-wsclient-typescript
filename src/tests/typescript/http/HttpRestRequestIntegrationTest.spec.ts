@@ -5,11 +5,11 @@ import {DocumentFile} from "../../../main/typescript/generated-sources";
 import {AxiosResponse} from "axios";
 import {it, suite} from "mocha";
 
-suite("HttpRestRequestIntegrationTest", function () {
+suite("HttpRestRequestIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('http');
 	let testServer: TestServer = new TestServer();
 
-	it('testWithCredentials', async function () {
+	it('testWithCredentials', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -49,7 +49,7 @@ suite("HttpRestRequestIntegrationTest", function () {
 		await session.close();
 	});
 
-	it('testWithInvalidCredentials', async function () {
+	it('testWithInvalidCredentials', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;
@@ -73,7 +73,7 @@ suite("HttpRestRequestIntegrationTest", function () {
 		}
 	});
 
-	it('testNullEntity', async function () {
+	it('testNullEntity', async function (): Promise<void> {
 		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 			this.skip();
 			return;

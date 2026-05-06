@@ -5,6 +5,7 @@
 /softvision-webpdf-wsclient-typescript-*
 /.idea/libraries/
 /yarn-error.log
+/.yarn/
 /.yarnrc
 /.npmrc
 /config/config.json
