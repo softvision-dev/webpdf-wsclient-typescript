@@ -1,6 +1,6 @@
 ﻿import fs from "node:fs";
 import path from "node:path";
-import {ModelName} from "../port/ModelName";
+import {ModelName} from "./ModelName";
 
 /** Minimal OpenAPI 3.x document shape used for schema extraction. */
 type OpenApiSpec = {
@@ -762,6 +762,7 @@ function writeParameterModel(generatedBaseDir: string): void {
 	const content: string = [
 		"export interface Parameter {",
 		"\ttoJson(): any;",
+		"\tclone(): any;",
 		"}",
 		"",
 	].join("\n");
