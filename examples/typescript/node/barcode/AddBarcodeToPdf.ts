@@ -50,22 +50,23 @@ class AddBarcodeToPdf {
 
 			/** Order the webservice to add barcodes to the source document.
 			 * You may add multiple barcodes to the hereby created element: */
-			let add: AddBarcode = new AddBarcode({});
+			let add: AddBarcode = new AddBarcode();
 			barcode.add = add;
 
 			/** Select and parameterize the barcode type, that you want to add to your document. */
-			let aztec: AztecBarcode = new AztecBarcode({});
+			let aztec: AztecBarcode = new AztecBarcode({
+				charset: "utf-8",
+				margin: 5,
+				pages: "1-5",
+				rotation: 90,
+				value: "http://www.softvision.de",
+				errorCorrection: 50,
+				layers: 10
+			});
 			add.aztec!.push(aztec);
-			aztec.charset = "utf-8";
-			aztec.margin = 5;
-			aztec.pages = "1-5";
-			aztec.rotation = 90;
-			aztec.value = "http://www.softvision.de";
-			aztec.errorCorrection = 50;
-			aztec.layers = 10;
 
 			/** Position the barcode on the selected pages: */
-			let position: Rectangle = new Rectangle({});
+			let position: Rectangle = new Rectangle();
 			aztec.position = position;
 			position.metrics = Metrics.Px;
 			position.x = 15;

@@ -47,7 +47,7 @@ class ConvertURLToPdf {
 			 * For this example we shall select a URL and shall define the dimensions of the created pages.
 			 */
 			urlConverter.url = sourceURL;
-			let page: UrlConverterPage = new UrlConverterPage({});
+			let page: UrlConverterPage = new UrlConverterPage();
 			urlConverter.page = page;
 			page.metrics = Metrics.Mm;
 			page.width = 800;

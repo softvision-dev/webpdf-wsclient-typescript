@@ -1,5 +1,16 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {Metrics, ToolboxWatermarkWatermark, WatermarkFont, WatermarkText, ToolboxWatermark, WatermarkPosition, WatermarkPositionMode} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    Metrics,
+    ToolboxWatermarkWatermark,
+    WatermarkFont,
+    WatermarkText,
+    ToolboxWatermark,
+    WatermarkPosition,
+    WatermarkPositionMode
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link ToolboxWebService} demonstrating how you can add a
@@ -40,19 +51,19 @@ async function main() {
         let restDocument = await session.uploadDocument(sourceDocument, "filename");
 
         /** Initialize and add a toolbox parameter root: */
-        let toolboxOperation = new ToolboxWatermark({});
+        let toolboxOperation = new ToolboxWatermark();
         toolboxWebService.getOperationParameters().push(toolboxOperation);
 
         /** Initialize and add the watermark operation: */
-        let watermark = new ToolboxWatermarkWatermark({});
+        let watermark = new ToolboxWatermarkWatermark();
         toolboxOperation.watermark = watermark;
 
         /** Parameterize your webservice call by setting the presentation and contents of the watermark: */
         watermark.pages = "1,3-5,6";
         watermark.angle = 66;
-        let text = new WatermarkText({});
+        let text = new WatermarkText();
         watermark.text = text;
-        let font = new WatermarkFont({});
+        let font = new WatermarkFont();
         text.font = font;
         font.opacity = 35;
         font.name = "FontName";
@@ -65,7 +76,7 @@ async function main() {
         /**
          * Select a position for the watermark:
          */
-        let position = new WatermarkPosition({});
+        let position = new WatermarkPosition();
         text.position = position;
         position.x = 15;
         position.y = -6;

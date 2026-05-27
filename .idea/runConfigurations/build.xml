@@ -6,7 +6,9 @@
       <script value="build" />
     </scripts>
     <node-interpreter value="project" />
-    <envs />
+    <envs>
+      <env name="JAVA_HOME" value="C:\Program Files\Java\jdk-21.0.11+10" />
+    </envs>
     <method v="2" />
   </configuration>
 </component>

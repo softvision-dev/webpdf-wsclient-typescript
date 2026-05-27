@@ -5,19 +5,10 @@ const {execSync} = require('child_process');
 (async () => {
     try {
         console.log('-- clean folders --');
-        execSync('yarn run clean', {stdio: "inherit"});
+        execSync('shx rm -rf lib build', {stdio: "inherit"});
 
         console.log('-- generate sources --');
-        let workdir = "/usr/src/wsclient";
-        let volume = __dirname + ":" + workdir;
-        let pomPath = workdir + "/codegen/pom.xml";
-        let dockerCommand = [
-            "docker run", "-i", "--rm", "--name wsclient-maven", "-v " + volume, "-w " + workdir,
-            "maven:3.9.2-eclipse-temurin-11-alpine"
-        ].join(" ");
-        execSync(dockerCommand + ' mvn clean package -f ' + pomPath, {
-            stdio: "inherit"
-        });
+        execSync('yarn run codegen', {stdio: "inherit"});
 
         console.log('-- compile sources --');
         execSync('yarn run compile', {stdio: "inherit"});

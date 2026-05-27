@@ -1,4 +1,6 @@
-const globals: any = global as any;
+const globals: any = typeof globalThis !== "undefined"
+	? globalThis
+	: (typeof self !== "undefined" ? self : {});
 
 type Btoa = WindowOrWorkerGlobalScope["btoa"];
 
@@ -12,7 +14,8 @@ class WsclientConfiguration {
 
 	private constructor() {
 		// init defaults
-		if (typeof process !== "undefined") {
+		const isNodeRuntime: boolean = typeof process !== "undefined" && !!process.versions?.node;
+		if (isNodeRuntime) {
 			this._FormData = require("form-data");
 			this._btoa = function (data: string): string {
 				return Buffer.from(data).toString('base64');

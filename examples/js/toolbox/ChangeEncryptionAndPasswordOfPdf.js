@@ -1,5 +1,14 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {Encrypt, PasswordEncrypt, PdfEncryptionKey, ToolboxSecurity, ToolboxSecuritySecurity} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    Encrypt,
+    PasswordEncrypt,
+    PdfEncryptionKey,
+    ToolboxSecurity,
+    ToolboxSecuritySecurity
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link ToolboxWebService} demonstrating how you can set an open
@@ -40,18 +49,18 @@ async function main() {
         let restDocument = await session.uploadDocument(sourceDocument, "filename");
 
         /** Initialize and add a toolbox parameter root: */
-        let toolboxOperation = new ToolboxSecurity({});
+        let toolboxOperation = new ToolboxSecurity();
         toolboxWebService.getOperationParameters().push(toolboxOperation);
 
         /** Initialize and add the security operation: */
-        let security = new ToolboxSecuritySecurity({});
+        let security = new ToolboxSecuritySecurity();
         toolboxOperation.security = security;
 
         /**
          * We first want to set permissions for the protected document, to limit what users - other than the owner -
          * may do with the document.
          */
-        let encrypt = new Encrypt({});
+        let encrypt = new Encrypt();
         security.encrypt = encrypt;
         encrypt.canAssemble = true;
         encrypt.canExtractContent = true;
@@ -61,7 +70,7 @@ async function main() {
         /**
          * Next we want to set the open and permission password.
          */
-        let password = new PasswordEncrypt({});
+        let password = new PasswordEncrypt();
         encrypt.password = password;
         password.encryptionKey = PdfEncryptionKey.AES128;
         password.open = "password";

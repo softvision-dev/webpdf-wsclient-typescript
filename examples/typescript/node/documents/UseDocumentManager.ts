@@ -87,7 +87,7 @@ class UseDocumentManager {
 			await documentManager.updateDocumentHistory(specificDocument.getDocumentId(), historyEntries[0]);
 
 			/** compress {@link RestDocument}s to an archive */
-			let fileCompress: FileCompress = new FileCompress({});
+			let fileCompress: FileCompress = new FileCompress();
 
 			let documentIdList: Array<string> = [];
 			for (let document of documents) {
@@ -101,10 +101,10 @@ class UseDocumentManager {
 
 			/** extract all {@link RestDocument}s from an archive */
 			let unzippedFiles: Array<RestDocument> = await documentManager.extractDocument(
-				archiveFile.getDocumentId(), new FileExtract({})
+				archiveFile.getDocumentId(), new FileExtract()
 			);
 			/** you can also extract the archive directly */
-			unzippedFiles = await archiveFile.extractDocument(new FileExtract({}));
+			unzippedFiles = await archiveFile.extractDocument(new FileExtract());
 
 			/** delete a {@link RestDocument} from the {@link DocumentManager} */
 			await documentManager.deleteDocument(archiveFile.getDocumentId());

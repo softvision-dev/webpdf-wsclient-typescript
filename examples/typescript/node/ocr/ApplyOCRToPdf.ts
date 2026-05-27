@@ -58,7 +58,7 @@ class ApplyOCRToPdf {
 			ocr.outputFormat = OcrOutput.Text;
 
 			/** Searching for text in a 800x600 pixel area of the contained pages */
-			let page: OcrPage = new OcrPage({});
+			let page: OcrPage = new OcrPage();
 			ocr.page = page;
 			page.width = 800;
 			page.height = 600;

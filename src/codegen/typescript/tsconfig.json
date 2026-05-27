@@ -1,0 +1,14 @@
+{
+	"extends": "../../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": ".",
+		"outDir": "../../../build/codegen",
+		"declaration": false,
+		"declarationMap": false,
+		"sourceMap": false,
+		"noEmit": true
+	},
+	"include": [
+		"./**/*.ts"
+	]
+}

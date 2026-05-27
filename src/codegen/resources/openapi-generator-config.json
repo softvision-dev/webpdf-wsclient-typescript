@@ -1,0 +1,14 @@
+{
+	"supportsES6": true,
+	"npmName": "@softvision/webpdf-wsclient-typescript-raw",
+	"npmVersion": "0.0.0",
+	"withInterfaces": true,
+	"withSeparateModelsAndApi": true,
+	"apiPackage": "api",
+	"modelPackage": "models",
+	"modelPropertyNaming": "original",
+	"enumPropertyNaming": "original",
+	"stringEnums": false,
+	"useSingleRequestParameter": true,
+	"snapshot": false
+}

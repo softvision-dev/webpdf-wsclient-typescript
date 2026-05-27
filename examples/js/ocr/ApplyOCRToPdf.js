@@ -1,5 +1,14 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {Metrics, OcrLanguage, OcrOutput, OcrPage, Ocr} from "../../../lib/generated-sources";
+import {
+    Metrics,
+    Ocr,
+    OcrLanguage,
+    OcrOutput,
+    OcrPage,
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link OcrWebService} demonstrating how you can extract text
@@ -52,7 +61,7 @@ async function main() {
         ocr.outputFormat = OcrOutput.Text;
 
         /** Searching for text in a 800x600 pixel area of the contained pages */
-        let page = new OcrPage({});
+        let page = new OcrPage();
         ocr.page = page;
         page.width = 800;
         page.height = 600;

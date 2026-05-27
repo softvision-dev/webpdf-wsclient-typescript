@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "11.0.0-beta.0",
+	"version": "11.0.0-beta.43",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -39,21 +39,27 @@
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"typecheck:tests": "tsc -p src/tests/tsconfig.json --noEmit",
 		"clean": "shx rm -rf lib build",
+		"codegen:raw": "yarn openapi-generator-cli generate -i src/codegen/resources/schema/openapi.json -g typescript-axios -c src/codegen/resources/openapi-generator-config.json -o build/codegen/raw",
+		"codegen": "ts-node --project src/codegen/typescript/tsconfig.json src/codegen/typescript/generate.ts",
 		"lint": "eslint . --max-warnings=0",
 		"lint:fix": "eslint . --fix",
 		"build": "node build.js",
-		"deploy": "node deploy.js"
+		"deploy": "node deploy.js",
+		"publish:local": "node deploy.js --target local",
+		"publish:public": "node deploy.js --target public"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/softvision-dev/webpdf-wsclient-typescript"
 	},
 	"dependencies": {
-		"axios": "^1.16.0"
+		"axios": "^1.16.0",
+		"dotenv": "^16.6.1"
 	},
 	"devDependencies": {
 		"@azure/msal-node": "^5.1.5",
 		"@eslint/compat": "^2.0.5",
+		"@openapitools/openapi-generator-cli": "^2.32.0",
 		"@types/adm-zip": "^0.5.8",
 		"@types/auth0": "^3.3.11",
 		"@types/chai": "^5.2.3",
@@ -78,6 +84,10 @@
 	"files": [
 		"lib/**/*"
 	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
 	"engines": {
 		"node": "24.x.x",
 		"yarn": "4.x.x"

@@ -61,27 +61,27 @@ class AddAttachmentToPdf {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxAttachment = new ToolboxAttachment({});
+			let toolboxOperation: ToolboxAttachment = new ToolboxAttachment();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the attachment operation: */
-			let attachment: ToolboxAttachmentAttachment = new ToolboxAttachmentAttachment({});
+			let attachment: ToolboxAttachmentAttachment = new ToolboxAttachmentAttachment();
 			toolboxOperation.attachment = attachment;
 
 			/** Parameterize your webservice call:
 			 * Prepare the file attachment to add. */
-			let add: AddToolboxAttachment = new AddToolboxAttachment({});
+			let add: AddToolboxAttachment = new AddToolboxAttachment();
 			attachment.add = add;
-			let fileAttachment: FileAttachment = new FileAttachment({});
+			let fileAttachment: FileAttachment = new FileAttachment();
 			add.file!.push(fileAttachment);
 			fileAttachment.fileName = "attachment filename";
-			let data: AttachmentFileData = new AttachmentFileData({});
+			let data: AttachmentFileData = new AttachmentFileData();
 			fileAttachment.data = data;
 			data.source = FileDataSource.Value;
 			data.value = attachmentToAdd;
 
 			/** Define a visual appearance for the attachment: */
-			let annotation: FileAnnotation = new FileAnnotation({});
+			let annotation: FileAnnotation = new FileAnnotation();
 			fileAttachment.annotation = annotation;
 			annotation.page = 1;
 			annotation.color = "#FFFFFF";
@@ -91,7 +91,7 @@ class AddAttachmentToPdf {
 			annotation.popupText = "The attachment´s description";
 
 			/** Position the annotation on the selected page: */
-			let point: Point = new Point({});
+			let point: Point = new Point();
 			annotation.point = point;
 			point.x = 15;
 			point.y = 20;

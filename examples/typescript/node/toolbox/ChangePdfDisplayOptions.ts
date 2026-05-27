@@ -46,11 +46,11 @@ class ChangePdfDisplayOptions {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxOptions = new ToolboxOptions({});
+			let toolboxOperation: ToolboxOptions = new ToolboxOptions();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the options operation: */
-			let options: ToolboxOptionsOptions = new ToolboxOptionsOptions({});
+			let options: ToolboxOptionsOptions = new ToolboxOptionsOptions();
 			toolboxOperation.options = options;
 
 			/**

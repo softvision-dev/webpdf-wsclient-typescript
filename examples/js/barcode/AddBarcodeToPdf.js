@@ -1,5 +1,15 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {AddBarcode, AztecBarcode, Rectangle, Metrics, Coordinates, Barcode} from "../../../lib/generated-sources";
+import {
+    AddBarcode,
+    AztecBarcode,
+    Barcode,
+    Coordinates,
+    Metrics,
+    Rectangle,
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link BarcodeWebService} demonstrating the creation of a
@@ -44,11 +54,11 @@ async function main() {
 
         /** Order the webservice to add barcodes to the source document.
          * You may add multiple barcodes to the hereby created element: */
-        let add = new AddBarcode({});
+        let add = new AddBarcode();
         barcode.add = add;
 
         /** Select and parameterize the barcode type, that you want to add to your document. */
-        let aztec = new AztecBarcode({});
+        let aztec = new AztecBarcode();
         add.aztec.push(aztec);
         aztec.charset = "utf-8";
         aztec.margin = 5;
@@ -59,7 +69,7 @@ async function main() {
         aztec.layers = 10;
 
         /** Position the barcode on the selected pages: */
-        let position = new Rectangle({});
+        let position = new Rectangle();
         aztec.position = position;
         position.metrics = Metrics.Px;
         position.x = 15;

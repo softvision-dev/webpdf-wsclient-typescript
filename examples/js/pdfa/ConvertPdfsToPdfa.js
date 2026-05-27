@@ -1,5 +1,14 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {ConvertPdfa, PdfaLevel, PdfaSuccessReport, PdfaErrorReport, Pdfa} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    ConvertPdfa,
+    PdfaLevel,
+    PdfaSuccessReport,
+    PdfaErrorReport,
+    Pdfa
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link PdfaWebService} demonstrating how you can a PDF document
@@ -50,7 +59,7 @@ async function main() {
         /** Parameterize your webservice call.
          * In this example we want to convert the document to conformance level "3b".
          */
-        let convert = new ConvertPdfa({});
+        let convert = new ConvertPdfa();
         pdfa.convert = convert;
         convert.level = PdfaLevel._3b;
         convert.imageQuality = 90;

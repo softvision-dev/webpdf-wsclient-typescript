@@ -46,18 +46,18 @@ class ChangeEncryptionAndPasswordOfPdf {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxSecurity = new ToolboxSecurity({});
+			let toolboxOperation: ToolboxSecurity = new ToolboxSecurity();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the security operation: */
-			let security: ToolboxSecuritySecurity = new ToolboxSecuritySecurity({});
+			let security: ToolboxSecuritySecurity = new ToolboxSecuritySecurity();
 			toolboxOperation.security = security;
 
 			/**
 			 * We first want to set permissions for the protected document, to limit what users - other than the owner -
 			 * may do with the document.
 			 */
-			let encrypt: Encrypt = new Encrypt({});
+			let encrypt: Encrypt = new Encrypt();
 			security.encrypt = encrypt;
 			encrypt.canAssemble = true;
 			encrypt.canExtractContent = true;
@@ -67,7 +67,7 @@ class ChangeEncryptionAndPasswordOfPdf {
 			/**
 			 * Next we want to set the open and permission password.
 			 */
-			let password: PasswordEncrypt = new PasswordEncrypt({});
+			let password: PasswordEncrypt = new PasswordEncrypt();
 			encrypt.password = password;
 			password.encryptionKey = PdfEncryptionKey.AES128;
 			password.open = "password";

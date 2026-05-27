@@ -1,5 +1,12 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {UrlConverterPage, Metrics, UrlConverter} from "../../../lib/generated-sources";
+import {
+    Metrics,
+    SessionContext,
+    SessionFactory,
+    UrlConverter,
+    UrlConverterPage,
+    WebServiceProtocol,
+    WebServiceTypes
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link UrlConverterWebService} demonstrating how you can
@@ -41,7 +48,7 @@ async function main() {
          * For this example we shall select a URL and shall define the dimensions of the created pages.
          */
         urlConverter.url = sourceURL;
-        let page = new UrlConverterPage({});
+        let page = new UrlConverterPage();
         urlConverter.page = page;
         page.metrics = Metrics.Mm;
         page.width = 800;

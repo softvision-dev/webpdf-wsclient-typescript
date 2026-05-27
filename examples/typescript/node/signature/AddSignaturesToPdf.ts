@@ -51,7 +51,7 @@ class AddSignaturesToPdf {
 
 			/** Parameterize your webservice call.
 			 * For this example, we will entirely prohibit further editing of the document. */
-			let add: AddSignature = new AddSignature({});
+			let add: AddSignature = new AddSignature();
 			signature.add = add;
 			add.reason = "webPDF wsclient sample";
 			add.location = "Main Street, Anytown, USA";
@@ -60,10 +60,10 @@ class AddSignaturesToPdf {
 			add.keyName = "Generic self-signed certificate";
 
 			/** Next we shall position our signature on page 1 of the document: */
-			let appearance: AppearanceAdd = new AppearanceAdd({});
+			let appearance: AppearanceAdd = new AppearanceAdd();
 			add.appearance = appearance;
 			appearance.page = 1;
-			let position: SignaturePosition = new SignaturePosition({});
+			let position: SignaturePosition = new SignaturePosition();
 			position.x = 5;
 			position.y = 5;
 			position.width = 80;
@@ -71,8 +71,8 @@ class AddSignaturesToPdf {
 			appearance.position = position;
 
 			/** And will then add textual and image contents to the visual appearance: */
-			let image: SignatureImage = new SignatureImage({});
-			let imageData: SignatureFileData = new SignatureFileData({});
+			let image: SignatureImage = new SignatureImage();
+			let imageData: SignatureFileData = new SignatureFileData();
 			imageData.value = signatureImage;
 			image.data = imageData;
 			image.opacity = 40;

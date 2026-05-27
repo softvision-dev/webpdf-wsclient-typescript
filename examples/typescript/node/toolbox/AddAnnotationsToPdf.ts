@@ -59,23 +59,23 @@ class AddAnnotationsToPdf {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxAnnotation = new ToolboxAnnotation({});
+			let toolboxOperation: ToolboxAnnotation = new ToolboxAnnotation();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the annotation operation: */
-			let annotation: ToolboxAnnotationAnnotation = new ToolboxAnnotationAnnotation({});
+			let annotation: ToolboxAnnotationAnnotation = new ToolboxAnnotationAnnotation();
 			toolboxOperation.annotation = annotation;
 
 			/** Parameterize your webservice call.
 			 * We want to add a new annotation to the document: */
-			let add: AddToolboxAnnotation = new AddToolboxAnnotation({});
+			let add: AddToolboxAnnotation = new AddToolboxAnnotation();
 			annotation.add = add;
 
 			/**
 			 * We select a markup annotation to add:
 			 * (You may add multiple annotations using the same operation.)
 			 */
-			let markupAnnotation: MarkupAnnotation = new MarkupAnnotation({});
+			let markupAnnotation: MarkupAnnotation = new MarkupAnnotation();
 			add.markup!.push(markupAnnotation);
 			markupAnnotation.creator = "Creator";
 			markupAnnotation.name = "Annotationsname";
@@ -88,9 +88,9 @@ class AddAnnotationsToPdf {
 			/**
 			 * Finally we position the annotation on the selected page:
 			 */
-			let position: PositionMarkupAnnotation = new PositionMarkupAnnotation({});
+			let position: PositionMarkupAnnotation = new PositionMarkupAnnotation();
 			markupAnnotation.position = position;
-			let rectangle: Rectangle = new Rectangle({});
+			let rectangle: Rectangle = new Rectangle();
 			position.pathElement!.push(rectangle);
 			rectangle.x = 15;
 			rectangle.y = 20;

@@ -19,6 +19,7 @@ import {
 	ApplicationConfigPortalUserInterface,
 	ApplicationConfigPortalUserInterfaceInterface,
 	ClusterMode,
+	ClusterSettings,
 	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
@@ -41,12 +42,14 @@ import {
 	TrustStoreKeyStoreInterface,
 	TruststoreServer,
 	TruststoreServerInterface,
+	Tsa,
+	TsaHashAlgorithm,
+	TsaInterface,
 	User,
 	Users,
 	Webservice,
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
-import {ClusterSettings, Tsa, TsaHashAlgorithm, TsaInterface} from "../../../lib/generated-sources";
 import {it, suite} from "mocha";
 
 const atob: (data: string) => string = function (data: string): string {
@@ -278,7 +281,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		applicationConfig.tsa = Tsa.fromJson({
 			url: "http://timestamp.comodoca.com",
-			hashAlgorithm: TsaHashAlgorithm.SHA256
+			hashAlgorithm: TsaHashAlgorithm.Sha256
 		} as TsaInterface)
 
 		try {

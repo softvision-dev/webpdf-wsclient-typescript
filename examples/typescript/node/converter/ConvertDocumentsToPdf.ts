@@ -54,7 +54,7 @@ class ConvertDocumentsToPdf {
 			 * Which might not be a perfect choice for your selected document, but demonstrates how to add parameters
 			 * to the converter call.
 			 * (Most of the time it is preferable to let the converter select page formats automatically.) */
-			let page: ConverterPage = new ConverterPage({});
+			let page: ConverterPage = new ConverterPage();
 			converter.page = page;
 			page.width = 300;
 			page.height = 100;

@@ -56,7 +56,7 @@ class ConvertPdfsToPdfa {
 			/** Parameterize your webservice call.
 			 * In this example we want to convert the document to conformance level "3b".
 			 */
-			let convert: ConvertPdfa = new ConvertPdfa({});
+			let convert: ConvertPdfa = new ConvertPdfa();
 			pdfa.convert = convert;
 			convert.level = PdfaLevel._3b;
 			convert.imageQuality = 90;

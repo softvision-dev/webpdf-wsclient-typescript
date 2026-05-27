@@ -17,7 +17,6 @@ import {
 	ConfigurationType,
 	ConnectorKeyStore,
 	DataSourceServerState,
-	ExecutableApplicationCheckInterface,
 	ExecutableName,
 	FileDataStore,
 	FileGroupDataStore,
@@ -874,10 +873,10 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 		let applicationConfiguration: ApplicationConfiguration = ApplicationConfiguration.fromJson({
 			configuration: configuration,
 			configurationChecks: [
-				{
+				ApplicationCheck.fromJson({
 					checkType: ApplicationCheckMode.Executable,
 					executables: executables
-				} as ExecutableApplicationCheckInterface
+				})
 			],
 			configurationMode: ConfigurationMode.Validate,
 			configurationType: ConfigurationType.Application,

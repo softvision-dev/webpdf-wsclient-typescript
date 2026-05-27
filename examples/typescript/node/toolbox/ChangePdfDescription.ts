@@ -46,11 +46,11 @@ class ChangePdfDescription {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxDescription = new ToolboxDescription({});
+			let toolboxOperation: ToolboxDescription = new ToolboxDescription();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the description operation: */
-			let description: ToolboxDescriptionDescription = new ToolboxDescriptionDescription({});
+			let description: ToolboxDescriptionDescription = new ToolboxDescriptionDescription();
 			toolboxOperation.description = description;
 
 			/**

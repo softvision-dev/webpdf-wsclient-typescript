@@ -1,5 +1,10 @@
-import {AdministrationManager, SessionContext, SessionFactory, WebServiceProtocol} from "../../../lib";
-import {ServerStatus} from "../../../lib/generated-sources";
+import {
+    AdministrationManager,
+    ServerStatus,
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link AdministrationManager} demonstrating how you can
@@ -16,38 +21,38 @@ import {ServerStatus} from "../../../lib/generated-sources";
  * <p>
  */
 async function main() {
-	/** Adapt the following fields accordingly: */
-	let webPDFServerURL = "http://localhost:8080/webPDF/";
+    /** Adapt the following fields accordingly: */
+    let webPDFServerURL = "http://localhost:8080/webPDF/";
 
-	/** Initialize a simple {@link SessionContext}. */
-	let sessionContext = new SessionContext(WebServiceProtocol.REST, new URL(webPDFServerURL));
+    /** Initialize a simple {@link SessionContext}. */
+    let sessionContext = new SessionContext(WebServiceProtocol.REST, new URL(webPDFServerURL));
 
-	try {
-		/** Initialize the session with the webPDF Server (using REST): */
-		let session = await SessionFactory.createInstance(sessionContext);
+    try {
+        /** Initialize the session with the webPDF Server (using REST): */
+        let session = await SessionFactory.createInstance(sessionContext);
 
-		/** Get {@link AdministrationManager} from {@link RestSession} */
-		let administrationManager = session.getAdministrationManager();
+        /** Get {@link AdministrationManager} from {@link RestSession} */
+        let administrationManager = session.getAdministrationManager();
 
-		/** Get {@link ServerStatus} from {@link AdministrationManager} */
-		let serverStatus = await administrationManager.fetchServerStatus();
+        /** Get {@link ServerStatus} from {@link AdministrationManager} */
+        let serverStatus = await administrationManager.fetchServerStatus();
 
-		await session.close();
-	} catch (resultException) {
-		/** Should an exception have occurred, you can use the following methods to request further information
-		 * about the exception: */
-		let errorCode = resultException.getErrorCode();
-		let error = resultException.getClientError();
-		let message = resultException.getMessage();
-		let cause = resultException.getCause();
-		let stMessage = resultException.getStackTraceMessage();
+        await session.close();
+    } catch (resultException) {
+        /** Should an exception have occurred, you can use the following methods to request further information
+         * about the exception: */
+        let errorCode = resultException.getErrorCode();
+        let error = resultException.getClientError();
+        let message = resultException.getMessage();
+        let cause = resultException.getCause();
+        let stMessage = resultException.getStackTraceMessage();
 
-		/** Also be aware, that you may use the subtypes {@link ClientResultException},
-		 * {@link ServerResultException} and {@link AuthResultException} to differentiate the different failure
-		 * sources in your catches. */
-	}
+        /** Also be aware, that you may use the subtypes {@link ClientResultException},
+         * {@link ServerResultException} and {@link AuthResultException} to differentiate the different failure
+         * sources in your catches. */
+    }
 }
 
 (function () {
-	document.getElementById("start").onclick = main;
+    document.getElementById("start").onclick = main;
 })()

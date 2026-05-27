@@ -46,19 +46,19 @@ class AddWatermarkToPdf {
 			let restDocument: RestDocument = await session.uploadDocument(sourceDocument, "filename");
 
 			/** Initialize and add a toolbox parameter root: */
-			let toolboxOperation: ToolboxWatermark = new ToolboxWatermark({});
+			let toolboxOperation: ToolboxWatermark = new ToolboxWatermark();
 			toolboxWebService.getOperationParameters().push(toolboxOperation);
 
 			/** Initialize and add the watermark operation: */
-			let watermark: ToolboxWatermarkWatermark = new ToolboxWatermarkWatermark({});
+			let watermark: ToolboxWatermarkWatermark = new ToolboxWatermarkWatermark();
 			toolboxOperation.watermark = watermark;
 
 			/** Parameterize your webservice call by setting the presentation and contents of the watermark: */
 			watermark.pages = "1,3-5,6";
 			watermark.angle = 66;
-			let text: WatermarkText = new WatermarkText({});
+			let text: WatermarkText = new WatermarkText();
 			watermark.text = text;
-			let font: WatermarkFont = new WatermarkFont({});
+			let font: WatermarkFont = new WatermarkFont();
 			text.font = font;
 			font.opacity = 35;
 			font.name = "FontName";
@@ -71,7 +71,7 @@ class AddWatermarkToPdf {
 			/**
 			 * Select a position for the watermark:
 			 */
-			let position: WatermarkPosition = new WatermarkPosition({});
+			let position: WatermarkPosition = new WatermarkPosition();
 			text.position = position;
 			position.x = 15;
 			position.y = -6;

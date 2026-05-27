@@ -1,5 +1,18 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {ToolboxAnnotation, AddToolboxAnnotation, Coordinates, MarkupAnnotation, Metrics, PositionMarkupAnnotation, Rectangle, ToolboxAnnotationAnnotation, MarkupsAnnotation} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    ToolboxAnnotation,
+    AddToolboxAnnotation,
+    Coordinates,
+    MarkupAnnotation,
+    Metrics,
+    PositionMarkupAnnotation,
+    Rectangle,
+    ToolboxAnnotationAnnotation,
+    MarkupsAnnotation
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link ToolboxWebService} demonstrating how you can add a
@@ -40,23 +53,23 @@ async function main() {
         let restDocument = await session.uploadDocument(sourceDocument, "filename");
 
         /** Initialize and add a toolbox parameter root: */
-        let toolboxOperation = new ToolboxAnnotation({});
+        let toolboxOperation = new ToolboxAnnotation();
         toolboxWebService.getOperationParameters().push(toolboxOperation);
 
         /** Initialize and add the annotation operation: */
-        let annotation = new ToolboxAnnotationAnnotation({});
+        let annotation = new ToolboxAnnotationAnnotation();
         toolboxOperation.annotation = annotation;
 
         /** Parameterize your webservice call.
          * We want to add a new annotation to the document: */
-        let add = new AddToolboxAnnotation({});
+        let add = new AddToolboxAnnotation();
         annotation.add = add;
 
         /**
          * We select a markup annotation to add:
          * (You may add multiple annotations using the same operation.)
          */
-        let markupAnnotation = new MarkupAnnotation({});
+        let markupAnnotation = new MarkupAnnotation();
         add.markup.push(markupAnnotation);
         markupAnnotation.creator = "Creator";
         markupAnnotation.name = "Annotationsname";
@@ -69,9 +82,9 @@ async function main() {
         /**
          * Finally we position the annotation on the selected page:
          */
-        let position = new PositionMarkupAnnotation({});
+        let position = new PositionMarkupAnnotation();
         markupAnnotation.position = position;
-        let rectangle = new Rectangle({});
+        let rectangle = new Rectangle();
         position.pathElement.push(rectangle);
         rectangle.x = 15;
         rectangle.y = 20;

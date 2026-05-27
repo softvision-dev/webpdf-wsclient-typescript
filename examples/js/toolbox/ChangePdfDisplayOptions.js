@@ -1,5 +1,13 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {InitialView, Magnification, ToolboxOptions, ToolboxOptionsOptions} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    InitialView,
+    Magnification,
+    ToolboxOptions,
+    ToolboxOptionsOptions
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link ToolboxWebService} demonstrating how you can change the
@@ -40,11 +48,11 @@ async function main() {
         let restDocument = await session.uploadDocument(sourceDocument, "filename");
 
         /** Initialize and add a toolbox parameter root: */
-        let toolboxOperation = new ToolboxOptions({});
+        let toolboxOperation = new ToolboxOptions();
         toolboxWebService.getOperationParameters().push(toolboxOperation);
 
         /** Initialize and add the options operation: */
-        let options = new ToolboxOptionsOptions({});
+        let options = new ToolboxOptionsOptions();
         toolboxOperation.options = options;
 
         /**

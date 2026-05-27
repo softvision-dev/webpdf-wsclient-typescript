@@ -190,8 +190,8 @@ suite("RestWebserviceFactoryTest", function (): void {
 
 		let deleteOptions: ToolboxDelete = webService.getOperationParameters()[0] as ToolboxDelete;
 		expect(deleteOptions, "Operation should have been initialized.").to.exist;
-		expect(deleteOptions._delete, "Delete element should have been created.").to.exist;
-		expect(deleteOptions._delete!.pages, "Value of pages attribute is unexpected.").is.equal("1");
+		expect(deleteOptions.delete, "Delete element should have been created.").to.exist;
+		expect(deleteOptions.delete!.pages, "Value of pages attribute is unexpected.").is.equal("1");
 
 		let rotateOptions: ToolboxRotate = webService.getOperationParameters()[1] as ToolboxRotate;
 		expect(rotateOptions, "Rotate element should have been created.").to.exist;

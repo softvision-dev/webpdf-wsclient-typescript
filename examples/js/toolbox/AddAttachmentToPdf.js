@@ -1,7 +1,21 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {Coordinates, Metrics} from "../../../lib/generated-sources";
+import {
+    AddToolboxAttachment,
+    AttachmentFileData,
+    Coordinates,
+    FileAnnotation,
+    FileAttachment,
+    FileDataSource,
+    Icons,
+    Metrics,
+    Point,
+    SessionContext,
+    SessionFactory,
+    ToolboxAttachment,
+    ToolboxAttachmentAttachment,
+    WebServiceProtocol,
+    WebServiceTypes
+} from "../../../src/main/typescript/generated-sources";
 import {RestDocument, RestSession, ToolboxWebService} from "../../../src/main/typescript";
-import {AddToolboxAttachment, AttachmentFileData, FileAnnotation, FileAttachment, FileDataSource, Icons, Point, ToolboxAttachment, ToolboxAttachmentAttachment} from "../../../src/main/typescript/generated-sources";
 
 /** file to base64 helper */
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -51,27 +65,27 @@ async function main() {
         let restDocument = await session.uploadDocument(sourceDocument, "filename");
 
         /** Initialize and add a toolbox parameter root: */
-        let toolboxOperation = new ToolboxAttachment({});
+        let toolboxOperation = new ToolboxAttachment();
         toolboxWebService.getOperationParameters().push(toolboxOperation);
 
         /** Initialize and add the attachment operation: */
-        let attachment = new ToolboxAttachmentAttachment({});
+        let attachment = new ToolboxAttachmentAttachment();
         toolboxOperation.attachment = attachment;
 
         /** Parameterize your webservice call:
          * Prepare the file attachment to add. */
-        let add = new AddToolboxAttachment({});
+        let add = new AddToolboxAttachment();
         attachment.add = add;
-        let fileAttachment = new FileAttachment({});
+        let fileAttachment = new FileAttachment();
         add.file.push(fileAttachment);
         fileAttachment.fileName = "attachment filename";
-        let data = new AttachmentFileData({});
+        let data = new AttachmentFileData();
         fileAttachment.data = data;
         data.source = FileDataSource.Value;
         data.value = attachmentToAdd;
 
         /** Define a visual appearance for the attachment: */
-        let annotation = new FileAnnotation({});
+        let annotation = new FileAnnotation();
         fileAttachment.annotation = annotation;
         annotation.page = 1;
         annotation.color = "#FFFFFF";
@@ -81,7 +95,7 @@ async function main() {
         annotation.popupText = "The attachment´s description";
 
         /** Position the annotation on the selected page: */
-        let point = new Point({});
+        let point = new Point();
         annotation.point = point;
         point.x = 15;
         point.y = 20;

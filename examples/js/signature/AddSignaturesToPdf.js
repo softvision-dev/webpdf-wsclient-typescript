@@ -1,5 +1,16 @@
-import {SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../../lib";
-import {AddSignature, AppearanceAdd, CertificationLevel, Signature, SignatureFileData, SignatureImage, SignaturePosition} from "../../../lib/generated-sources";
+import {
+    SessionContext,
+    SessionFactory,
+    WebServiceProtocol,
+    WebServiceTypes,
+    AddSignature,
+    AppearanceAdd,
+    CertificationLevel,
+    Signature,
+    SignatureFileData,
+    SignatureImage,
+    SignaturePosition
+} from "../../../src/main/typescript/generated-sources";
 
 /** file to base64 helper */
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -53,7 +64,7 @@ async function main() {
 
         /** Parameterize your webservice call.
          * For this example, we will entirely prohibit further editing of the document. */
-        let add = new AddSignature({});
+        let add = new AddSignature();
         signature.add = add;
         add.reason = "webPDF wsclient sample";
         add.location = "Main Street, Anytown, USA";
@@ -62,10 +73,10 @@ async function main() {
         add.keyName = "Generic self-signed certificate";
 
         /** Next we shall position our signature on page 1 of the document: */
-        let appearance = new AppearanceAdd({});
+        let appearance = new AppearanceAdd();
         add.appearance = appearance;
         appearance.page = 1;
-        let position = new SignaturePosition({});
+        let position = new SignaturePosition();
         position.x = 5;
         position.y = 5;
         position.width = 80;
@@ -73,8 +84,8 @@ async function main() {
         appearance.position = position;
 
         /** And will then add textual and image contents to the visual appearance: */
-        let image = new SignatureImage({});
-        let imageData = new SignatureFileData({});
+        let image = new SignatureImage();
+        let imageData = new SignatureFileData();
         imageData.value = signatureImage;
         image.data = imageData;
         image.opacity = 40;

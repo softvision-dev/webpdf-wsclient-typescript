@@ -4,7 +4,7 @@ import {
 	SessionFactory,
 	UserAuthProvider,
 	WebServiceProtocol
-} from "../../../lib";
+} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link AdministrationManager} demonstrating how you can

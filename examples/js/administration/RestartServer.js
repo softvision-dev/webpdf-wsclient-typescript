@@ -1,4 +1,4 @@
-import {AdministrationManager, SessionContext, SessionFactory, WebServiceProtocol} from "../../../lib";
+import {AdministrationManager, SessionContext, SessionFactory, WebServiceProtocol} from "../../../src/main/typescript/generated-sources";
 
 /**
  * Here you will find a usage example for the webPDF {@link AdministrationManager} demonstrating how you can
