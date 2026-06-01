@@ -68,6 +68,38 @@ The `.env` file is loaded automatically and is excluded from version control.
 
 ## Development
 
+### Prerequisites
+
+This project requires **Node.js 24** and **Yarn 4** (Berry), managed via [nvm](https://github.com/nvm-sh/nvm) and [Corepack](https://nodejs.org/api/corepack.html).
+
+**Node.js (nvm):**
+```bash
+nvm install   # reads .nvmrc → installs Node 24
+nvm use       # switches to Node 24
+```
+
+Optional: add a shell hook to `~/.zshrc` so `nvm use` runs automatically on `cd`:
+```bash
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local nvmrc_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+  if [ -n "$nvmrc_path" ]; then
+    nvm use
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+```
+
+**Corepack (Yarn 4):**
+
+Corepack reads the `packageManager` field in `package.json` and activates the exact Yarn version automatically. Enable it once per Node.js installation:
+```bash
+corepack enable
+```
+
+> After switching Node versions via nvm, run `corepack enable` again for the new version.
+
 Install dependencies:
 ```bash
 yarn install
