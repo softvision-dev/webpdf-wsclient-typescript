@@ -50,6 +50,22 @@ The following topics are covered:
 ## Documentation
 Have a look at our [wiki](https://github.com/softvision-dev/webpdf-wsclient-typescript/wiki) for examples and details.
 
+## Environment Variables
+
+Copy `.env.example` to `.env` and fill in the required values before running development scripts.
+The `.env` file is loaded automatically and is excluded from version control.
+
+| Variable | Required for | Description |
+|---|---|---|
+| `JAVA_HOME` | `yarn run codegen` | Absolute path to the JDK used by the OpenAPI Generator CLI. Not required when `java` is already on the system `PATH`. Example: `C:\Program Files\Java\jdk-21.0.11+10` |
+| `LOCAL_PUBLISH_API` | `yarn run publish:local` | Nexus Components API endpoint URL. Example: `https://nexus.example.com/service/rest/v1/components` |
+| `LOCAL_PUBLISH_REPOSITORY` | `yarn run publish:local` | Nexus repository name where the npm package is uploaded. |
+| `LOCAL_PUBLISH_USERNAME` | `yarn run publish:local` | Nexus username for authentication against the repository. |
+| `LOCAL_PUBLISH_PASSWORD` | `yarn run publish:local` | Nexus password for authentication against the repository. |
+| `LOCAL_PUBLISH_NPM_TAG` | `yarn run publish:local` | Optional npm distribution tag applied during upload (e.g., `beta`, `latest`). Leave empty to upload without an explicit tag. |
+
+> **Note:** `yarn run publish:public` uses npm auth config instead of the `LOCAL_PUBLISH_*` variables. Provide `NODE_AUTH_TOKEN` (or `NPM_TOKEN`) in your CI environment for public npm releases.
+
 ## Development
 
 Install dependencies:
@@ -90,6 +106,93 @@ CI should run the same commands:
 - `yarn run lint`
 - `yarn run build`
 
+## Testing
+
+### Test suites
+
+| Suite | Command | Server required |
+|---|---|---|
+| Codegen unit tests (30 tests) | `yarn mocha --config .mocharc.json "src/tests/typescript/codegen/**/*.spec.ts"` | No |
+| Full integration suite (62 tests) | `yarn mocha --config .mocharc.json` | Yes |
+
+### Test configuration
+
+Integration tests read `config/testConfig.json`, which is excluded from version control.
+Copy the sample file and adapt it to your environment:
+
+```bash
+cp config/testConfig-sample.json config/testConfig.json
+```
+
+The file has two top-level sections:
+
+#### `server`
+
+Defines the webPDF server endpoints used during tests.
+
+| Field | Description |
+|---|---|
+| `server.local.url` | Base URL of the local webPDF server (default: `http://localhost`) |
+| `server.local.httpPort` | HTTP port (default: `8080`) |
+| `server.local.httpsPort` | HTTPS port (default: `8443`) |
+| `server.local.path` | Context path (default: `/webPDF`) |
+| `server.local.adminName` / `adminPassword` | Admin credentials |
+| `server.local.userName` / `userPassword` | Regular user credentials |
+| `server.local.ldapAdminName` / `ldapAdminPassword` | Admin credentials for LDAP auth tests |
+| `server.local.ldapUserName` / `ldapUserPassword` | User credentials for LDAP auth tests |
+| `server.public.url` | Public portal URL — used when running against `portal.webpdf.de` |
+
+#### `integrationTests`
+
+Controls which integration test groups are active.
+
+| Field | Default | Description |
+|---|---|---|
+| `integrationTests.enabled` | `false` | Master switch — set to `true` to run integration tests |
+| `integrationTests.useContainer` | `false` | Start a webPDF Docker container via Testcontainers instead of using a pre-running server |
+| `integrationTests.oAuth.azureClient.enabled` | `false` | Enable Azure OAuth tests; fill in `authority`, `clientId`, `clientSecret`, `scope` |
+| `integrationTests.oAuth.auth0Client.enabled` | `false` | Enable Auth0 OAuth tests; fill in `authority`, `clientId`, `clientSecret`, `audience` |
+| `integrationTests.proxy.enabled` | `false` | Enable proxy routing tests; set `url` and `urlSSL` |
+| `integrationTests.tls.enabled` | `false` | Enable TLS/HTTPS tests |
+| `integrationTests.ldap.enabled` | `false` | Enable LDAP authentication tests |
+
+> **Note:** `testConfig.json` may contain OAuth client secrets — never commit this file.
+> It is already covered by `.gitignore`.
+
+## Publishing
+
+`yarn run build` must complete successfully before publishing. It cleans the output directories, regenerates sources via codegen, and compiles TypeScript to `lib/`.
+
+### Local (Nexus)
+
+Publishes the package to an internal Nexus repository using the Nexus Components REST API.
+
+**Prerequisites:** fill in all `LOCAL_PUBLISH_*` variables in `.env` (see [Environment Variables](#environment-variables)).
+
+```bash
+yarn run build
+yarn run publish:local
+```
+
+What the script does:
+1. Packs the `lib/` output into a `.tgz` archive via `npm pack`.
+2. Uploads the archive to Nexus via `POST {LOCAL_PUBLISH_API}?repository={LOCAL_PUBLISH_REPOSITORY}` with Basic Auth.
+3. Attaches the npm distribution tag from `LOCAL_PUBLISH_NPM_TAG` when set (e.g., `beta`).
+
+### Public (npmjs.org)
+
+Publishes the package to the public npm registry.
+
+**Prerequisites:** npm authentication must be configured. In CI, set `NODE_AUTH_TOKEN` (or `NPM_TOKEN`) as an environment secret. Locally, run `yarn npm login` once.
+
+```bash
+yarn run build
+yarn run publish:public
+```
+
+What the script does:
+1. Runs `yarn npm publish --access public` against the registry configured in `package.json` (`publishConfig.registry`).
+
 ## Codegen Contract
 
 The codegen contract defines the stable behavior of the TypeScript-based code generation pipeline.
@@ -126,8 +229,12 @@ Changes to the pipeline must not break the rules below without a deliberate deci
 
 ### Runtime and environment constraints
 
-- `yarn run codegen` requires Java for OpenAPI Generator.
-- Project-local Java via `JAVA_HOME` is supported (no global PATH required), e.g.:
+- `yarn run codegen` requires Java for the OpenAPI Generator CLI.
+- The generator version is configured in `openapitools.json` (currently `7.22.0`).
+  OpenAPI Generator 7.x requires **Java 11 or newer**; Java 17 LTS or Java 21 LTS are recommended.
+  The required Java version per generator release is documented on the
+  [OpenAPI Generator releases page](https://github.com/OpenAPITools/openapi-generator/releases).
+- Project-local Java via `JAVA_HOME` is supported (no global `PATH` entry required), e.g.:
   - `C:\Program Files\Java\jdk-21.0.11+10`
 
 ## Development and support

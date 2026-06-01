@@ -61,7 +61,7 @@ const publishLocal = async () => {
     const repository = requireEnv('LOCAL_PUBLISH_REPOSITORY');
     const username = requireEnv('LOCAL_PUBLISH_USERNAME');
     const password = requireEnv('LOCAL_PUBLISH_PASSWORD');
-    const npmTag = process.env.WEBPDF_LOCAL_PUBLISH_NPM_TAG ? process.env.WEBPDF_LOCAL_PUBLISH_NPM_TAG.trim() : '';
+    const npmTag = process.env.LOCAL_PUBLISH_NPM_TAG ? process.env.LOCAL_PUBLISH_NPM_TAG.trim() : '';
 
     console.log('-- pack project --');
     const packageFile = packProject();
