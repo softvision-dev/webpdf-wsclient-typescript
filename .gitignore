@@ -18,8 +18,22 @@
 /config/testConfig.json
 /config/buildConfig.json
 /docker/.env
-/.ai-workspace/*
+# Internal / local-only AI agent material — not part of the public repository.
+# AGENTS.md and CLAUDE.md (public, tool-neutral agent rules) are intentionally NOT ignored.
 /.ai-policy/*
-/AGENTS.md
 /.claude/*
-/CLAUDE.md
+
+# Local agent workspace: keep the directory structure, ignore its transient contents.
+/.ai-workspace/*
+!/.ai-workspace/commands/
+!/.ai-workspace/scripts/
+!/.ai-workspace/temp/
+!/.ai-workspace/tracking/
+/.ai-workspace/commands/*
+/.ai-workspace/scripts/*
+/.ai-workspace/temp/*
+/.ai-workspace/tracking/*
+!/.ai-workspace/commands/.gitkeep
+!/.ai-workspace/scripts/.gitkeep
+!/.ai-workspace/temp/.gitkeep
+!/.ai-workspace/tracking/.gitkeep
