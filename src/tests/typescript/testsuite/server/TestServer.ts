@@ -81,11 +81,19 @@ export class TestServer {
 	public async getDemoCertificate(): Promise<DetailedPeerCertificate> {
 		let serverUrl: URL = this.getServer(ServerType.PUBLIC, TransferProtocol.HTTPS);
 
-		return await new Promise<any>(function (resolve: (value: any) => void): void {
+		return await new Promise<any>(function (resolve: (value: any) => void, reject: (reason: any) => void): void {
 			var req: any = https.request(serverUrl.href, function (res: any): void {
 				let socket: TLSSocket = res.socket;
-				resolve(socket.getPeerCertificate(true));
+				let peerCertificate: DetailedPeerCertificate = socket.getPeerCertificate(true);
+
+				// Drain and close the connection so the (external) TLS socket does not linger and
+				// keep the Node event loop alive after the test run finishes.
+				res.resume();
+				socket.destroy();
+
+				resolve(peerCertificate);
 			});
+			req.on("error", reject);
 			req.end();
 		});
 	}

@@ -120,7 +120,12 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			this.session = session;
 			let restSession: RestSession<any> = session as RestSession<any>;
 
-			(this.getAuthMaterial() as WSClientSessionToken).refresh();
+			// Authorize the refresh call with the refresh token via dedicated, throwaway auth
+			// material instead of mutating the live access token in place. Mutating the shared
+			// token would expose the refresh token to concurrent requests as their bearer access
+			// token, and would leave the token permanently mutated if the refresh call fails.
+			let currentToken: WSClientSessionToken = this.getAuthMaterial() as WSClientSessionToken;
+			let refreshAuthMaterial: WSClientSessionToken = new WSClientSessionToken(currentToken.getRefreshToken());
 
 			let loginOptions: LoginOptions = LoginOptions.fromJson({
 				createRefreshToken: true
@@ -131,7 +136,8 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 					HttpMethod.POST,
 					restSession.getURL(AbstractAuthenticationProvider.REFRESH_PATH),
 					JSON.stringify(loginOptions.toJson()),
-					DataFormats.JSON.getMimeType()
+					DataFormats.JSON.getMimeType(),
+					refreshAuthMaterial
 				);
 
 			let token: WebpdfSessionToken = WebpdfSessionToken.fromJson(
@@ -139,9 +145,12 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			);
 
 			this.setAuthMaterial(new WSClientSessionToken(token.token, token.refreshToken, token.expiresIn));
-			this.updating = false;
 		} catch (ex: any) {
 			throw new AuthResultException(ex);
+		} finally {
+			// Always release the updating guard, even on failure, so the provider does not get
+			// permanently stuck returning stale auth material.
+			this.updating = false;
 		}
 
 		return this.getAuthMaterial();
@@ -182,10 +191,12 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			);
 
 			this.setAuthMaterial(new WSClientSessionToken(token.token, token.refreshToken, token.expiresIn));
-
-			this.updating = false;
 		} catch (ex: any) {
 			throw new AuthResultException(ex);
+		} finally {
+			// Always release the updating guard, even on failure, so the provider does not get
+			// permanently stuck returning stale auth material.
+			this.updating = false;
 		}
 
 		return this.getAuthMaterial();

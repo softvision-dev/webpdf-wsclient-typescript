@@ -51,23 +51,35 @@ suite("WebserviceTLSIntegrationTest", function (): void {
 			options.cert = certificateChain;
 		}
 
-		let sessionContext: SessionContext = new SessionContext(WebServiceProtocol.REST, url);
-		sessionContext.setTlsContext(new Agent(options));
-		let session: RestSession<RestDocument> = await SessionFactory.createInstance(sessionContext);
+		let agent: Agent = new Agent(options);
 
-		let filename: string = "lorem-ipsum.docx";
-		let file: any = testResources.getResource(filename);
-		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(file, filename);
+		try {
+			let sessionContext: SessionContext = new SessionContext(WebServiceProtocol.REST, url);
+			sessionContext.setTlsContext(agent);
+			let session: RestSession<RestDocument> = await SessionFactory.createInstance(sessionContext);
 
-		let converterWebService: ConverterWebService<RestDocument> = WebServiceFactory.createInstance(session, WebServiceTypes.CONVERTER);
-		let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+			try {
+				let filename: string = "lorem-ipsum.docx";
+				let file: any = testResources.getResource(filename);
+				let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(file, filename);
 
-		let fileOut: any = tmp.fileSync();
-		fs.writeFileSync(fileOut.name, downloadedFile);
-		expect(fs.existsSync(fileOut.name)).to.be.true;
+				let converterWebService: ConverterWebService<RestDocument> = WebServiceFactory.createInstance(session, WebServiceTypes.CONVERTER);
+				let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
+				let downloadedFile: Buffer = await resultDocument!.downloadDocument();
 
-		await session.close();
+				let fileOut: any = tmp.fileSync();
+				fs.writeFileSync(fileOut.name, downloadedFile);
+				expect(fs.existsSync(fileOut.name)).to.be.true;
+			} finally {
+				await session.close();
+			}
+		} finally {
+			// Destroy the custom HTTPS agent so no keep-alive socket to the (possibly external)
+			// TLS endpoint keeps the Node event loop alive after the tests finish. The outer
+			// finally also covers the case where session creation itself fails (expected error
+			// scenarios), where no session exists to close.
+			agent.destroy();
+		}
 	};
 
 	let testRestSSLParameter: { type: ServerType; protocol: TransferProtocol; hasError: boolean; setCertificate: boolean; selfSigned: boolean; }[] = [
