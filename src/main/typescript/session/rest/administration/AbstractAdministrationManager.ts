@@ -121,10 +121,9 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 
 		let response: AxiosResponse = await request.execute();
 
-		let contentLength: number = 0;
-		if (typeof response.headers[HttpHeaders.CONTENT_LENGTH.toLowerCase()] !== "undefined") {
-			contentLength = response.headers[HttpHeaders.CONTENT_LENGTH.toLowerCase()] as number;
-		}
+		let contentLength: number = parseInt(
+			response.headers[HttpHeaders.CONTENT_LENGTH.toLowerCase()], 10
+		) || 0;
 
 		return contentLength;
 	}

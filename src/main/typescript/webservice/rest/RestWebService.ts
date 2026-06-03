@@ -56,7 +56,7 @@ export abstract class RestWebService<T_OPERATION_DATA extends Parameter, T_OPERA
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.getSession())
 			.buildRequest(HttpMethod.POST, url, JSON.stringify(this.getWebServiceOptions()), DataFormats.JSON.getMimeType());
-		let documentFile: DocumentFile = await request.executeRequest();
+		let documentFile: DocumentFile = DocumentFile.fromJson(await request.executeRequest());
 		return documentManager.synchronizeDocument(documentFile);
 	}
 

@@ -68,6 +68,10 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 			clientConfig.httpsAgent = serverContext.getTlsContext()
 		}
 
+		if (serverContext.getRequestTimeout() > 0) {
+			clientConfig.timeout = serverContext.getRequestTimeout();
+		}
+
 		this._httpClient = axios.create(clientConfig);
 		this.documentManager = this.createDocumentManager();
 		this.administrationManager = this.createAdministrationManager();

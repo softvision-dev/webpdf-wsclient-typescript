@@ -12,10 +12,9 @@ suite("DataFormatTest", function (): void {
 		expect(DataFormats.JSON.matches("text/plain")).to.equal(false);
 	});
 
-	it("returns false for a missing content type instead of throwing (regression: B1)", function (): void {
-		// Simulates an error response that carries no Content-Type header. The previous
-		// implementation called String.prototype.split on undefined and threw a TypeError,
-		// masking the real server error. It must now return false without throwing.
+	it("returns false for a missing content type instead of throwing", function (): void {
+		// An error response without a Content-Type header must not throw — the real server
+		// error must not be masked by a TypeError from calling split on undefined.
 		expect(DataFormats.JSON.matches(undefined as unknown as string)).to.equal(false);
 		expect(DataFormats.JSON.matches(null as unknown as string)).to.equal(false);
 	});

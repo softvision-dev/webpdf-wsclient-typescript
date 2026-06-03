@@ -111,7 +111,10 @@ export class WebServiceFactory {
 				}
 
 				// convert the data into a operation object
-				let restOperationData: RestOperationData = RestOperationData.fromJson(parameter);
+				let restOperationData: RestOperationData | undefined = RestOperationData.fromJson(parameter);
+				if (restOperationData == null) {
+					throw new ClientResultException(WsclientErrors.INVALID_HTTP_MESSAGE_CONTENT);
+				}
 
 				return WebServiceFactory.createRestInstance(
 					session as RestSession<RestDocument>, this.determineWebServiceType(restOperationData),
@@ -132,31 +135,31 @@ export class WebServiceFactory {
 	private static createRestParameters(webServiceType: WebServiceType): RestOperationData {
 		switch (webServiceType) {
 			case WebServiceTypes.CONVERTER:
-				return RestOperationData.fromJson(ConverterOperation.fromJson({
+				return new RestOperationData(ConverterOperation.fromJson({
 					converter: Converter.fromJson({}).toJson()
 				} as ConverterOperationInterface));
 			case WebServiceTypes.URLCONVERTER:
-				return RestOperationData.fromJson(UrlConverterOperation.fromJson({
+				return new RestOperationData(UrlConverterOperation.fromJson({
 					urlconverter: UrlConverter.fromJson({}).toJson()
 				} as UrlConverterOperationInterface));
 			case WebServiceTypes.PDFA:
-				return RestOperationData.fromJson(PdfaOperation.fromJson({
+				return new RestOperationData(PdfaOperation.fromJson({
 					pdfa: Pdfa.fromJson({}).toJson()
 				} as PdfaOperationInterface));
 			case WebServiceTypes.TOOLBOX:
-				return RestOperationData.fromJson(ToolboxOperation.fromJson({
+				return new RestOperationData(ToolboxOperation.fromJson({
 					toolbox: []
 				} as ToolboxOperationInterface));
 			case WebServiceTypes.OCR:
-				return RestOperationData.fromJson(OcrOperation.fromJson({
+				return new RestOperationData(OcrOperation.fromJson({
 					ocr: Ocr.fromJson({}).toJson()
 				} as OcrOperationInterface));
 			case WebServiceTypes.SIGNATURE:
-				return RestOperationData.fromJson(SignatureOperation.fromJson({
+				return new RestOperationData(SignatureOperation.fromJson({
 					signature: Signature.fromJson({}).toJson()
 				} as SignatureOperationInterface));
 			case WebServiceTypes.BARCODE:
-				return RestOperationData.fromJson(BarcodeOperation.fromJson({
+				return new RestOperationData(BarcodeOperation.fromJson({
 					barcode: Barcode.fromJson({}).toJson()
 				} as BarcodeOperationInterface));
 			default:

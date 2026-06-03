@@ -7,7 +7,7 @@ const {URL} = require('url');
 const fs = require('fs');
 const FormData = require('form-data');
 const axios = require('axios');
-const packageJson = require('./package.json');
+const packageJson = require('../package.json');
 
 const PUBLISH_TARGETS = new Set(['local', 'public']);
 
@@ -94,6 +94,13 @@ const publishLocal = async () => {
 };
 
 const publishPublic = () => {
+    if (packageJson.version.includes('-')) {
+        throw new Error(
+            `Refusing to publish prerelease version "${packageJson.version}" to public registry. ` +
+            'Only stable releases may be published publicly.'
+        );
+    }
+
     // Requires npm auth config (for example via NODE_AUTH_TOKEN/NPM_TOKEN in CI).
     console.log('-- publish package to npmjs --');
     execSync('yarn npm publish --access public', {stdio: 'inherit'});

@@ -40,7 +40,7 @@ export class RestOperationData implements Parameter {
 	 * {@link WebServiceType} webPDF webservice call.
 	 * </p>
 	 */
-	public constructor(data?: any) {
+	public constructor(data: any = {}) {
 		this.billing = Billing.fromJson(data.billing);
 		this.password = PdfPassword.fromJson(data.password);
 		this.settings = Settings.fromJson(data.settings);
@@ -303,12 +303,8 @@ export class RestOperationData implements Parameter {
 	 *
 	 * @return The {@link BaseToolbox} Array for this {@link RestOperationData}.
 	 */
-	public getToolbox(): Array<BaseToolbox> | undefined {
-		if (typeof this.toolbox === "undefined") {
-			return [];
-		}
-		
-		return this.toolbox;
+	public getToolbox(): Array<BaseToolbox> {
+		return this.toolbox ?? [];
 	}
 	
 	/**
@@ -385,9 +381,9 @@ export class RestOperationData implements Parameter {
 		return typeof this.urlconverter !== "undefined";
 	}
 
-	public static fromJson(data: any): RestOperationData {
-		if (data === undefined || data === null) {
-			return data;
+	public static fromJson(data: any): RestOperationData | undefined {
+		if (data == null) {
+			return undefined;
 		}
 
 		return new RestOperationData(data);
@@ -409,6 +405,6 @@ export class RestOperationData implements Parameter {
 	}
 
 	public clone(): RestOperationData {
-		return RestOperationData.fromJson(this.toJson());
+		return new RestOperationData(this.toJson());
 	}
 }

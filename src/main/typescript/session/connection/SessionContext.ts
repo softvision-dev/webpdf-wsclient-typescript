@@ -23,6 +23,7 @@ export class SessionContext {
     private _tlsContext?: Agent;
     private _proxy?: AxiosProxyConfig;
     private _skewTime: number;
+    private _requestTimeout: number;
 
     /**
      * <p>
@@ -46,6 +47,7 @@ export class SessionContext {
         this._webServiceProtocol = webServiceProtocol;
         this._url = url;
         this._skewTime = 0;
+        this._requestTimeout = 0;
     }
 
     /**
@@ -142,6 +144,31 @@ export class SessionContext {
      */
     public getSkewTime(): number {
         return this._skewTime;
+    }
+
+    /**
+     * <p>
+     * Sets the request timeout (in milliseconds) for {@link Session}s.<br>
+     * When set to a value greater than 0, requests that do not receive a response within the given duration are
+     * aborted with a timeout error. Set to 0 to disable the timeout (default).
+     * </p>
+     *
+     * @param requestTimeout The request timeout in milliseconds. 0 disables the timeout.
+     */
+    public setRequestTimeout(requestTimeout: number): void {
+        this._requestTimeout = Math.max(0, requestTimeout);
+    }
+
+    /**
+     * <p>
+     * Returns the request timeout (in milliseconds) for {@link Session}s.<br>
+     * A value of 0 means no timeout is applied.
+     * </p>
+     *
+     * @return The request timeout in milliseconds. 0 means no timeout.
+     */
+    public getRequestTimeout(): number {
+        return this._requestTimeout;
     }
 
 }

@@ -9,7 +9,7 @@ export class WSClientSessionToken extends AbstractJWTToken {
 	private token: string;
 	private refreshToken: string;
 	private expiresIn: number;
-	private expiration: Date;
+	private expiration: Date | null;
 
 	/**
 	 * Creates a new {@link WSClientSessionToken} from preexisting token values.
@@ -21,10 +21,13 @@ export class WSClientSessionToken extends AbstractJWTToken {
 	public constructor(accessToken?: string, refreshToken?: string, expiresIn?: number) {
 		super();
 
-		this.expiration = new Date();
-		this.expiration.setSeconds(
-			this.expiration.getSeconds() + (typeof expiresIn !== "undefined" ? expiresIn : -1)
-		);
+		if (typeof expiresIn !== "undefined" && expiresIn > 0) {
+			this.expiration = new Date();
+			this.expiration.setSeconds(this.expiration.getSeconds() + expiresIn);
+		} else {
+			// expiresIn absent or 0 means no expiry was communicated by the server.
+			this.expiration = null;
+		}
 		this.token = typeof accessToken !== "undefined" ? accessToken : "";
 		this.refreshToken = typeof refreshToken !== "undefined" ? refreshToken : "";
 		this.expiresIn = typeof expiresIn !== "undefined" ? expiresIn : -1;
@@ -56,11 +59,12 @@ export class WSClientSessionToken extends AbstractJWTToken {
 	}
 
 	/**
-	 * Returns the {@link Date} the {@link WSClientSessionToken} will expire at.
+	 * Returns the {@link Date} the {@link WSClientSessionToken} will expire at, or {@code null} if no expiry
+	 * was communicated by the server (i.e. {@code expiresIn} was absent or 0 in the token response).
 	 *
-	 * @return The {@link Date} the {@link WSClientSessionToken} will expire at.
+	 * @return The {@link Date} the {@link WSClientSessionToken} will expire at, or {@code null}.
 	 */
-	public getExpiration(): Date {
+	public getExpiration(): Date | null {
 		return this.expiration;
 	}
 
@@ -82,7 +86,11 @@ export class WSClientSessionToken extends AbstractJWTToken {
 	 * @return true, if the current access token is expired.
 	 */
 	public isExpired(skewTime: number): boolean {
-		return this.expiration.getTime() < Date.now() + skewTime;
+		if (this.expiration === null) {
+			return false;
+		}
+
+		return this.expiration.getTime() < Date.now() + skewTime * 1000;
 	}
 }
 

@@ -149,13 +149,15 @@ export class RestWebServiceDocumentState implements RestDocumentState<RestWebSer
      * @throws ResultException Shall be thrown, when updating the document history failed.
      */
     public activeHistory(): HistoryEntry {
-        if (this.historyMap.size === 0) {
+        let active: HistoryEntry | undefined = Array.from(this.historyMap.values()).find(
+            (entry: HistoryEntry): boolean => entry.active === true
+        );
+
+        if (active == null) {
             throw new ClientResultException(WsclientErrors.INVALID_HISTORY_DATA);
         }
 
-        return Array.from(this.historyMap.values()).find((entry: HistoryEntry): boolean => {
-            return entry.active === true
-        })!;
+        return active;
     }
 
     /**

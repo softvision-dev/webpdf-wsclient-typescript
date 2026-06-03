@@ -11,7 +11,6 @@ export class ResultException extends Error {
 	private wsclientError: WsclientError;
 	private _errorCode: number;
 	private _stackTraceMessage?: string;
-	private _cause?: Error;
 
 	/**
 	 * <p>
@@ -30,11 +29,10 @@ export class ResultException extends Error {
 	constructor(
 		wsClientError: WsclientError, errorCode: number, errorMessage?: string, stackTraceMessage?: string, cause?: Error
 	) {
-		super(errorMessage);
+		super(errorMessage, { cause });
 		this.wsclientError = wsClientError;
 		this._errorCode = errorCode;
 		this._stackTraceMessage = stackTraceMessage;
-		this._cause = cause;
 	}
 
 	/**
@@ -83,6 +81,6 @@ export class ResultException extends Error {
 	}
 
 	public getCause(): Error | undefined {
-		return this._cause;
+		return this.cause as Error | undefined;
 	}
 }

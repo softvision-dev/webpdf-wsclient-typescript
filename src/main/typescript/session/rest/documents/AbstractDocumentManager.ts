@@ -643,7 +643,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
 			.buildRequest(
 				HttpMethod.GET,
-				this.session.getURL("documents/" + documentId + "/archive/" + archivePath)
+				this.session.getURL("documents/" + documentId + "/archive/" + archivePath.split("/").map(encodeURIComponent).join("/"))
 			);
 
 		return await request.executeRequest();

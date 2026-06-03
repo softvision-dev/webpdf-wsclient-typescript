@@ -1613,7 +1613,6 @@ __metadata:
     auth0: "npm:^5.9.1"
     axios: "npm:^1.16.0"
     chai: "npm:^6.2.2"
-    child_process: "npm:^1.0.2"
     dotenv: "npm:^16.6.1"
     eslint: "npm:^10.3.0"
     form-data: "npm:^4.0.5"
@@ -2648,13 +2647,6 @@ __metadata:
     ansi-styles: "npm:^4.1.0"
     supports-color: "npm:^7.1.0"
   checksum: 10c0/4a3fef5cc34975c898ffe77141450f679721df9dde00f6c304353fa9c8b571929123b26a0e4617bde5018977eb655b31970c297b91b63ee83bb82aeb04666880
-  languageName: node
-  linkType: hard
-
-"child_process@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "child_process@npm:1.0.2"
-  checksum: 10c0/6e45dff224c704dc5c5edc14532e6c0c5c23a7c5f823574349246082d94a29780a68a46155d8a6989ffa986cb12ed0b01fbfc6c713b6655959fabb6b8cd52e4a
   languageName: node
   linkType: hard
 

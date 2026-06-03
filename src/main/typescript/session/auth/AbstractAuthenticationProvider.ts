@@ -29,7 +29,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	private static readonly LOGIN_PATH: string = "authentication/user/login/";
 	private static readonly REFRESH_PATH: string = "authentication/user/refresh/";
 	private authMaterial: AuthMaterial;
-	private updating: boolean;
+	private inflight: Promise<AuthMaterial> | null;
 	private readonly initialAuthMaterial: AuthMaterial;
 	private session?: Session;
 	private sessionTimeout: number = 0;
@@ -61,7 +61,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	public constructor(authMaterial: AuthMaterial, resumeAuthMaterial?: AuthMaterial) {
 		this.initialAuthMaterial = authMaterial;
 		this.authMaterial = typeof resumeAuthMaterial !== "undefined" ? resumeAuthMaterial : authMaterial;
-		this.updating = false;
+		this.inflight = null;
 	}
 
 	/**
@@ -154,7 +154,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	 * @throws AuthResultException Shall be thrown, should the authentication/authorization fail for some reason.
 	 */
 	public async refresh(session: Session): Promise<AuthMaterial> {
-		if (this.updating || !instanceOfRestSession(session)) {
+		if (!instanceOfRestSession(session)) {
 			return this.getAuthMaterial();
 		}
 
@@ -162,11 +162,24 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			return await this.provide(session);
 		}
 
-		try {
-			this.updating = true;
-			this.session = session;
-			let restSession: RestSession<any> = session as RestSession<any>;
+		if (this.inflight !== null) {
+			return this.inflight;
+		}
 
+		this.inflight = this.executeRefresh(session);
+
+		try {
+			return await this.inflight;
+		} finally {
+			this.inflight = null;
+		}
+	}
+
+	private async executeRefresh(session: Session): Promise<AuthMaterial> {
+		this.session = session;
+		let restSession: RestSession<any> = session as RestSession<any>;
+
+		try {
 			// Authorize the refresh call with the refresh token via dedicated, throwaway auth
 			// material instead of mutating the live access token in place. Mutating the shared
 			// token would expose the refresh token to concurrent requests as their bearer access
@@ -192,10 +205,6 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			this.setAuthMaterial(new WSClientSessionToken(token.token, token.refreshToken, token.expiresIn));
 		} catch (ex: any) {
 			throw new AuthResultException(ex);
-		} finally {
-			// Always release the updating guard, even on failure, so the provider does not get
-			// permanently stuck returning stale auth material.
-			this.updating = false;
 		}
 
 		return this.getAuthMaterial();
@@ -209,15 +218,28 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	 * @throws AuthResultException Shall be thrown, should the authentication/authorization fail for some reason.
 	 */
 	protected async login(session: Session): Promise<AuthMaterial> {
-		if (this.updating || !instanceOfRestSession(session) || instanceOfSessionToken(this.getAuthMaterial())) {
+		if (!instanceOfRestSession(session) || instanceOfSessionToken(this.getAuthMaterial())) {
 			return this.getAuthMaterial();
 		}
 
-		try {
-			this.updating = true;
-			this.session = session;
-			let restSession: RestSession<any> = session as RestSession<any>;
+		if (this.inflight !== null) {
+			return this.inflight;
+		}
 
+		this.inflight = this.executeLogin(session);
+
+		try {
+			return await this.inflight;
+		} finally {
+			this.inflight = null;
+		}
+	}
+
+	private async executeLogin(session: Session): Promise<AuthMaterial> {
+		this.session = session;
+		let restSession: RestSession<any> = session as RestSession<any>;
+
+		try {
 			let loginOptions: LoginOptions = this.createLoginOptions();
 
 			let request: HttpRestRequest = await HttpRestRequest.createRequest(restSession)
@@ -236,10 +258,6 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			this.setAuthMaterial(new WSClientSessionToken(token.token, token.refreshToken, token.expiresIn));
 		} catch (ex: any) {
 			throw new AuthResultException(ex);
-		} finally {
-			// Always release the updating guard, even on failure, so the provider does not get
-			// permanently stuck returning stale auth material.
-			this.updating = false;
 		}
 
 		return this.getAuthMaterial();
@@ -264,7 +282,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	 * @throws AuthResultException Shall be thrown, should the authentication/authorization fail for some reason.
 	 */
 	public async provide(session: Session): Promise<AuthMaterial> {
-		if (this.updating || !instanceOfRestSession(session)) {
+		if (!instanceOfRestSession(session)) {
 			return this.authMaterial;
 		}
 

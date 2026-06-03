@@ -16,8 +16,8 @@ class TestAuthProvider extends AbstractAuthenticationProvider {
 		return this.getAuthMaterial();
 	}
 
-	public isUpdating(): boolean {
-		return (this as unknown as { updating: boolean }).updating;
+	public isInflight(): boolean {
+		return (this as unknown as { inflight: Promise<any> | null }).inflight !== null;
 	}
 }
 
@@ -54,6 +54,7 @@ function createStubSession(requestHandler: (config: any) => Promise<any>): any {
 		getDocumentManager: (): void => undefined,
 		uploadDocument: (): void => undefined,
 		getAdministrationManager: (): void => undefined,
+		getUserManager: (): void => undefined,
 		getUser: (): void => undefined,
 		getCertificates: (): void => undefined,
 		updateCertificates: (): void => undefined,
@@ -62,7 +63,7 @@ function createStubSession(requestHandler: (config: any) => Promise<any>): any {
 }
 
 suite("AuthenticationProviderRefreshTest", function (): void {
-	it("authorizes refresh with the refresh token and stores the new access token without mutating the old token (regression: C2+)",
+	it("authorizes refresh with the refresh token and stores the new access token without mutating the old token",
 		async function (): Promise<void> {
 			let capturedAuthorization: string | undefined;
 			let session: any = createStubSession(async (config: any): Promise<any> => {
@@ -89,11 +90,37 @@ suite("AuthenticationProviderRefreshTest", function (): void {
 			// (this is the actual leak the fix prevents).
 			expect(seedToken.getToken(), "live access token must not be mutated to the refresh token")
 				.to.equal("ACCESS");
-			// The updating guard must be released.
-			expect(provider.isUpdating()).to.equal(false);
+			// No in-flight operation must remain after completion.
+			expect(provider.isInflight()).to.equal(false);
 		});
 
-	it("releases the updating guard and keeps the token unmutated when refresh fails (regression: C2+)",
+	it("concurrent refresh calls share one in-flight request and both receive the new token",
+		async function (): Promise<void> {
+			let requestCount: number = 0;
+			let session: any = createStubSession(async (): Promise<any> => {
+				requestCount++;
+				return {
+					status: 200,
+					headers: {"content-type": "application/json"},
+					data: {token: "NEW_ACCESS", refreshToken: "NEW_REFRESH", expiresIn: 3600}
+				};
+			});
+
+			let seedToken: WSClientSessionToken = new WSClientSessionToken("ACCESS", "REFRESH", 3600);
+			let provider: TestAuthProvider = new TestAuthProvider(seedToken);
+
+			let [result1, result2]: AuthMaterial[] = await Promise.all([
+				provider.refresh(session),
+				provider.refresh(session)
+			]);
+
+			expect(requestCount, "only one HTTP request must be made for concurrent refreshes").to.equal(1);
+			expect((result1 as WSClientSessionToken).getToken()).to.equal("NEW_ACCESS");
+			expect((result2 as WSClientSessionToken).getToken()).to.equal("NEW_ACCESS");
+			expect(provider.isInflight()).to.equal(false);
+		});
+
+	it("releases the updating guard and keeps the token unmutated when refresh fails",
 		async function (): Promise<void> {
 			let session: any = createStubSession(async (): Promise<any> => {
 				throw new Error("network down");
@@ -110,8 +137,8 @@ suite("AuthenticationProviderRefreshTest", function (): void {
 			}
 
 			expect(thrown, "a failed refresh must surface an exception").to.be.instanceOf(AuthResultException);
-			// The provider must not be permanently stuck in the updating state.
-			expect(provider.isUpdating(), "updating guard must be reset after a failed refresh").to.equal(false);
+			// No in-flight operation must remain after a failed refresh.
+			expect(provider.isInflight()).to.equal(false);
 			// The live token must remain the original access token (no leak / poisoning).
 			expect(seedToken.getToken()).to.equal("ACCESS");
 		});

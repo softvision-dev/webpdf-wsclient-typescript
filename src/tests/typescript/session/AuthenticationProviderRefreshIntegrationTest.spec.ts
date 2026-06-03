@@ -17,13 +17,12 @@ import {it, suite} from "mocha";
  *
  * Uses an anonymous session (no credentials required) and refreshes twice. The refresh endpoint
  * is authorized with the refresh token, so a successful refresh proves the Authorization header is
- * built correctly end-to-end. Refreshing twice exercises refresh-token rotation, which the previous
- * in-place token mutation bug (C2+) would have broken on the second call.
+ * built correctly end-to-end. Refreshing twice exercises refresh-token rotation.
  */
 suite("AuthenticationProviderRefreshIntegrationTest", function (): void {
 	let testServer: TestServer = new TestServer();
 
-	it("refreshes an anonymous session twice against the live server without breaking auth (regression: C2+)",
+	it("refreshes an anonymous session twice against the live server without breaking auth",
 		async function (): Promise<void> {
 			if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
 				this.skip();

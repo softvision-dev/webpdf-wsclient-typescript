@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "11.0.0-beta.45",
+	"version": "11.0.0-beta.46",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
@@ -8,7 +8,7 @@
 		".": {
 			"types": "./lib/index.d.ts",
 			"require": "./lib/index.js",
-			"import": "./lib/index.js",
+			"import": "./lib/esm/index.js",
 			"default": "./lib/index.js"
 		}
 	},
@@ -16,11 +16,14 @@
 	"author": "SoftVision Development GmbH",
 	"license": "Apache-2.0",
 	"packageManager": "yarn@4.14.1",
-	"homepage": "https://github.com/softvision-dev",
+	"homepage": "https://github.com/softvision-dev/webpdf-wsclient-typescript#readme",
+	"bugs": {
+		"url": "https://github.com/softvision-dev/webpdf-wsclient-typescript/issues"
+	},
 	"keywords": [
-		"TypeScript",
+		"typescript",
 		"javascript",
-		"SoftVision",
+		"softvision",
 		"api",
 		"client",
 		"pdf",
@@ -29,13 +32,14 @@
 		"pdf-converter",
 		"pdf-generation",
 		"pdf-manipulation",
-		"webPDF",
-		"webPDF-server",
-		"webPDF-wsclient",
+		"webpdf",
+		"webpdf-server",
+		"webpdf-wsclient",
 		"pdf-portal"
 	],
 	"scripts": {
-		"compile": "tsc",
+		"compile": "tsc -p tsconfig.json",
+		"compile:esm": "tsc -p tsconfig.esm.json",
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"typecheck:tests": "tsc -p src/tests/tsconfig.json --noEmit",
 		"clean": "shx rm -rf lib build",
@@ -43,18 +47,17 @@
 		"codegen": "ts-node --project src/codegen/typescript/tsconfig.json src/codegen/typescript/generate.ts",
 		"lint": "eslint . --max-warnings=0",
 		"lint:fix": "eslint . --fix",
-		"build": "node build.js",
-		"deploy": "node deploy.js",
-		"publish:local": "node deploy.js --target local",
-		"publish:public": "node deploy.js --target public"
+		"build": "node scripts/build.js",
+		"deploy": "node scripts/deploy.js",
+		"publish:local": "node scripts/deploy.js --target local",
+		"publish:public": "node scripts/deploy.js --target public"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/softvision-dev/webpdf-wsclient-typescript"
 	},
 	"dependencies": {
-		"axios": "^1.16.0",
-		"dotenv": "^16.6.1"
+		"axios": "^1.16.0"
 	},
 	"devDependencies": {
 		"@azure/msal-node": "^5.1.5",
@@ -70,7 +73,7 @@
 		"adm-zip": "^0.5.17",
 		"auth0": "^5.9.1",
 		"chai": "^6.2.2",
-		"child_process": "^1.0.2",
+		"dotenv": "^16.6.1",
 		"eslint": "^10.3.0",
 		"form-data": "^4.0.5",
 		"mocha": "^11.7.5",
@@ -89,7 +92,6 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"engines": {
-		"node": "24.x.x",
-		"yarn": "4.x.x"
+		"node": ">=20"
 	}
 }

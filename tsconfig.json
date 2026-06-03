@@ -3,9 +3,9 @@
 		"target": "ES6",
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
-		"sourceMap": true,
+		"sourceMap": false,
 		"declaration": true,
-		"declarationMap": true,
+		"declarationMap": false,
 		"removeComments": true,
 		"esModuleInterop": true,
 		"downlevelIteration": true,
@@ -17,7 +17,8 @@
 		],
 		"lib": [
 			"DOM",
-			"ES2020"
+			"ES2020",
+			"ES2022.Error"
 		],
 		"strict": true,
 		"noUncheckedIndexedAccess": false,
