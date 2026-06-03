@@ -59,12 +59,12 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		expect(uploadedFile.getDocumentId()).to.exist;
 
 		let downloadedFile: any = await uploadedFile.downloadDocument();
-		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
+		expect(Buffer.from(sourceFile).equals(Buffer.from(downloadedFile)), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
 
-		let downloadedFileArchive: Buffer = await session.getDocumentManager().downloadArchive(
+		let downloadedFileArchive: Uint8Array = await session.getDocumentManager().downloadArchive(
 			[uploadedFile.getDocumentId()]
 		);
-		let zipFile: AdmZip = new AdmZip(downloadedFileArchive);
+		let zipFile: AdmZip = new AdmZip(Buffer.from(downloadedFileArchive));
 		let zipEntries: Array<AdmZip.IZipEntry> = zipFile.getEntries();
 		expect(zipEntries.length, "archive should contain 1 document.").to.equal(1);
 		expect(zipEntries[0].entryName, "names should be equal.").to.equal(sourceFilename);
@@ -121,7 +121,7 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		expect(anonymousSession, "Valid anonymous session should have been created.").to.exist;
 
 		// Raw-byte download (Accept: application/octet-stream).
-		let rawData: Buffer = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
+		let rawData: Uint8Array = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
 		expect((sourceFile as Buffer).equals(rawData),
 			"The raw-byte shared download should equal the uploaded document.").to.be.true;
 
@@ -181,7 +181,7 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		expect(anonymousSession, "Valid anonymous session should have been created.").to.exist;
 
 		// Raw-byte download (Accept: application/octet-stream).
-		let rawData: Buffer = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
+		let rawData: Uint8Array = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
 		expect((sourceFile as Buffer).equals(rawData),
 			"The raw-byte shared download should equal the uploaded document.").to.be.true;
 
@@ -325,7 +325,7 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 
 		let downloadedFile: any = await uploadedFile.downloadDocument();
-		expect(sourceFile.toString() === downloadedFile.toString(), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
+		expect(Buffer.from(sourceFile).equals(Buffer.from(downloadedFile)), "The content of the uploaded and the downloaded document should have been equal.").to.be.true;
 
 		await session.close();
 	});
@@ -640,9 +640,9 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		expect(uploadedFile, "Valid document should have been returned.").to.exist;
 		expect(uploadedFile.getDocumentId()).to.exist;
 
-		let downloadedFile: Buffer = await uploadedFile.extractArchiveFile("logo.png");
+		let downloadedFile: Uint8Array = await uploadedFile.extractArchiveFile("logo.png");
 		let compareFile: any = testResources.getResource("logo.png");
-		expect(downloadedFile.equals(compareFile), "Content of output file should be identical to test file.").to.be.true;
+		expect(Buffer.from(downloadedFile).equals(compareFile), "Content of output file should be identical to test file.").to.be.true;
 
 		await session.close();
 	});
@@ -706,8 +706,8 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		let updatedFile: RestDocument = await uploadedFile.updateDocument(newData);
 		expect(updatedFile, "Valid document should have been returned.").to.exist;
 
-		let downloadedFile: Buffer = await updatedFile.downloadDocument();
-		expect(downloadedFile.toString(), "content should equal \"" + fileContent + "\"").to.equal(fileContent);
+		let downloadedFile: Uint8Array = await updatedFile.downloadDocument();
+		expect(new TextDecoder().decode(downloadedFile), "content should equal \"" + fileContent + "\"").to.equal(fileContent);
 
 		await session.close();
 	});

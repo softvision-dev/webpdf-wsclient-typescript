@@ -26,7 +26,7 @@ export interface SharedDocumentDownload {
 	/**
 	 * The binary file data of the downloaded document.
 	 */
-	data: Buffer;
+	data: Uint8Array;
 }
 
 /**
@@ -97,7 +97,7 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	downloadDocument(documentId: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer>;
+	}): Promise<Uint8Array>;
 
 	/**
 	 * Downloads the {@link RestDocument}s with the given documents IDs as archive and returns it as {@link Buffer}.
@@ -110,7 +110,7 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	downloadArchive(documentIdList: Array<string>, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer>
+	}): Promise<Uint8Array>
 
 	/**
 	 * Uploads the given {@link Blob} to the webPDF server as a document resource with the given file name, adds
@@ -253,17 +253,17 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return The {@link Buffer} of the downloaded document.
 	 * @throws ResultException Shall be thrown, should the download have failed.
 	 */
-	downloadSharedDocument(shareUrl: string): Promise<Buffer>;
+	downloadSharedDocument(shareUrl: string): Promise<Uint8Array>;
 
 	/**
 	 * Downloads a document via a pre-signed, login-free share URL and returns the raw file bytes.
 	 *
 	 * @param shareUrl     The pre-signed share URL of the document to download.
 	 * @param withMetadata {@code false} to request the raw {@code application/octet-stream} representation.
-	 * @return The {@link Buffer} of the downloaded document.
+	 * @return The raw bytes of the downloaded document.
 	 * @throws ResultException Shall be thrown, should the download have failed.
 	 */
-	downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Buffer>;
+	downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Uint8Array>;
 
 	/**
 	 * <p>
@@ -319,7 +319,7 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @return The {@link Buffer} of the extracted and downloaded archive file.
 	 * @throws ResultException Shall be thrown, should the download have failed.
 	 */
-	extractArchiveFile(documentId: string, archivePath: string): Promise<Buffer>;
+	extractArchiveFile(documentId: string, archivePath: string): Promise<Uint8Array>;
 
 	/**
 	 * <p>

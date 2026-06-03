@@ -87,7 +87,7 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	buildSupportPackage(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer>;
+	}): Promise<Uint8Array>;
 
 	/**
 	 * Restarts the server.

@@ -59,7 +59,7 @@ suite("WebserviceProxyTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process();
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -109,7 +109,7 @@ suite("WebserviceProxyTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process();
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);

@@ -65,7 +65,7 @@ suite("WebserviceTLSIntegrationTest", function (): void {
 
 				let converterWebService: ConverterWebService<RestDocument> = WebServiceFactory.createInstance(session, WebServiceTypes.CONVERTER);
 				let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
-				let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+				let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 				let fileOut: any = tmp.fileSync();
 				fs.writeFileSync(fileOut.name, downloadedFile);

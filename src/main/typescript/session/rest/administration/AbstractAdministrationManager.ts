@@ -183,7 +183,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	public async buildSupportPackage(group?: Array<SupportEntryGroup>, start?: string, end?: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer> {
+	}): Promise<Uint8Array> {
 		await this.validateUser();
 
 		let searchParams: URLSearchParams = new URLSearchParams();
@@ -208,7 +208,7 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			.setOnDownloadProgress(options?.onProgress)
 			.buildRequest(HttpMethod.GET, this.session.getURL("admin/server/support", searchParams));
 
-		return await request.executeRequest();
+		return new Uint8Array(await request.executeRequest());
 	}
 
 	/**

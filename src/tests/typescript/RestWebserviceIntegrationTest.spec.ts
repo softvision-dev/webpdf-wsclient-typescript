@@ -98,7 +98,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect(resultDocument?.getDocumentFile(), "Downloaded REST document is undefined").to.exist;
 		expect(filename.split(".")[0]).to.equal(resultDocument?.getDocumentFile().fileName);
 
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -180,7 +180,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect(pageCount).to.equal(2);
 		expect(resourceFilename.split(".")[0]).to.equal(resultDocument?.getDocumentFile().fileName);
 
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -246,7 +246,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		]);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -298,7 +298,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		]);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -336,13 +336,13 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		]);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
 		expect(fs.existsSync(fileOut.name)).to.be.true;
 
-		let extractionInformation: Document = Document.fromJson(JSON.parse(downloadedFile.toString()).document);
+		let extractionInformation: Document = Document.fromJson(JSON.parse(new TextDecoder().decode(downloadedFile)).document);
 		expect((extractionInformation.form!.field![0].annotation![0].positions![0] as AnnotationRectangle).rectangle).to.exist
 
 		await session.close();
@@ -402,7 +402,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -443,7 +443,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.part).to.equal("3");
 		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.conformance).to.equal("b");
 
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -485,7 +485,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -545,7 +545,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -583,7 +583,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process();
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -620,7 +620,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		]);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync({postfix: ".png"});
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -630,7 +630,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 
 		let expectedImagePath: string = "toolbox_image_rest.png";
 		let expectedImage: any = testResources.getResource(expectedImagePath);
-		expect((downloadedFile).equals(expectedImage), "Content of output file should be identical to test file.").to.be.true;
+		expect(Buffer.from(downloadedFile).equals(expectedImage), "Content of output file should be identical to test file.").to.be.true;
 	});
 
 	it('testToolboxCreateOutputFile', async function (): Promise<void> {
@@ -648,8 +648,8 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		let file: any = testResources.getResource(filename);
 		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(file, filename);
 
-		let fileData: Buffer = await uploadedFile.downloadDocument();
-		let base64String: string = wsclientConfiguration.btoa(String.fromCharCode(...new Uint8Array(fileData)));
+		let fileData: Uint8Array = await uploadedFile.downloadDocument();
+		let base64String: string = wsclientConfiguration.btoa(String.fromCharCode(...fileData));
 
 		let webService: ToolboxWebService<RestDocument> = WebServiceFactory.createInstance(session, WebServiceTypes.TOOLBOX);
 		webService.getAdditionalParameter().set("name", "portfolio");
@@ -673,7 +673,7 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		]);
 
 		let resultDocument: RestDocument | undefined = await webService.process();
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);

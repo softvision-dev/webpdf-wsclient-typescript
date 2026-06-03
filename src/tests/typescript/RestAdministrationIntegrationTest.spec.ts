@@ -461,7 +461,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		);
 
 		try {
-			let result: Buffer = await session.getAdministrationManager().buildSupportPackage();
+			let result: Uint8Array = await session.getAdministrationManager().buildSupportPackage();
 			expect(result, "Result should exist").to.exist;
 			expect(result.byteLength, "Content size should be > 0.").to.be.greaterThan(0);
 		} catch (ex: any) {

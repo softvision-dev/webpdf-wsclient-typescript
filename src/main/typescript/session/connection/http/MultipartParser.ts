@@ -12,10 +12,26 @@ export interface MultipartPart {
 	/**
 	 * The raw, byte-exact body of this part (without the part headers and without the trailing boundary CRLF).
 	 */
-	data: Buffer;
+	data: Uint8Array;
 }
 
-const HEADER_SEPARATOR: Buffer = Buffer.from("\r\n\r\n");
+const HEADER_SEPARATOR: Uint8Array = new Uint8Array([13, 10, 13, 10]);
+
+/**
+ * Returns the index of the first occurrence of {@code needle} in {@code haystack} at or after {@code start},
+ * or {@code -1} if not found.
+ */
+function indexOfBytes(haystack: Uint8Array, needle: Uint8Array, start: number = 0): number {
+	outer: for (let i: number = start; i <= haystack.length - needle.length; i++) {
+		for (let j: number = 0; j < needle.length; j++) {
+			if (haystack[i + j] !== needle[j]) {
+				continue outer;
+			}
+		}
+		return i;
+	}
+	return -1;
+}
 
 /**
  * Extracts the boundary token from a {@code multipart/*} {@code Content-Type} header value. The boundary may be given
@@ -67,38 +83,38 @@ function extractPartContentType(headerText: string): string | undefined {
  * @return The parsed {@link MultipartPart}s, in document order.
  * @throws ResultException Shall be thrown, should the {@code Content-Type} carry no boundary.
  */
-export function parseMultipartMixed(body: Buffer, contentType: string): MultipartPart[] {
-	let delimiter: Buffer = Buffer.from("--" + extractBoundary(contentType));
+export function parseMultipartMixed(body: Uint8Array, contentType: string): MultipartPart[] {
+	let delimiter: Uint8Array = new TextEncoder().encode("--" + extractBoundary(contentType));
 	let parts: MultipartPart[] = [];
 
-	let boundaryIndex: number = body.indexOf(delimiter);
+	let boundaryIndex: number = indexOfBytes(body, delimiter);
 	while (boundaryIndex !== -1) {
 		let afterDelimiter: number = boundaryIndex + delimiter.length;
 
 		// The closing delimiter ("--boundary--") terminates the multipart body.
-		if (body.subarray(afterDelimiter, afterDelimiter + 2).toString("latin1") === "--") {
+		if (body[afterDelimiter] === 45 && body[afterDelimiter + 1] === 45) {
 			break;
 		}
 
-		let nextBoundary: number = body.indexOf(delimiter, afterDelimiter);
+		let nextBoundary: number = indexOfBytes(body, delimiter, afterDelimiter);
 		if (nextBoundary === -1) {
 			break;
 		}
 
-		let headerEnd: number = body.indexOf(HEADER_SEPARATOR, afterDelimiter);
+		let headerEnd: number = indexOfBytes(body, HEADER_SEPARATOR, afterDelimiter);
 		if (headerEnd !== -1 && headerEnd < nextBoundary) {
-			let headerText: string = body.subarray(afterDelimiter, headerEnd).toString("latin1");
+			let headerText: string = new TextDecoder("latin1").decode(body.subarray(afterDelimiter, headerEnd));
 			let bodyStart: number = headerEnd + HEADER_SEPARATOR.length;
 
 			// The body runs up to the CRLF that precedes the next boundary delimiter.
 			let bodyEnd: number = nextBoundary;
-			if (bodyEnd - bodyStart >= 2 && body.subarray(bodyEnd - 2, bodyEnd).toString("latin1") === "\r\n") {
+			if (bodyEnd - bodyStart >= 2 && body[bodyEnd - 2] === 13 && body[bodyEnd - 1] === 10) {
 				bodyEnd -= 2;
 			}
 
 			parts.push({
 				contentType: extractPartContentType(headerText),
-				data: Buffer.from(body.subarray(bodyStart, bodyEnd))
+				data: body.slice(bodyStart, bodyEnd)
 			});
 		}
 

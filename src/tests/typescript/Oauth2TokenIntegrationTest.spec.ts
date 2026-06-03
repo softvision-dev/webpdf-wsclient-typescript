@@ -31,7 +31,7 @@ suite("Oauth2TokenIntegrationTest", function (): void {
 		} as ConvertPdfaInterface);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);

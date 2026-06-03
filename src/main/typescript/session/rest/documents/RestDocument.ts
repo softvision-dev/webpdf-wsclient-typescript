@@ -79,7 +79,7 @@ export interface RestDocument extends Document {
 	downloadDocument(options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer>;
+	}): Promise<Uint8Array>;
 
 	/**
 	 * This is a shortcut for {@link DocumentManager#deleteDocument} and deletes the {@link RestDocument}.
@@ -145,7 +145,7 @@ export interface RestDocument extends Document {
 	 * @return The {@link Buffer} of the extracted and downloaded archive file.
 	 * @throws ResultException Shall be thrown, should the download have failed.
 	 */
-	extractArchiveFile(archivePath: string): Promise<Buffer>;
+	extractArchiveFile(archivePath: string): Promise<Uint8Array>;
 
 	/**
 	 * This is a shortcut for {@link DocumentManager#extractDocument} and updates the {@link RestDocument}.

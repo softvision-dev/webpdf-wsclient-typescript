@@ -42,7 +42,7 @@ suite("RestCredentialsIntegrationTest", function (): void {
 		let file: any = testResources.getResource(filename);
 		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(file, filename);
 		let resultDocument: RestDocument | undefined = await converterWebService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);
@@ -79,7 +79,7 @@ suite("RestCredentialsIntegrationTest", function (): void {
 		let file: any = testResources.getResource(filename);
 		let uploadedFile: RestDocument = await session.getDocumentManager().uploadDocument(file, filename);
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 
 		let fileOut: any = tmp.fileSync();
 		fs.writeFileSync(fileOut.name, downloadedFile);

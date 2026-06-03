@@ -99,7 +99,7 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	public downloadDocument(options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer> {
+	}): Promise<Uint8Array> {
 		return this.accessInternalState().getDocumentManager().downloadDocument(this.getDocumentId(), options);
 	}
 
@@ -150,7 +150,7 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 	/**
 	 * @inheritDoc
 	 */
-	public async extractArchiveFile(archivePath: string): Promise<Buffer> {
+	public async extractArchiveFile(archivePath: string): Promise<Uint8Array> {
 		return await this.accessInternalState().getDocumentManager().extractArchiveFile(
 			this.getDocumentId(), archivePath
 		);

@@ -17,9 +17,7 @@ class WsclientConfiguration {
 		const isNodeRuntime: boolean = typeof process !== "undefined" && !!process.versions?.node;
 		if (isNodeRuntime) {
 			this._FormData = require("form-data");
-			this._btoa = function (data: string): string {
-				return Buffer.from(data).toString('base64');
-			};
+			this._btoa = btoa;
 		} else {
 			this._FormData = typeof FormData !== "undefined" ? FormData : globals.FormData;
 			this._btoa = typeof window !== "undefined" ? window.btoa.bind(window) : globals.btoa;

@@ -137,7 +137,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	public async downloadDocument(documentId: string, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer> {
+	}): Promise<Uint8Array> {
 		if (!this.containsDocument(documentId)) {
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 		}
@@ -148,7 +148,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 			.setAbortSignal(options?.abortSignal)
 			.buildRequest(HttpMethod.GET, this.session.getURL("documents/" + documentId));
 
-		return await request.executeRequest();
+		return new Uint8Array(await request.executeRequest());
 	}
 
 	/**
@@ -157,7 +157,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	public async downloadArchive(documentIdList: Array<string>, options?: {
 		onProgress?: (event: AxiosProgressEvent) => void,
 		abortSignal?: AbortSignal
-	}): Promise<Buffer> {
+	}): Promise<Uint8Array> {
 		for (let documentId of documentIdList) {
 			if (!this.containsDocument(documentId)) {
 				throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
@@ -181,7 +181,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 				DataFormats.JSON.getMimeType()
 			);
 
-		return await request.executeRequest();
+		return new Uint8Array(await request.executeRequest());
 	}
 
 	/**
@@ -498,8 +498,8 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		return shareUrl;
 	}
 
-	public downloadSharedDocument(shareUrl: string): Promise<Buffer>;
-	public downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Buffer>;
+	public downloadSharedDocument(shareUrl: string): Promise<Uint8Array>;
+	public downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Uint8Array>;
 	public downloadSharedDocument(shareUrl: string, withMetadata: true): Promise<SharedDocumentDownload>;
 
 	/**
@@ -520,7 +520,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	 */
 	public async downloadSharedDocument(
 		shareUrl: string, withMetadata: boolean = false
-	): Promise<Buffer | SharedDocumentDownload> {
+	): Promise<Uint8Array | SharedDocumentDownload> {
 		let shareUri: URL;
 		try {
 			shareUri = new URL(shareUrl);
@@ -533,7 +533,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 				.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
 				.buildRequest(HttpMethod.GET, shareUri);
 
-			return Buffer.from(await request.executeRequest());
+			return new Uint8Array(await request.executeRequest());
 		}
 
 		let request: HttpRestRequest = HttpRestRequest.createRequest(this.session)
@@ -548,7 +548,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 
 		// Split the multipart/mixed body into its parts, then discriminate the JSON metadata part from the binary
 		// document part by Content-Type. The metadata part is decoded as UTF-8; the binary part stays byte-exact.
-		let parts: MultipartPart[] = parseMultipartMixed(Buffer.from(response.data), contentType);
+		let parts: MultipartPart[] = parseMultipartMixed(new Uint8Array(response.data), contentType);
 		let jsonPart: MultipartPart | undefined = parts.find((part: MultipartPart): boolean =>
 			typeof part.contentType !== "undefined" && DataFormats.JSON.matches(part.contentType));
 		let binaryPart: MultipartPart | undefined = parts.find((part: MultipartPart): boolean =>
@@ -559,8 +559,8 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		}
 
 		return {
-			documentFile: DocumentFile.fromJson(JSON.parse(jsonPart.data.toString("utf-8"))),
-			data: binaryPart?.data ?? Buffer.alloc(0)
+			documentFile: DocumentFile.fromJson(JSON.parse(new TextDecoder("utf-8").decode(jsonPart.data))),
+			data: binaryPart?.data ?? new Uint8Array(0)
 		};
 	}
 
@@ -634,7 +634,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 	/**
 	 * @inheritDoc
 	 */
-	public async extractArchiveFile(documentId: string, archivePath: string): Promise<Buffer> {
+	public async extractArchiveFile(documentId: string, archivePath: string): Promise<Uint8Array> {
 		if (!this.containsDocument(documentId)) {
 			throw new ClientResultException(WsclientErrors.INVALID_DOCUMENT);
 		}
@@ -646,7 +646,7 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 				this.session.getURL("documents/" + documentId + "/archive/" + archivePath.split("/").map(encodeURIComponent).join("/"))
 			);
 
-		return await request.executeRequest();
+		return new Uint8Array(await request.executeRequest());
 	}
 
 	/**
