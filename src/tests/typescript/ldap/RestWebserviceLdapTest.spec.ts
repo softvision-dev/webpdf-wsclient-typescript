@@ -47,6 +47,11 @@ suite("RestWebserviceLdapTest", function (): void {
 
 		expect(certificates!.certificates.length, "User should have certificates.").to.be.greaterThan(0);
 
+		let freshCertificates: UserCertificates = await session.getUserManager().readCertificates();
+		expect(freshCertificates, "readCertificates should not return null.").to.exist;
+		expect(freshCertificates.keyStores.length, "readCertificates should return keystores.").to.be.greaterThan(0);
+		expect(freshCertificates.certificates.length, "readCertificates should return certificates.").to.be.greaterThan(0);
+
 		// check errorneous
 		parameter = KeyStorePassword.fromJson({
 			keyStorePassword: "test"
@@ -129,6 +134,12 @@ suite("RestWebserviceLdapTest", function (): void {
 				expect(certificate.isPrivateKeyReadable, "this certificates private key should be readable.").to.be.true;
 			}
 		}
+
+		// verify updateCertificatePasswords mirrors updateCertificates
+		let viaUserManager: UserCertificates = await session.getUserManager().updateCertificatePasswords(keyStoreName, parameter);
+		expect(viaUserManager, "updateCertificatePasswords should not return null.").to.exist;
+		expect(viaUserManager.keyStores.length, "updateCertificatePasswords should return keystores.").to.be.greaterThan(0);
+		expect(viaUserManager.certificates.length, "updateCertificatePasswords should return certificates.").to.be.greaterThan(0);
 
 		await session.close();
 	});

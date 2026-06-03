@@ -3,7 +3,6 @@ import {RestSession} from "../RestSession";
 import {
 	AdminClusterConfiguration,
 	AdminClusterConfigurationInterface,
-	AggregationServerState,
 	Application,
 	ApplicationCheck,
 	ApplicationCheckMode,
@@ -16,10 +15,10 @@ import {
 	ConfigurationResult,
 	ConfigurationType,
 	ConnectorKeyStore,
-	DataSourceServerState,
 	ExecutableName,
 	FileDataStore,
 	FileGroupDataStore,
+	Formats,
 	GlobalKeyStore,
 	LogCheck,
 	LogConfiguration,
@@ -36,15 +35,14 @@ import {
 	ServerConfigurationInterface,
 	ServerStatus,
 	SessionTable,
-	Statistic,
 	SupportEntryGroup,
+	TimeSeries,
 	TrustStoreKeyStore,
 	UserCheck,
 	UserConfiguration,
 	UserConfigurationInterface,
 	UserCredentials,
-	Users,
-	Webservice
+	Users
 } from "../../../generated-sources";
 import {DataFormats} from "../../DataFormat";
 import {ClientResultException, WsclientErrors} from "../../../exception";
@@ -964,43 +962,55 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 
 	/**
 	 * <p>
-	 * <b>(Experimental Web service)</b>
-	 * </p>
-	 * <p>
-	 * Reads statistic information from the server for Web services and file formats.
+	 * Reads time-bucketed job statistics per webservice for a fixed rolling window from the server.
 	 * </p>
 	 *
-	 * @param dataSource  Data source from which the data is read.
-	 * @param aggregation Aggregation mode for the retrieved data.
-	 * @param webservices List of webservice names from which the data should be retrieved.
-	 * @param start 	  Start date for the data, formatted as ISO-8601 extended offset (zoned based) date-time
-	 * 					  format.
-	 * @param end 		  End date for the data, formatted as ISO-8601 extended offset (zoned based) date-time
-	 * 					  format.
-	 * @return The requested {@link Statistic}.
+	 * @param services The webservice names (lowercase, e.g. converter, pdfa, toolbox, signature, ocr, barcode,
+	 * 				   urlconverter) the statistics shall be read for. An empty {@link Array} selects all webservices.
+	 * @param window   The rolling window to read (one of 1h, 6h, 12h, 24h, 72h, 168h, 720h). undefined or empty uses
+	 * 				   the server default (24h).
+	 * @return The requested {@link TimeSeries}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	public async fetchServerStatistic(
-		dataSource: DataSourceServerState, aggregation: AggregationServerState,
-		webservices: Array<Webservice>, start: Date, end: Date
-	): Promise<Statistic> {
+	public async fetchTimeSeries(services: Array<string>, window?: string): Promise<TimeSeries> {
 		await this.validateUser();
 
 		let searchParams: URLSearchParams = new URLSearchParams();
-		searchParams.set("start", start.toISOString());
-		searchParams.set("end", end.toISOString());
-
-		for (let webservice of webservices) {
-			searchParams.append("webservice", webservice);
+		for (let service of services) {
+			searchParams.append("services", service);
+		}
+		if (typeof window !== "undefined" && window !== "") {
+			searchParams.set("window", window);
 		}
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
-			.buildRequest(
-				HttpMethod.GET,
-				this.session.getURL("admin/statistic/" + [dataSource, aggregation].join("/"), searchParams)
-			)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/timeseries", searchParams));
 
-		return Statistic.fromJson(await request.executeRequest());
+		return TimeSeries.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * <p>
+	 * Reads cumulative job statistics per source file format and webservice from the server.
+	 * </p>
+	 *
+	 * @param services The webservice names (lowercase, e.g. converter, pdfa) the statistics shall be read for.
+	 * 				   An empty {@link Array} selects all webservices.
+	 * @return The requested {@link Formats}.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	public async fetchFormats(services: Array<string>): Promise<Formats> {
+		await this.validateUser();
+
+		let searchParams: URLSearchParams = new URLSearchParams();
+		for (let service of services) {
+			searchParams.append("services", service);
+		}
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/formats", searchParams));
+
+		return Formats.fromJson(await request.executeRequest());
 	}
 
 	/**
@@ -1304,5 +1314,37 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			.buildRequest(HttpMethod.GET, this.session.getURL("admin/cluster/status"));
 
 		return ClusterStatus.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * Fetches the Prometheus metrics from the server in text exposition format.
+	 * <p>
+	 * The metrics endpoint is served at the application context root (e.g. {@code /webPDF/metrics}),
+	 * which lies outside the REST API base path ({@code /webPDF/rest/}). The URL is therefore
+	 * constructed directly from the session's server URL rather than via {@link RestSession#getURL}.
+	 * </p>
+	 *
+	 * @return The Prometheus metrics as a plain-text string.
+	 * @throws ResultException Shall be thrown if the request failed.
+	 */
+	public async fetchMetrics(): Promise<string> {
+		await this.validateUser();
+
+		let metricsUrl: URL;
+		try {
+			let serverUrl: string = this.session.getSessionContext().getUrl().toString();
+			if (!serverUrl.endsWith("/")) {
+				serverUrl += "/";
+			}
+			metricsUrl = new URL(serverUrl + "metrics");
+		} catch (ex: any) {
+			throw new ClientResultException(WsclientErrors.INVALID_URL, ex);
+		}
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.PLAIN.getMimeType())
+			.buildRequest(HttpMethod.GET, metricsUrl);
+
+		return await request.executeRequest();
 	}
 }

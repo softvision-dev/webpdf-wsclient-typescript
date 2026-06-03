@@ -1,5 +1,5 @@
 import {Document} from "../../documents"
-import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -106,6 +106,16 @@ export interface RestDocument extends Document {
 	 * @throws ResultException Shall be thrown, should updating the document security have failed.
 	 */
 	updateDocumentSecurity(passwordType: PdfPassword): Promise<RestDocument>;
+
+	/**
+	 * This is a shortcut for {@link DocumentManager#shareDocument} and creates a pre-signed, login-free share URL for
+	 * the {@link RestDocument}.
+	 *
+	 * @param options The {@link ShareRequestOptions} defining the share link's expiration and one-time-use behaviour.
+	 * @return The pre-signed share URL for this {@link RestDocument}.
+	 * @throws ResultException Shall be thrown, should creating the share URL have failed.
+	 */
+	shareDocument(options: ShareRequestOptions): Promise<string>;
 
 	/**
 	 * This is a shortcut for {@link DocumentManager#renameDocument} and returns {@link Info} about the

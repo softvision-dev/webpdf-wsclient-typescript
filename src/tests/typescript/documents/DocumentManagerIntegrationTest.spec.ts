@@ -7,6 +7,7 @@ import {
 	ServerResultException,
 	SessionContext,
 	SessionFactory,
+	SharedDocumentDownload,
 	ToolboxWebService,
 	UserAuthProvider,
 	WebServiceFactory,
@@ -25,7 +26,8 @@ import {
 	InfoForm,
 	InfoType, MetadataPdf,
 	PdfPassword,
-	PdfPasswordInterface
+	PdfPasswordInterface,
+	ShareRequestOptions
 } from "../../../main/typescript/generated-sources";
 import AdmZip from "adm-zip";
 import {it, suite} from "mocha";
@@ -75,6 +77,123 @@ suite("DocumentManagerIntegrationTest", function (): void {
 		fileList = await session.getDocumentManager().getDocuments();
 		expect(fileList.length, "file list should be empty.").to.equal(0);
 
+		await session.close();
+	});
+
+	it('testDocumentShare', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "test.pdf";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+		let document: RestDocument = await session.getDocumentManager().uploadDocument(sourceFile, sourceFilename);
+		expect(document, "Valid document should have been returned.").to.exist;
+		expect(document.getDocumentId()).to.exist;
+
+		// Multi-use links so the same share can be downloaded in both representations below.
+		let options: ShareRequestOptions = ShareRequestOptions.fromJson({
+			expirationTime: 300,
+			oneTimeUse: false
+		} as ShareRequestOptions);
+
+		let shareUrl: string = await session.getDocumentManager().shareDocument(document.getDocumentId(), options);
+		expect(shareUrl, "A share URL should have been returned.").to.exist;
+		expect(shareUrl.trim().length, "The returned share URL should not be empty.").to.be.greaterThan(0);
+
+		// The document shortcut must yield an equivalent (non-empty) share URL.
+		let shortcutUrl: string = await document.shareDocument(options);
+		expect(shortcutUrl, "A share URL should have been returned via the document shortcut.").to.exist;
+		expect(shortcutUrl.trim().length, "The share URL returned via the document shortcut should not be empty.")
+			.to.be.greaterThan(0);
+
+		// Raw-byte and multipart downloads via a login-free anonymous session.
+		let anonymousSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL))
+		);
+		expect(anonymousSession, "Valid anonymous session should have been created.").to.exist;
+
+		// Raw-byte download (Accept: application/octet-stream).
+		let rawData: Buffer = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
+		expect((sourceFile as Buffer).equals(rawData),
+			"The raw-byte shared download should equal the uploaded document.").to.be.true;
+
+		// Multipart download (Accept: multipart/mixed) returning the document metadata.
+		let sharedDocument: SharedDocumentDownload =
+			await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl, true);
+		expect(sharedDocument.documentFile,
+			"The multipart shared download should return document metadata.").to.exist;
+		expect((sourceFile as Buffer).equals(sharedDocument.data),
+			"The multipart shared download should equal the uploaded document.").to.be.true;
+
+		await anonymousSession.close();
+		await session.close();
+	});
+
+	it('testUploadAndShare', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+		expect(session, "Valid session should have been created.").to.exist;
+
+		let sourceFilename: string = "test.pdf";
+		let sourceFile: any = testResources.getResource(sourceFilename);
+
+		// Multi-use link so the uploaded file can be downloaded in both representations below.
+		let options: ShareRequestOptions = ShareRequestOptions.fromJson({
+			expirationTime: 300,
+			oneTimeUse: false
+		} as ShareRequestOptions);
+
+		// Upload and share in a single call; the document is not added to the document storage.
+		let shareUrl: string = await session.getDocumentManager().uploadAndShare(sourceFile, sourceFilename, options);
+		expect(shareUrl, "A share URL should have been returned.").to.exist;
+		expect(shareUrl.trim().length, "The returned share URL should not be empty.").to.be.greaterThan(0);
+		expect(session.getDocumentManager().getDocuments().length,
+			"The uploaded-and-shared document must not appear in the document storage.").to.equal(0);
+
+		// A second upload-and-share must yield an equivalent (non-empty) share URL.
+		let secondShareUrl: string =
+			await session.getDocumentManager().uploadAndShare(sourceFile, sourceFilename, options);
+		expect(secondShareUrl, "A share URL should have been returned via the second call.").to.exist;
+		expect(secondShareUrl.trim().length, "The share URL returned via the second call should not be empty.")
+			.to.be.greaterThan(0);
+		expect(session.getDocumentManager().getDocuments().length,
+			"The uploaded-and-shared document must not appear in the document storage.").to.equal(0);
+
+		// Download both shared URLs login-free via an anonymous session and verify the full round-trip.
+		let anonymousSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL))
+		);
+		expect(anonymousSession, "Valid anonymous session should have been created.").to.exist;
+
+		// Raw-byte download (Accept: application/octet-stream).
+		let rawData: Buffer = await anonymousSession.getDocumentManager().downloadSharedDocument(shareUrl);
+		expect((sourceFile as Buffer).equals(rawData),
+			"The raw-byte shared download should equal the uploaded document.").to.be.true;
+
+		// Multipart download (Accept: multipart/mixed) returning the metadata.
+		let sharedDocument: SharedDocumentDownload =
+			await anonymousSession.getDocumentManager().downloadSharedDocument(secondShareUrl, true);
+		expect(sharedDocument.documentFile,
+			"The multipart shared download should return document metadata.").to.exist;
+		expect((sourceFile as Buffer).equals(sharedDocument.data),
+			"The multipart shared download should equal the uploaded document.").to.be.true;
+
+		await anonymousSession.close();
 		await session.close();
 	});
 

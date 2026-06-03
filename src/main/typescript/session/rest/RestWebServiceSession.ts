@@ -3,6 +3,7 @@ import {SessionContext} from "../connection";
 import {AuthenticationProvider} from "../auth";
 import {DocumentManager, RestWebServiceDocument, RestWebServiceDocumentManager} from "./documents";
 import {AdministrationManager, RestAdministrationManager} from "./administration";
+import {RestUserManager, UserManager} from "./user";
 import {RestSession} from "./RestSession";
 import {RestWebService, WebServiceFactory, WebServiceType} from "../../webservice";
 
@@ -69,6 +70,15 @@ export class RestWebServiceSession extends AbstractRestSession<RestWebServiceDoc
 	 */
 	protected createAdministrationManager(): AdministrationManager<RestWebServiceDocument> {
 		return new RestAdministrationManager(this);
+	}
+
+	/**
+	 * Creates a new {@link UserManager} matching this {@link RestSession}.
+	 *
+	 * @return The created {@link UserManager}.
+	 */
+	protected createUserManager(): UserManager<RestWebServiceDocument> {
+		return new RestUserManager(this);
 	}
 
 	/**

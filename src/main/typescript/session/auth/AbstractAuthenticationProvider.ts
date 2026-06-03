@@ -32,6 +32,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	private updating: boolean;
 	private readonly initialAuthMaterial: AuthMaterial;
 	private session?: Session;
+	private sessionTimeout: number = 0;
 
 	/**
 	 * <p>
@@ -100,6 +101,52 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 	}
 
 	/**
+	 * <p>
+	 * Returns the optional session lifetime (in seconds) requested for the login/refresh of this
+	 * {@link AuthenticationProvider}.
+	 * </p>
+	 *
+	 * @return The requested session lifetime in seconds. 0 means the server default is used.
+	 */
+	public getSessionTimeout(): number {
+		return this.sessionTimeout;
+	}
+
+	/**
+	 * <p>
+	 * Sets an optional session lifetime (in seconds) for the login/refresh of this {@link AuthenticationProvider}.<br>
+	 * If set to a value greater than 0, the issued access token and the session expire after this many seconds instead
+	 * of the server default. The value is capped by the server at its configured default session lifetime, so it can
+	 * only shorten a session, never extend it beyond the server policy. Use this for short-lived, single-purpose logins
+	 * (e.g. an upload that only shares a document) so a forgotten logout self-expires quickly.
+	 * </p>
+	 *
+	 * @param sessionTimeout The session lifetime in seconds. 0 (or a negative value) uses the server default.
+	 */
+	public setSessionTimeout(sessionTimeout: number): void {
+		this.sessionTimeout = Math.max(0, sessionTimeout);
+	}
+
+	/**
+	 * Creates the {@link LoginOptions} for a login/refresh request, applying the configured session lifetime.
+	 * <p>
+	 * The sessionTimeout is only transmitted when a positive value was requested. Otherwise it is left undefined so it
+	 * is omitted from the request body entirely - this keeps the request backwards compatible with older webPDF servers
+	 * that do not know the field (the generated model would otherwise serialize its non-undefined default of 0).
+	 * </p>
+	 *
+	 * @return The prepared {@link LoginOptions}.
+	 */
+	private createLoginOptions(): LoginOptions {
+		let loginOptions: LoginOptions = LoginOptions.fromJson({
+			createRefreshToken: true
+		} as LoginOptionsInterface);
+		loginOptions.sessionTimeout = this.sessionTimeout > 0 ? this.sessionTimeout : undefined;
+
+		return loginOptions;
+	}
+
+	/**
 	 * Refresh authorization {@link SessionToken} for an active {@link Session}.
 	 *
 	 * @param session The session to refresh the authorization for.
@@ -127,9 +174,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			let currentToken: WSClientSessionToken = this.getAuthMaterial() as WSClientSessionToken;
 			let refreshAuthMaterial: WSClientSessionToken = new WSClientSessionToken(currentToken.getRefreshToken());
 
-			let loginOptions: LoginOptions = LoginOptions.fromJson({
-				createRefreshToken: true
-			} as LoginOptionsInterface);
+			let loginOptions: LoginOptions = this.createLoginOptions();
 
 			let request: HttpRestRequest = await HttpRestRequest.createRequest(restSession)
 				.buildRequest(
@@ -173,9 +218,7 @@ export abstract class AbstractAuthenticationProvider implements AuthenticationPr
 			this.session = session;
 			let restSession: RestSession<any> = session as RestSession<any>;
 
-			let loginOptions: LoginOptions = LoginOptions.fromJson({
-				createRefreshToken: true
-			} as LoginOptionsInterface);
+			let loginOptions: LoginOptions = this.createLoginOptions();
 
 			let request: HttpRestRequest = await HttpRestRequest.createRequest(restSession)
 				.buildRequest(

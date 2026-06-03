@@ -61,6 +61,7 @@ export class DataFormat {
  * @see #JSON
  * @see #OCTET_STREAM
  * @see #PLAIN
+ * @see #MULTIPART
  * @see #ANY
  */
 export const DataFormats: Record<string, DataFormat> = {
@@ -83,6 +84,11 @@ export const DataFormats: Record<string, DataFormat> = {
      * A plain text.
      */
     PLAIN: new DataFormat("text/plain"),
+
+    /**
+     * A multipart message combining several body parts (e.g. metadata and binary content).
+     */
+    MULTIPART: new DataFormat("multipart/mixed"),
 
     /**
      * unspecified file format.

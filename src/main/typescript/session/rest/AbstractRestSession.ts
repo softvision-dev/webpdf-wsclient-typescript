@@ -7,6 +7,7 @@ import {HttpMethod, HttpRestRequest, SessionContext} from "../connection";
 import {AuthenticationProvider} from "../auth";
 import {DocumentManager, RestDocument} from "./documents";
 import {AdministrationManager} from "./administration";
+import {UserManager} from "./user";
 import {DataFormats} from "../DataFormat";
 import {wsclientConfiguration} from "../../configuration";
 
@@ -32,6 +33,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	protected certificates?: UserCertificates;
 	protected readonly documentManager: DocumentManager<T_REST_DOCUMENT>;
 	protected administrationManager: AdministrationManager<T_REST_DOCUMENT>;
+	protected readonly userManager: UserManager<T_REST_DOCUMENT>;
 
 	/**
 	 * <p>
@@ -69,6 +71,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 		this._httpClient = axios.create(clientConfig);
 		this.documentManager = this.createDocumentManager();
 		this.administrationManager = this.createAdministrationManager();
+		this.userManager = this.createUserManager();
 	}
 
 	/**
@@ -96,6 +99,15 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 */
 	public getAdministrationManager(): AdministrationManager<T_REST_DOCUMENT> {
 		return this.administrationManager;
+	}
+
+	/**
+	 * Returns the active {@link UserManager} of this {@link RestSession}.
+	 *
+	 * @return The active {@link UserManager} of this {@link RestSession}.
+	 */
+	public getUserManager(): UserManager<T_REST_DOCUMENT> {
+		return this.userManager;
 	}
 
 	/**
@@ -140,6 +152,8 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 * @param keyStorePassword The {@link KeyStorePassword} to unlock the certificates with.
 	 * @return The {@link UserCertificates} of the logged in user in this {@link RestSession}.
 	 * @throws ResultException Shall be thrown, if the request failed.
+	 * @deprecated Use {@link UserManager#updateCertificatePasswords} instead,
+	 * accessible via {@link RestSession#getUserManager}.
 	 */
 	public async updateCertificates(keystoreName: string, keyStorePassword: KeyStorePassword):
 		Promise<UserCertificates | undefined> {
@@ -183,6 +197,13 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 * @return The created {@link AdministrationManager}.
 	 */
 	protected abstract createAdministrationManager(): AdministrationManager<T_REST_DOCUMENT>;
+
+	/**
+	 * Creates a new {@link UserManager} matching this {@link RestSession}.
+	 *
+	 * @return The created {@link UserManager}.
+	 */
+	protected abstract createUserManager(): UserManager<T_REST_DOCUMENT>;
 
 	public abstract createWebServiceInstance<T_WEBSERVICE extends RestWebService<any, any, any>>(
 		webServiceType: WebServiceType

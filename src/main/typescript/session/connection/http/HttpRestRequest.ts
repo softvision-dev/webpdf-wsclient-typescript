@@ -22,6 +22,7 @@ export class HttpRestRequest {
 	private readonly session: RestSession<any>;
 	private acceptHeader: string;
 	private requestConfig: AxiosRequestConfig;
+	private responseContentType?: string;
 
 	/**
 	 * Creates a {@link HttpRestRequest} preparing and executing a request for a given {@link RestSession} to provide
@@ -139,7 +140,10 @@ export class HttpRestRequest {
 		this.requestConfig.headers[HttpHeaders.ACCEPT] = this.acceptHeader;
 		if (this.acceptHeader === DataFormats.JSON.getMimeType()) {
 			this.requestConfig.responseType = "json";
-		} else if (this.acceptHeader === DataFormats.OCTET_STREAM.getMimeType()) {
+		} else if (this.acceptHeader === DataFormats.OCTET_STREAM.getMimeType() ||
+			this.acceptHeader === DataFormats.MULTIPART.getMimeType()) {
+			// Multipart bodies carry binary parts, so they must be read as raw bytes (like octet-stream)
+			// to avoid axios coercing the response into a (corrupting) string/JSON representation.
 			this.requestConfig.responseType = "arraybuffer";
 		}
 
@@ -272,6 +276,17 @@ export class HttpRestRequest {
 	}
 
 	/**
+	 * Returns the {@code Content-Type} of the most recently executed response, or {@code undefined} if no response has
+	 * been received yet or the response carried no {@code Content-Type} header. For multipart responses this includes
+	 * the boundary parameter required to parse the body.
+	 *
+	 * @return The {@code Content-Type} of the most recently executed response, or {@code undefined}.
+	 */
+	public getResponseContentType(): string | undefined {
+		return this.responseContentType;
+	}
+
+	/**
 	 * <p>
 	 * Executes {@link HttpRestRequest}.
 	 * </p>
@@ -305,6 +320,7 @@ export class HttpRestRequest {
 		}
 
 		await this.checkResponse(response);
+		this.responseContentType = response.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
 		return response;
 	}
 }

@@ -1,5 +1,5 @@
 import {RestDocument} from "./RestDocument";
-import {DocumentManager} from "./DocumentManager";
+import {DocumentManager, SharedDocumentDownload} from "./DocumentManager";
 import {RestSession} from "../RestSession";
 import {
 	DocumentFile,
@@ -11,12 +11,13 @@ import {
 	Info,
 	InfoType,
 	Parameter,
-	PdfPassword
+	PdfPassword,
+	ShareRequestOptions
 } from "../../../generated-sources";
-import {HttpMethod, HttpRestRequest} from "../../connection";
+import {HttpMethod, HttpRestRequest, MultipartPart, parseMultipartMixed} from "../../connection";
 import {ClientResultException, WsclientErrors} from "../../../exception";
 import {DataFormats} from "../../DataFormat";
-import {AxiosProgressEvent} from "axios";
+import {AxiosProgressEvent, AxiosResponse} from "axios";
 import {RestDocumentState} from "./RestDocumentState";
 import {wsclientConfiguration} from "../../../configuration";
 
@@ -421,6 +422,146 @@ export abstract class AbstractDocumentManager<T_REST_DOCUMENT extends RestDocume
 		);
 
 		return await this.synchronizeDocument(documentFile);
+	}
+
+	/**
+	 * <p>
+	 * Creates a pre-signed, login-free share URL for the {@link RestDocument} selected by documentId and returns it.
+	 * <ul>
+	 * <li>Anyone who has the returned URL can access the document until the share token expires.</li>
+	 * <li>The validity period and one-time-use behaviour are controlled via the given {@link ShareRequestOptions};
+	 * values left unset fall back to the server defaults.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param documentId The unique documentId of the document in the server´s document storage.
+	 * @param options    The {@link ShareRequestOptions} defining the share link's expiration and one-time-use behaviour.
+	 * @return The pre-signed share URL for the selected document.
+	 * @throws ResultException Shall be thrown, should creating the share URL have failed.
+	 */
+	public async shareDocument(documentId: string, options: ShareRequestOptions): Promise<string> {
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.PLAIN.getMimeType())
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("documents/" + documentId + "/share"),
+				this.prepareHttpEntity(options),
+				DataFormats.JSON.getMimeType()
+			);
+
+		let shareUrl: any = await request.executeRequest();
+		if (typeof shareUrl === "undefined" || shareUrl === null) {
+			throw new ClientResultException(WsclientErrors.HTTP_EMPTY_ENTITY);
+		}
+
+		return shareUrl;
+	}
+
+	/**
+	 * <p>
+	 * Uploads the given {@link Blob} to the webPDF server and immediately creates a pre-signed, login-free share URL
+	 * for it in a single call, returning that URL. The uploaded document is <b>not</b> added to this
+	 * {@link DocumentManager}'s document storage.
+	 * </p>
+	 *
+	 * @param data     The document {@link Blob} to upload and share.
+	 * @param fileName The name of the uploaded document.
+	 * @param options  The {@link ShareRequestOptions} defining the share link's expiration and one-time-use behaviour.
+	 * @return The pre-signed share URL for the uploaded document.
+	 * @throws ResultException Shall be thrown, should the upload or creating the share URL have failed.
+	 */
+	public async uploadAndShare(data: Blob, fileName: string, options: ShareRequestOptions): Promise<string> {
+		let formData: FormData = new wsclientConfiguration.FormData();
+		formData.append('filedata', data as any, fileName);
+
+		let searchParams: URLSearchParams = new URLSearchParams();
+		if (typeof options.expirationTime !== "undefined") {
+			searchParams.set("expirationTime", String(options.expirationTime));
+		}
+		if (typeof options.oneTimeUse !== "undefined") {
+			searchParams.set("oneTimeUse", String(options.oneTimeUse));
+		}
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.PLAIN.getMimeType())
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("documents/share", searchParams),
+				formData
+			);
+
+		let shareUrl: any = await request.executeRequest();
+		if (typeof shareUrl === "undefined" || shareUrl === null) {
+			throw new ClientResultException(WsclientErrors.HTTP_EMPTY_ENTITY);
+		}
+
+		return shareUrl;
+	}
+
+	public downloadSharedDocument(shareUrl: string): Promise<Buffer>;
+	public downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Buffer>;
+	public downloadSharedDocument(shareUrl: string, withMetadata: true): Promise<SharedDocumentDownload>;
+
+	/**
+	 * <p>
+	 * Downloads a document via a pre-signed, login-free share URL (as returned by {@link shareDocument}). When
+	 * withMetadata is true, the {@code multipart/mixed} representation is requested and both the parsed
+	 * {@link DocumentFile} metadata and the binary file data are returned; otherwise the raw
+	 * {@code application/octet-stream} representation is returned as a {@link Buffer}.
+	 * </p>
+	 * <p>
+	 * As the share URL is self-contained, the download does not require an authenticated session.
+	 * </p>
+	 *
+	 * @param shareUrl     The pre-signed share URL of the document to download.
+	 * @param withMetadata true to request the multipart representation and return the document metadata.
+	 * @return A {@link Buffer} of the raw bytes, or a {@link SharedDocumentDownload} when withMetadata is true.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	public async downloadSharedDocument(
+		shareUrl: string, withMetadata: boolean = false
+	): Promise<Buffer | SharedDocumentDownload> {
+		let shareUri: URL;
+		try {
+			shareUri = new URL(shareUrl);
+		} catch (ex: any) {
+			throw new ClientResultException(WsclientErrors.INVALID_URL, ex);
+		}
+
+		if (!withMetadata) {
+			let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+				.setAcceptHeader(DataFormats.OCTET_STREAM.getMimeType())
+				.buildRequest(HttpMethod.GET, shareUri);
+
+			return Buffer.from(await request.executeRequest());
+		}
+
+		let request: HttpRestRequest = HttpRestRequest.createRequest(this.session)
+			.setAcceptHeader(DataFormats.MULTIPART.getMimeType());
+		await request.buildRequest(HttpMethod.GET, shareUri);
+		let response: AxiosResponse = await request.execute();
+
+		let contentType: string | undefined = request.getResponseContentType();
+		if (typeof contentType === "undefined") {
+			throw new ClientResultException(WsclientErrors.HTTP_EMPTY_ENTITY);
+		}
+
+		// Split the multipart/mixed body into its parts, then discriminate the JSON metadata part from the binary
+		// document part by Content-Type. The metadata part is decoded as UTF-8; the binary part stays byte-exact.
+		let parts: MultipartPart[] = parseMultipartMixed(Buffer.from(response.data), contentType);
+		let jsonPart: MultipartPart | undefined = parts.find((part: MultipartPart): boolean =>
+			typeof part.contentType !== "undefined" && DataFormats.JSON.matches(part.contentType));
+		let binaryPart: MultipartPart | undefined = parts.find((part: MultipartPart): boolean =>
+			typeof part.contentType === "undefined" || !DataFormats.JSON.matches(part.contentType));
+
+		if (typeof jsonPart === "undefined") {
+			throw new ClientResultException(WsclientErrors.HTTP_EMPTY_ENTITY);
+		}
+
+		return {
+			documentFile: DocumentFile.fromJson(JSON.parse(jsonPart.data.toString("utf-8"))),
+			data: binaryPart?.data ?? Buffer.alloc(0)
+		};
 	}
 
 	/**

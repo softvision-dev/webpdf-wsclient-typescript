@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.5 (2026-05-05T07:21:32Z)"
+		"version": "webPDF 11.0.0 (2026-06-02T13:54:40Z)"
 	},
 	"servers": [
 		{
@@ -61,10 +61,6 @@
 		{
 			"description": "**Important:** Web services in this area are intended for usage of the portal application only and may change at any time without notice!",
 			"name": "portal"
-		},
-		{
-			"description": "**Important:** Web services in this area are currently experimental and may change at any time without notice!",
-			"name": "experimental"
 		}
 	],
 	"paths": {
@@ -521,6 +517,53 @@
 				]
 			}
 		},
+		"/admin/formats": {
+			"get": {
+				"description": "Reads cumulative job statistics per source file format and webservice.",
+				"operationId": "readFormats",
+				"parameters": [
+					{
+						"description": "List of webservice names. Repeat the parameter or use a comma-separated list. Empty = all webservices.",
+						"example": "converter",
+						"in": "query",
+						"name": "services",
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Admin_Formats"
+								}
+							}
+						},
+						"description": "Per-format statistics"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Reads per-format job statistics",
+				"tags": [
+					"administration"
+				]
+			}
+		},
 		"/admin/server/log": {
 			"get": {
 				"description": "Returns the contents of the current log or a specific log file of the server. If the `date` query parameter is specified, an explicitly selected log will be read.",
@@ -818,58 +861,31 @@
 				]
 			}
 		},
-		"/admin/statistic/{dataSource}/{aggregation}": {
+		"/admin/timeseries": {
 			"get": {
-				"description": "Reads statistic information from the server for Web services and file formats. **(Experimental Web service)**",
-				"operationId": "readServerStatistic",
+				"description": "Reads time-bucketed job statistics per webservice for a fixed rolling window.",
+				"operationId": "readTimeSeries",
 				"parameters": [
 					{
-						"description": "Data source from which the data is read.",
-						"in": "path",
-						"name": "dataSource",
-						"required": true,
-						"schema": {
-							"$ref": "#/components/schemas/Admin_DataSourceServerState"
-						}
-					},
-					{
-						"description": "Aggregation mode for the retrieved data.",
-						"in": "path",
-						"name": "aggregation",
-						"required": true,
-						"schema": {
-							"$ref": "#/components/schemas/Admin_AggregationServerState"
-						}
-					},
-					{
-						"description": "List of webservice names from which the data should be retrieved.",
+						"description": "List of webservice names. Repeat the parameter or use a comma-separated list. Empty = all webservices.",
+						"example": "converter,pdfa",
 						"in": "query",
-						"name": "webservice",
+						"name": "services",
 						"schema": {
 							"type": "array",
 							"items": {
-								"$ref": "#/components/schemas/Webservice"
+								"type": "string"
 							}
 						}
 					},
 					{
-						"description": "Start date for the data, formatted as ISO-8601 extended offset (zoned based) date-time format.",
-						"example": "2022-01-20T12:30:00,000Z",
+						"description": "Rolling window: 1h, 6h, 12h, 24h, 72h, 168h, 720h.",
+						"example": "24h",
 						"in": "query",
-						"name": "start",
+						"name": "window",
 						"schema": {
 							"type": "string",
-							"default": ""
-						}
-					},
-					{
-						"description": "End date for the data, formatted as ISO-8601 extended offset (zoned based) date-time format.",
-						"example": "2022-01-22T23:59:59,000Z",
-						"in": "query",
-						"name": "end",
-						"schema": {
-							"type": "string",
-							"default": ""
+							"default": "24h"
 						}
 					}
 				],
@@ -878,11 +894,11 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Admin_Statistic"
+									"$ref": "#/components/schemas/Admin_TimeSeries"
 								}
 							}
 						},
-						"description": "Server statistic"
+						"description": "Time-series statistics"
 					},
 					"400": {
 						"$ref": "#/components/responses/400BadRequest"
@@ -896,9 +912,9 @@
 						"BearerAuth": []
 					}
 				],
-				"summary": "Reads statistic information (Experimental Web service)",
+				"summary": "Reads historical job statistics",
 				"tags": [
-					"experimental"
+					"administration"
 				]
 			}
 		},
@@ -1568,6 +1584,84 @@
 				]
 			}
 		},
+		"/documents/share": {
+			"post": {
+				"description": "Uploads a document and immediately creates a pre-signed shared URL for it in a single call, without first storing it in the caller's document storage. The URL is returned in the response body and can be used to download the document without logging in.\n\nThis is the input-side counterpart to `POST /documents/{documentId}/share`: it lets a remote client hand a (potentially large) file to the server out-of-band and then reference it by its share URL.\n\n* The uploaded document is **not** added to the caller's document storage: it is placed only in the dedicated short-lived share session, so it does **not** appear in `GET /documents/list` and cannot be accessed via the regular `/documents` API. It is reachable solely through the returned share URL and is removed automatically when the share link expires.\n* The upload is authenticated like a normal document upload and is subject to the same storage limits.\n* When `oneTimeUse` is omitted, it falls back to the server-configured default (`<share oneTimeUse>`), consistent with `POST /documents/{documentId}/share`. Set it explicitly to `false` to allow the uploaded file to be read by more than one subsequent operation.\n* The requested `expirationTime` must not exceed the server's configured `maxExpiration`.\n",
+				"operationId": "uploadAndShareDocument",
+				"parameters": [
+					{
+						"description": "Seconds before the share link expires. Uses the server default if omitted.",
+						"in": "query",
+						"name": "expirationTime",
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"description": "If true, the link is invalidated after the first download. Uses the server default if omitted.",
+						"in": "query",
+						"name": "oneTimeUse",
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"filedata": {
+										"type": "string",
+										"format": "binary",
+										"description": "The document to upload and share, as binary data bytes."
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"text/plain": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"description": "The document has been uploaded and shared. The pre-signed share URL is in the response body.\n"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Webservice_Exception"
+								}
+							}
+						},
+						"description": "The request is invalid. For example, the requested `expirationTime` exceeds the server's configured `maxExpiration`, or no file data was provided."
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "The share feature is not enabled on this server."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Uploads a document and immediately creates a shared URL for it",
+				"tags": [
+					"documents"
+				]
+			}
+		},
 		"/documents/{documentId}": {
 			"delete": {
 				"description": "Deletes the document selected via it´s `documentId` from the server´s document storage.\n\n* To select the document use the `documentId` returned, when uploading the document to the server´s **document storage**, or select a `documentId` of one of the documents returned by `GET /documents/list`.",
@@ -2165,6 +2259,69 @@
 				]
 			}
 		},
+		"/documents/{documentId}/share": {
+			"post": {
+				"description": "Creates a shared URL for a document, which is returned in the response body. The URL is pre-signed and is used to share documents without logging in. Anyone who has the URL can access the document. The URL is limited to a maximum validity period and can also be defined as a one-time URL.\n\n* To select the document use the `documentId` returned, when uploading the document to the server´s **document storage**, or select a `documentId` of one of the documents returned by `GET /documents/list`.\n",
+				"operationId": "shareDocument",
+				"parameters": [
+					{
+						"description": "The unique `documentId` of the document in the server´s document storage.",
+						"in": "path",
+						"name": "documentId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Share_RequestOptions"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"text/plain": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						},
+						"description": "The document has been shared, and the URL for shared access is in the body of the response.\n"
+					},
+					"400": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Webservice_Exception"
+								}
+							}
+						},
+						"description": "The request is invalid. For example, the requested `expirationTime` exceeds the server's configured `maxExpiration`."
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "The share feature is not enabled on this server."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Creates a shared URL for a selected document",
+				"tags": [
+					"documents"
+				]
+			}
+		},
 		"/documents/{documentId}/update": {
 			"post": {
 				"description": "Updates the document information of a selected document in the server´s **document storage**, using the given `DocumentFile` as body request parameter and returns the updated document information. You can use this to change the file name of a document.\n\n* Currently only the `fileName` in `DocumentFile` can be updated.\n* To select the document use the `documentId` returned, when uploading the document to the server´s **document storage**, or select a `documentId` of one of the documents returned by `GET /documents/list`.",
@@ -2367,6 +2524,58 @@
 				"summary": "Gets the portal information [Internal use only, will change without further notice]",
 				"tags": [
 					"portal"
+				]
+			}
+		},
+		"/share/{shareId}": {
+			"get": {
+				"description": "Downloads a document that was previously shared via a pre-signed URL. The share token encoded in the `shareId` path parameter is validated, and if valid, the document is returned.\n\n* By default (or when requesting `multipart/mixed`) the response is a multipart body containing the document metadata as JSON and the binary file data.\n* Clients that send `Accept: application/octet-stream` receive the raw file bytes directly, together with a `Content-Disposition` header. This makes the share link directly consumable by browsers and command-line tools (e.g. `curl -o result.pdf`) without having to parse a multipart body.\n* The share token may be configured as a one-time-use token, in which case the share link is invalidated after the first successful download.\n* If the share token has expired or has already been used, the server returns HTTP 410 (Gone).\n",
+				"operationId": "downloadSharedDocument",
+				"parameters": [
+					{
+						"description": "The pre-signed share token identifying the shared document session.",
+						"in": "path",
+						"name": "shareId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							},
+							"multipart/mixed": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						},
+						"description": "The document was downloaded successfully. Depending on the `Accept` header the response is either a multipart body (document metadata as JSON plus the binary file data) or the raw file bytes.\n"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "The share feature is not enabled on this server."
+					},
+					"410": {
+						"description": "The share token has expired, has already been used, or the shared document is no longer available."
+					}
+				},
+				"summary": "Downloads a document via its pre-signed share URL",
+				"tags": [
+					"documents"
 				]
 			}
 		},
@@ -2670,17 +2879,6 @@
 			}
 		},
 		"schemas": {
-			"Admin_AggregationServerState": {
-				"type": "string",
-				"default": "hour",
-				"enum": [
-					"minute",
-					"hour",
-					"day",
-					"month",
-					"year"
-				]
-			},
 			"Admin_ApplicationCheck": {
 				"type": "object",
 				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.",
@@ -2954,14 +3152,6 @@
 					"checkType"
 				]
 			},
-			"Admin_DataSourceServerState": {
-				"type": "string",
-				"default": "realtime",
-				"enum": [
-					"realtime",
-					"persistent"
-				]
-			},
 			"Admin_DocumentStorageProviderCheck": {
 				"type": "object",
 				"allOf": [
@@ -3143,6 +3333,69 @@
 					"checkType"
 				]
 			},
+			"Admin_FormatBucket": {
+				"type": "object",
+				"description": "Cumulative job statistics for one source file format",
+				"properties": {
+					"avgExecutionMs": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "Average execution time per job in milliseconds"
+					},
+					"executionTimeMs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Summed execution time in milliseconds for this format"
+					},
+					"format": {
+						"type": "string",
+						"default": "",
+						"description": "Source file format (lowercase short name)",
+						"example": "docx"
+					},
+					"jobs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Total number of jobs for this format"
+					}
+				},
+				"readOnly": true
+			},
+			"Admin_FormatService": {
+				"type": "object",
+				"description": "Cumulative per-format statistics for one webservice",
+				"properties": {
+					"formats": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Admin_FormatBucket"
+						}
+					},
+					"service": {
+						"type": "string",
+						"default": "",
+						"description": "Webservice name (lowercase)",
+						"example": "converter"
+					}
+				},
+				"readOnly": true
+			},
+			"Admin_Formats": {
+				"type": "object",
+				"description": "Cumulative per-source-format job statistics",
+				"properties": {
+					"series": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Admin_FormatService"
+						}
+					}
+				},
+				"readOnly": true
+			},
 			"Admin_GenericFileDataStore": {
 				"type": "object",
 				"allOf": [
@@ -3287,17 +3540,17 @@
 					},
 					"numberOfErrorJobs": {
 						"type": "integer",
-						"format": "int32",
+						"format": "int64",
 						"default": 0
 					},
 					"numberOfJobs": {
 						"type": "integer",
-						"format": "int32",
+						"format": "int64",
 						"default": 0
 					},
 					"numberOfSuccessfulJobs": {
 						"type": "integer",
-						"format": "int32",
+						"format": "int64",
 						"default": 0
 					}
 				}
@@ -3488,26 +3741,6 @@
 					}
 				},
 				"readOnly": true
-			},
-			"Admin_PoolEntryServerState": {
-				"type": "object",
-				"properties": {
-					"count": {
-						"type": "integer",
-						"format": "int32",
-						"default": 0
-					},
-					"poolSize": {
-						"type": "integer",
-						"format": "int32",
-						"default": 0
-					},
-					"queueSize": {
-						"type": "integer",
-						"format": "int32",
-						"default": 0
-					}
-				}
 			},
 			"Admin_PoolServerState": {
 				"type": "object",
@@ -3743,6 +3976,11 @@
 						"default": 0,
 						"description": "UTC datetime of last update",
 						"readOnly": true
+					},
+					"retentionDays": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0
 					}
 				}
 			},
@@ -3850,20 +4088,6 @@
 					"checkType"
 				]
 			},
-			"Admin_Statistic": {
-				"type": "object",
-				"properties": {
-					"data": {
-						"type": "object",
-						"additionalProperties": {
-							"type": "object",
-							"additionalProperties": {
-								"$ref": "#/components/schemas/Admin_TimeFrameServerState"
-							}
-						}
-					}
-				}
-			},
 			"Admin_SupportEntryGroup": {
 				"type": "string",
 				"default": "logs",
@@ -3892,54 +4116,123 @@
 					"fileGroup"
 				]
 			},
-			"Admin_TimeEntryServerState": {
+			"Admin_TimeSeries": {
 				"type": "object",
+				"description": "Historical job statistics aggregated into time buckets",
 				"properties": {
-					"executionTimeMs": {
-						"type": "integer",
-						"format": "int64",
-						"default": 0
+					"from": {
+						"type": "string",
+						"default": "",
+						"description": "ISO-8601 UTC start of the window",
+						"example": "2025-01-20T00:00:00Z"
 					},
-					"numberOfErrors": {
+					"granularitySeconds": {
 						"type": "integer",
-						"format": "int64",
-						"default": 0
+						"format": "int32",
+						"default": 0,
+						"description": "Size of one display bucket in seconds",
+						"example": 3600
 					},
-					"numberOfJobs": {
+					"retentionDays": {
 						"type": "integer",
-						"format": "int64",
-						"default": 0
-					}
-				}
-			},
-			"Admin_TimeFrameServerState": {
-				"type": "object",
-				"properties": {
-					"executionTimeMs": {
-						"type": "integer",
-						"format": "int64",
-						"default": 0
+						"format": "int32",
+						"default": 0,
+						"description": "Configured retention period of the coarse time-series tier in days"
 					},
-					"formats": {
-						"type": "object",
-						"additionalProperties": {
-							"$ref": "#/components/schemas/Admin_TimeEntryServerState"
+					"series": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Admin_TimeSeriesService"
 						}
 					},
-					"instances": {
-						"$ref": "#/components/schemas/Admin_PoolEntryServerState"
+					"to": {
+						"type": "string",
+						"default": "",
+						"description": "ISO-8601 UTC end of the window (now)",
+						"example": "2025-01-20T06:00:00Z"
 					},
-					"numberOfErrors": {
-						"type": "integer",
-						"format": "int64",
-						"default": 0
-					},
-					"numberOfJobs": {
-						"type": "integer",
-						"format": "int64",
-						"default": 0
+					"window": {
+						"type": "string",
+						"default": "",
+						"description": "Requested rolling window",
+						"example": "6h"
 					}
-				}
+				},
+				"readOnly": true
+			},
+			"Admin_TimeSeriesBucket": {
+				"type": "object",
+				"description": "Aggregated job statistics for one time bucket",
+				"properties": {
+					"avgExecutionMs": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "Average execution time per job in milliseconds"
+					},
+					"avgPoolSize": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "Average number of active pool threads"
+					},
+					"avgQueueSize": {
+						"type": "number",
+						"format": "double",
+						"default": 0,
+						"description": "Average queue depth"
+					},
+					"errors": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Number of failed jobs"
+					},
+					"executionTimeMs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Summed execution time in milliseconds"
+					},
+					"jobs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Total number of jobs"
+					},
+					"successful": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Number of successful jobs (jobs - errors)"
+					},
+					"timestamp": {
+						"type": "string",
+						"default": "",
+						"description": "ISO-8601 UTC start of the bucket",
+						"example": "2025-01-20T08:00:00Z"
+					}
+				},
+				"readOnly": true
+			},
+			"Admin_TimeSeriesService": {
+				"type": "object",
+				"description": "Time-series statistics for one webservice",
+				"properties": {
+					"buckets": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Admin_TimeSeriesBucket"
+						}
+					},
+					"service": {
+						"type": "string",
+						"default": "",
+						"description": "Webservice name (lowercase)",
+						"example": "converter"
+					}
+				},
+				"readOnly": true
 			},
 			"Admin_TrustStoreKeyStore": {
 				"type": "object",
@@ -5564,6 +5857,13 @@
 						"type": "boolean",
 						"default": false,
 						"description": "If enabled (true), a refresh token is also created."
+					},
+					"sessionTimeout": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "Optional session lifetime in seconds. If set (greater than 0), the issued access token and the session expire after this many seconds instead of the server default. The value is capped at the configured default session lifetime, so it can only shorten a session, never extend it beyond the server policy. Use this for short-lived, single-purpose logins (e.g. an upload that only shares a document) so that a forgotten logout self-expires quickly. 0 (or omitted) uses the server default.",
+						"example": 60
 					}
 				}
 			},
@@ -8799,7 +9099,7 @@
 					},
 					"version": {
 						"type": "string",
-						"default": "v10.0",
+						"default": "v11.0",
 						"description": "Key schema version",
 						"example": "v10.0"
 					}
@@ -19372,6 +19672,9 @@
 					"rest": {
 						"$ref": "#/components/schemas/ServerConfig_LocalAuthRest"
 					},
+					"share": {
+						"$ref": "#/components/schemas/ServerConfig_LocalAuthShare"
+					},
 					"soap": {
 						"$ref": "#/components/schemas/ServerConfig_LocalAuthSoap"
 					}
@@ -19412,6 +19715,41 @@
 					}
 				}
 			},
+			"ServerConfig_LocalAuthShare": {
+				"type": "object",
+				"description": "Defines the settings for shared document URL tokens issued by the server.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If set to true (default), the share token provider is active and pre-signed document URLs can be issued. If set to false, the provider is disabled and no share tokens can be created or validated."
+					},
+					"expiration": {
+						"type": "integer",
+						"format": "int32",
+						"default": 300,
+						"description": "Default number of seconds before the share token expires when the caller does not specify a custom expiration time. Must be between 30 and maxExpiration.",
+						"minimum": 30
+					},
+					"maxExpiration": {
+						"type": "integer",
+						"format": "int32",
+						"default": 3600,
+						"description": "Maximum number of seconds a caller may request for a share token's lifetime. Requests with an expirationTime exceeding this limit are rejected with HTTP 400. Must be greater than or equal to expiration.",
+						"minimum": 10
+					},
+					"oneTimeUse": {
+						"type": "boolean",
+						"default": true,
+						"description": "Server default for the one-time-use flag when the caller does not specify it. If set to true (default), the share link is invalidated after the first successful download."
+					},
+					"persistentKey": {
+						"type": "boolean",
+						"default": false,
+						"description": "If set to true, the shared signing key is persisted to disk and survives server restarts. If set to false (default), a new ephemeral key is generated on each server start, invalidating all previously issued share tokens."
+					}
+				}
+			},
 			"ServerConfig_LocalAuthSoap": {
 				"type": "object",
 				"description": "Defines the settings for accessing the server's SOAP API (web services).",
@@ -19425,6 +19763,37 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If enabled, then the SOAP API is available."
+					}
+				}
+			},
+			"ServerConfig_Mcp": {
+				"type": "object",
+				"description": "Configures the Model Context Protocol (MCP) server embedded in webPDF.\n\nOverride any attribute via the corresponding environment variable or system property (takes precedence over XML values).",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Controls whether the MCP server is started. Defaults to `true` when the `<mcp>` element is present.\n\nThe MCP server is **disabled by default** when no `<mcp>` element is present in `server.xml` and no environment variable is set. Add `<mcp/>` to `server.xml` or set `WEBPDF_MCP_ENABLED=true` to activate the MCP server.\n\nOverride via environment variable `WEBPDF_MCP_ENABLED` or system property `webpdf.mcp.enabled`."
+					},
+					"password": {
+						"type": "string",
+						"default": "",
+						"description": "Password for authenticating MCP's internal REST API calls against webPDF. Used together with `username`.\n\nOverride via environment variable `WEBPDF_MCP_PASSWORD` or system property `webpdf.mcp.password`."
+					},
+					"token": {
+						"type": "string",
+						"default": "",
+						"description": "Bearer token required by clients calling the MCP endpoint (`/{contextPath}/mcp/message`).\n\nWhen set, every request to the MCP endpoint must carry the HTTP header `Authorization: Bearer <token>`. Requests without a valid token are rejected with HTTP 401.\n\nLeave empty to disable MCP endpoint authentication (suitable for trusted private networks or when access is controlled at network level).\n\nOverride via environment variable `WEBPDF_MCP_TOKEN` or system property `webpdf.mcp.token`."
+					},
+					"url": {
+						"type": "string",
+						"default": "",
+						"description": "Overrides the base URL of the webPDF REST API used by the MCP server for internal tool calls (e.g. `http://localhost:8080/webPDF/`).\n\nIf empty, the URL is derived automatically from the active connector and context path.\n\nIn cluster deployments, set this to the load balancer URL (e.g. `http://haproxy-internal/webPDF/`) so that tool executions are distributed across all cluster nodes.\n\nOverride via environment variable `WEBPDF_MCP_URL` or system property `webpdf.mcp.url`."
+					},
+					"username": {
+						"type": "string",
+						"default": "",
+						"description": "Username for authenticating MCP's internal REST API calls against webPDF.\n\nLeave empty for anonymous access (sufficient when webPDF authentication is disabled or when anonymous access to the REST API is permitted).\n\nIn cluster deployments where `url` points to a load balancer with authentication required, set both `username` and `password`.\n\nOverride via environment variable `WEBPDF_MCP_USERNAME` or system property `webpdf.mcp.username`."
 					}
 				}
 			},
@@ -19683,6 +20052,9 @@
 					},
 					"localAuth": {
 						"$ref": "#/components/schemas/ServerConfig_LocalAuth"
+					},
+					"mcp": {
+						"$ref": "#/components/schemas/ServerConfig_Mcp"
 					},
 					"oauth": {
 						"$ref": "#/components/schemas/ServerConfig_OAuth"
@@ -20175,6 +20547,23 @@
 				},
 				"readOnly": true
 			},
+			"Share_RequestOptions": {
+				"type": "object",
+				"description": "Options for creating a shared document URL",
+				"properties": {
+					"expirationTime": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "Seconds before the share link expires. Uses server default if omitted."
+					},
+					"oneTimeUse": {
+						"type": "boolean",
+						"default": false,
+						"description": "If true, the link is invalidated after first download. Uses server default if omitted."
+					}
+				}
+			},
 			"UserConfig_User": {
 				"type": "object",
 				"description": "Defines the attributes of a user.",
@@ -20212,20 +20601,6 @@
 						}
 					}
 				}
-			},
-			"Webservice": {
-				"type": "string",
-				"default": "converter",
-				"description": "Defines the available web services",
-				"enum": [
-					"signature",
-					"pdfa",
-					"toolbox",
-					"converter",
-					"urlconverter",
-					"ocr",
-					"barcode"
-				]
 			},
 			"Webservice_Exception": {
 				"type": "object",

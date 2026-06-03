@@ -3,6 +3,7 @@ import {DocumentManager, RestDocument} from "./documents";
 import {RestWebService, WebServiceType} from "../../webservice";
 import {AxiosProgressEvent, AxiosInstance} from "axios";
 import {AdministrationManager} from "./administration";
+import {UserManager} from "./user";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources";
 
 /**
@@ -56,6 +57,13 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
     getAdministrationManager(): AdministrationManager<T_REST_DOCUMENT>;
 
     /**
+     * Returns the active {@link UserManager} of this {@link RestSession}.
+     *
+     * @return The active {@link UserManager} of this {@link RestSession}.
+     */
+    getUserManager(): UserManager<T_REST_DOCUMENT>;
+
+    /**
      * Returns the {@link UserCredentials} logged in via this {@link RestSession}.
      *
      * @return The {@link UserCredentials} logged in via this {@link RestSession}.
@@ -79,6 +87,8 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
      * @param keyStorePassword The {@link KeyStorePassword} to unlock the certificates with.
      * @return The {@link UserCertificates} of the logged in user in this {@link RestSession}.
      * @throws ResultException Shall be thrown, if the request failed.
+     * @deprecated Use {@link UserManager#updateCertificatePasswords} instead,
+     * accessible via {@link RestSession#getUserManager}.
      */
     updateCertificates(keystoreName: string, keyStorePassword: KeyStorePassword): Promise<UserCertificates | undefined>;
 
@@ -103,6 +113,7 @@ export function instanceOfRestSession(object: any): boolean {
         'getDocumentManager' in object &&
         'uploadDocument' in object &&
         'getAdministrationManager' in object &&
+        'getUserManager' in object &&
         'getUser' in object &&
         'getCertificates' in object &&
         'updateCertificates' in object &&

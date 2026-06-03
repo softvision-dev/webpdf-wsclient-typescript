@@ -7,9 +7,27 @@ import {
 	HistoryEntry,
 	Info,
 	InfoType,
-	PdfPassword
+	PdfPassword,
+	ShareRequestOptions
 } from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
+
+/**
+ * The result of a multipart shared-document download, bundling the parsed document metadata with the binary file data.
+ *
+ * @see DocumentManager#downloadSharedDocument
+ */
+export interface SharedDocumentDownload {
+	/**
+	 * The {@link DocumentFile} metadata parsed from the multipart response.
+	 */
+	documentFile: DocumentFile;
+
+	/**
+	 * The binary file data of the downloaded document.
+	 */
+	data: Buffer;
+}
 
 /**
  * A class implementing {@link DocumentManager} allows to monitor and interact with the {@link RestDocument}s uploaded
@@ -180,6 +198,89 @@ export interface DocumentManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown, should updating the document security have failed.
 	 */
 	updateDocumentSecurity(documentId: string, passwordType: PdfPassword): Promise<T_REST_DOCUMENT>;
+
+	/**
+	 * <p>
+	 * Creates a pre-signed, login-free share URL for the {@link RestDocument} selected by documentId and returns it.
+	 * <ul>
+	 * <li>Anyone who has the returned URL can access the document until the share token expires.</li>
+	 * <li>The validity period and one-time-use behaviour are controlled via the given {@link ShareRequestOptions};
+	 * values left unset fall back to the server defaults.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param documentId The unique documentId of the document in the server´s document storage.
+	 * @param options    The {@link ShareRequestOptions} defining the share link's expiration and one-time-use behaviour.
+	 * @return The pre-signed share URL for the selected document.
+	 * @throws ResultException Shall be thrown, should creating the share URL have failed.
+	 */
+	shareDocument(documentId: string, options: ShareRequestOptions): Promise<string>;
+
+	/**
+	 * <p>
+	 * Uploads the given {@link Blob} to the webPDF server and immediately creates a pre-signed, login-free share URL
+	 * for it in a single call, returning that URL.
+	 * <ul>
+	 * <li>The uploaded document is <b>not</b> added to this {@link DocumentManager}'s document storage: it is placed
+	 * only in a dedicated short-lived share session, is not listed by the regular {@code /documents} API and is removed
+	 * automatically once the share link expires.</li>
+	 * <li>This is the input-side counterpart to {@link #shareDocument}, allowing a (potentially large) file to be
+	 * referenced by its share URL instead of being inlined.</li>
+	 * <li>The validity period and one-time-use behaviour are controlled via the given {@link ShareRequestOptions};
+	 * values left unset fall back to the server defaults.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param data     The document {@link Blob} to upload and share.
+	 * @param fileName The name of the uploaded document.
+	 * @param options  The {@link ShareRequestOptions} defining the share link's expiration and one-time-use behaviour.
+	 * @return The pre-signed share URL for the uploaded document.
+	 * @throws ResultException Shall be thrown, should the upload or creating the share URL have failed.
+	 */
+	uploadAndShare(data: Blob, fileName: string, options: ShareRequestOptions): Promise<string>;
+
+	/**
+	 * <p>
+	 * Downloads a document via a pre-signed, login-free share URL (as returned by {@link #shareDocument}) and returns
+	 * the raw file bytes.
+	 * </p>
+	 * <p>
+	 * This requests the {@code application/octet-stream} representation. As the share URL is self-contained, the
+	 * download does not require an authenticated session.
+	 * </p>
+	 *
+	 * @param shareUrl The pre-signed share URL of the document to download.
+	 * @return The {@link Buffer} of the downloaded document.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	downloadSharedDocument(shareUrl: string): Promise<Buffer>;
+
+	/**
+	 * Downloads a document via a pre-signed, login-free share URL and returns the raw file bytes.
+	 *
+	 * @param shareUrl     The pre-signed share URL of the document to download.
+	 * @param withMetadata {@code false} to request the raw {@code application/octet-stream} representation.
+	 * @return The {@link Buffer} of the downloaded document.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	downloadSharedDocument(shareUrl: string, withMetadata: false): Promise<Buffer>;
+
+	/**
+	 * <p>
+	 * Downloads a document via a pre-signed, login-free share URL (as returned by {@link #shareDocument}) and returns
+	 * both the binary file data and the parsed {@link DocumentFile} metadata.
+	 * </p>
+	 * <p>
+	 * This requests the {@code multipart/mixed} representation and parses the document metadata from the response. As
+	 * the share URL is self-contained, the download does not require an authenticated session.
+	 * </p>
+	 *
+	 * @param shareUrl     The pre-signed share URL of the document to download.
+	 * @param withMetadata {@code true} to request the multipart representation and return the document metadata.
+	 * @return The {@link SharedDocumentDownload} bundling document metadata and binary file data.
+	 * @throws ResultException Shall be thrown, should the download have failed.
+	 */
+	downloadSharedDocument(shareUrl: string, withMetadata: true): Promise<SharedDocumentDownload>;
 
 	/**
 	 * Returns information about the document selected by documentId in the document storage.

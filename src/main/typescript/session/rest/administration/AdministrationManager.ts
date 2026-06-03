@@ -3,7 +3,6 @@ import {RestDocument} from "../documents";
 import {AxiosProgressEvent} from "axios";
 import {HttpRestRequest} from "../../connection";
 import {
-	AggregationServerState,
 	Application,
 	ApplicationCheck,
 	ClusterCheck,
@@ -11,10 +10,10 @@ import {
 	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
-	DataSourceServerState,
 	ExecutableName,
 	FileDataStore,
 	FileGroupDataStore,
+	Formats,
 	GlobalKeyStore,
 	LogCheck,
 	LogFileConfiguration,
@@ -24,12 +23,11 @@ import {
 	ServerCheck,
 	ServerStatus,
 	SessionTable,
-	Statistic,
 	SupportEntryGroup,
+	TimeSeries,
 	TrustStoreKeyStore,
 	UserCheck,
-	Users,
-	Webservice
+	Users
 } from "../../../generated-sources";
 
 /**
@@ -452,26 +450,29 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 
 	/**
 	 * <p>
-	 * <b>(Experimental Web service)</b>
-	 * </p>
-	 * <p>
-	 * Reads statistic information from the server for Web services and file formats.
+	 * Reads time-bucketed job statistics per webservice for a fixed rolling window from the server.
 	 * </p>
 	 *
-	 * @param dataSource  Data source from which the data is read.
-	 * @param aggregation Aggregation mode for the retrieved data.
-	 * @param webservices List of webservice names from which the data should be retrieved.
-	 * @param start 	  Start date for the data, formatted as ISO-8601 extended offset (zoned based) date-time
-	 * 					  format.
-	 * @param end 		  End date for the data, formatted as ISO-8601 extended offset (zoned based) date-time
-	 * 					  format.
-	 * @return The requested {@link Statistic}.
+	 * @param services The webservice names (lowercase, e.g. converter, pdfa, toolbox, signature, ocr, barcode,
+	 * 				   urlconverter) the statistics shall be read for. An empty {@link Array} selects all webservices.
+	 * @param window   The rolling window to read (one of 1h, 6h, 12h, 24h, 72h, 168h, 720h). undefined or empty uses
+	 * 				   the server default (24h).
+	 * @return The requested {@link TimeSeries}.
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
-	fetchServerStatistic(
-		dataSource: DataSourceServerState, aggregation: AggregationServerState,
-		webservices: Array<Webservice>, start: Date, end: Date
-	): Promise<Statistic>;
+	fetchTimeSeries(services: Array<string>, window?: string): Promise<TimeSeries>;
+
+	/**
+	 * <p>
+	 * Reads cumulative job statistics per source file format and webservice from the server.
+	 * </p>
+	 *
+	 * @param services The webservice names (lowercase, e.g. converter, pdfa) the statistics shall be read for.
+	 * 				   An empty {@link Array} selects all webservices.
+	 * @return The requested {@link Formats}.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	fetchFormats(services: Array<string>): Promise<Formats>;
 
 	/**
 	 * Returns the session table from server with detailed status information about each session.
@@ -603,4 +604,12 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown, if the request failed.
 	 */
 	fetchClusterStatus(): Promise<ClusterStatus>;
+
+	/**
+	 * Fetches the Prometheus metrics from the server in text exposition format.
+	 *
+	 * @return The Prometheus metrics as a plain-text string.
+	 * @throws ResultException Shall be thrown if the request failed.
+	 */
+	fetchMetrics(): Promise<string>;
 }

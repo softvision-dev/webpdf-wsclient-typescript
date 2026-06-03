@@ -700,6 +700,11 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect(user.isUser, "User should be user.").to.be.true;
 		expect(user.isAdmin, "User should not be admin.").to.not.be.true;
 		expect(user.userName, "Username should be empty.").to.be.empty;
+
+		let freshInfo: UserCredentials = await session.getUserManager().fetchUserInfo();
+		expect(freshInfo, "fetchUserInfo should not return null.").to.exist;
+		expect(freshInfo.userName, "fetchUserInfo username should match cached getUser.").to.equal(user.userName);
+		expect(freshInfo.isAdmin, "fetchUserInfo admin flag should match cached getUser.").to.equal(user.isAdmin);
 		await session.close();
 
 		// User
@@ -713,6 +718,11 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect(user.isUser, "User should be user.").to.be.true;
 		expect(user.isAdmin, "User should not be admin.").to.not.be.true;
 		expect(user.userName, "Username should be user.").to.equal(testServer.getLocalUserName());
+
+		let freshUserInfo: UserCredentials = await session.getUserManager().fetchUserInfo();
+		expect(freshUserInfo, "fetchUserInfo should not return null.").to.exist;
+		expect(freshUserInfo.userName, "fetchUserInfo username should match cached getUser.").to.equal(user.userName);
+		expect(freshUserInfo.isAdmin, "fetchUserInfo should confirm user is not admin.").to.not.be.true;
 		await session.close();
 
 		// Admin
@@ -726,6 +736,11 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		expect(user.isUser, "User should be user.").to.be.true;
 		expect(user.isAdmin, "User should be admin.").to.be.true;
 		expect(user.userName, "Username should be admin.").to.equal(testServer.getLocalAdminName());
+
+		let freshAdminInfo: UserCredentials = await session.getUserManager().fetchUserInfo();
+		expect(freshAdminInfo, "fetchUserInfo should not return null.").to.exist;
+		expect(freshAdminInfo.userName, "fetchUserInfo username should match cached getUser.").to.equal(user.userName);
+		expect(freshAdminInfo.isAdmin, "fetchUserInfo should confirm user is admin.").to.be.true;
 		await session.close();
 	});
 });

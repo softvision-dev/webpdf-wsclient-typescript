@@ -1,7 +1,7 @@
 import {AbstractDocument} from "../../documents";
 import {RestDocument} from "./RestDocument";
 import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState";
-import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword} from "../../../generated-sources";
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources";
 import {AxiosProgressEvent} from "axios";
 
 /**
@@ -124,6 +124,13 @@ export class RestWebServiceDocument extends AbstractDocument implements RestDocu
 		return await this.accessInternalState().getDocumentManager().updateDocumentSecurity(
 			this.getDocumentId(), passwordType
 		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async shareDocument(options: ShareRequestOptions): Promise<string> {
+		return await this.accessInternalState().getDocumentManager().shareDocument(this.getDocumentId(), options);
 	}
 
 	/**

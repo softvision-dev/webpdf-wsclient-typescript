@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
 import {
 	AuthMaterial,
+	ClientResultException,
 	RestDocument,
 	RestSession,
 	SessionContext,
@@ -10,7 +11,6 @@ import {
 	WebServiceProtocol
 } from "../../main/typescript";
 import {
-	AggregationServerState,
 	Application,
 	ApplicationCheck,
 	ApplicationCheckMode,
@@ -23,9 +23,9 @@ import {
 	ClusterStatus,
 	ConfigurationResult,
 	ConnectorKeyStore,
-	DataSourceServerState,
 	ExecutableName,
 	FileGroupDataStore,
+	Formats,
 	GlobalKeyStore,
 	GlobalKeystoreFormat,
 	KeystoreSSL,
@@ -37,7 +37,7 @@ import {
 	ServerStatus,
 	SessionTable,
 	SSLKeystoreFormat,
-	Statistic,
+	TimeSeries,
 	TrustStoreKeyStore,
 	TrustStoreKeyStoreInterface,
 	TruststoreServer,
@@ -47,7 +47,6 @@ import {
 	TsaInterface,
 	User,
 	Users,
-	Webservice,
 	WebserviceStatus
 } from "../../main/typescript/generated-sources";
 import {it, suite} from "mocha";
@@ -107,6 +106,41 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		}
 
 		await session.close();
+	});
+
+	it('testFetchMetrics', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		// Non-admin users must not access metrics
+		let userSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+
+		let thrown: any;
+		try {
+			await userSession.getAdministrationManager().fetchMetrics();
+		} catch (ex: any) {
+			thrown = ex;
+		}
+		expect(thrown, "Metrics should not be accessible by a non-admin user").to.be.instanceOf(ClientResultException);
+
+		await userSession.close();
+
+		// Admin can access metrics
+		let adminSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		let metrics: string = await adminSession.getAdministrationManager().fetchMetrics();
+		expect(metrics, "Metrics should not be null.").to.exist;
+		expect(metrics.length, "Metrics response should not be empty.").to.be.greaterThan(0);
+
+		await adminSession.close();
 	});
 
 	it('testUserConfig', async function (): Promise<void> {
@@ -654,21 +688,48 @@ suite("RestAdministrationIntegrationTest", function (): void {
 			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
 		);
 
-		let currentDate: Date = new Date();
-		let yesterday: Date = new Date();
-		yesterday.setDate(currentDate.getDate() - 1);
-
 		try {
-			let result: Statistic = await session.getAdministrationManager().fetchServerStatistic(
-				DataSourceServerState.Realtime, AggregationServerState.Month,
-				[Webservice.Converter], yesterday, currentDate
-			);
+			let services: Array<string> = ["converter"];
 
-			expect(result, "There should be statistics").to.exist;
-			expect(result.data?.converter, "There should be converter data").to.exist;
+			let timeSeries: TimeSeries = await session.getAdministrationManager().fetchTimeSeries(services, "24h");
+			expect(timeSeries, "There should be time-series statistics").to.exist;
+			expect(timeSeries.series, "There should be a time-series series list").to.exist;
+
+			let formats: Formats = await session.getAdministrationManager().fetchFormats(services);
+			expect(formats, "There should be per-format statistics").to.exist;
+			expect(formats.series, "There should be a per-format series list").to.exist;
 		} catch (ex: any) {
 			expect(ex, "The server request did not work").to.be.undefined;
 		}
+
+		await session.close();
+	});
+
+	it('testSessionTimeout', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let requestedTimeout: number = 60;
+		let authProvider: UserAuthProvider = new UserAuthProvider(
+			testServer.getLocalAdminName(), testServer.getLocalAdminPassword()
+		);
+		authProvider.setSessionTimeout(requestedTimeout);
+		expect(authProvider.getSessionTimeout(), "The requested session timeout should be stored on the provider.")
+			.to.equal(requestedTimeout);
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			authProvider
+		);
+
+		let authMaterial: AuthMaterial = await session.getAuthProvider().provide(session);
+		let jwtToken: any = JSON.parse(atob(authMaterial.getToken().split(".")[1]));
+		let lifetime: number = jwtToken.exp - jwtToken.iat;
+		expect(lifetime, "The token lifetime should be positive.").to.be.greaterThan(0);
+		expect(lifetime, "The token lifetime should be capped to the requested session timeout.")
+			.to.be.at.most(requestedTimeout + 5);
 
 		await session.close();
 	});
