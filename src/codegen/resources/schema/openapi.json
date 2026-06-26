@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-06-02T13:54:40Z)"
+		"version": "webPDF 11.0.0 (2026-06-17T09:59:54Z)"
 	},
 	"servers": [
 		{
@@ -2831,6 +2831,43 @@
 					"urlconverter"
 				]
 			}
+		},
+		"/viewer/{tenantId}/profile": {
+			"get": {
+				"description": "Provides profile for tenant",
+				"operationId": "readProfile",
+				"parameters": [
+					{
+						"description": "The group of datastore files to search for the file.",
+						"in": "path",
+						"name": "tenantId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"default": "generic"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Profile"
+								}
+							}
+						},
+						"description": "Profile request was successful"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"summary": "Provides profile for tenant"
+			}
 		}
 	},
 	"components": {
@@ -4741,7 +4778,7 @@
 					},
 					"preset": {
 						"type": "string",
-						"default": "",
+						"default": "custom",
 						"description": "Predefined metric configuration presets optimized for different deployment environments.\n\nPresets provide sensible defaults that can be overridden by explicit element configurations.",
 						"enum": [
 							"production",
@@ -10736,6 +10773,9 @@
 					"mail": {
 						"$ref": "#/components/schemas/Operation_ConverterMail"
 					},
+					"markdown": {
+						"$ref": "#/components/schemas/Operation_ConverterMarkdown"
+					},
 					"maxRecursion": {
 						"type": "integer",
 						"format": "int32",
@@ -10988,6 +11028,34 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If \"true\", then a background defined in the e-mail (in the HTML content) is also output in the PDF document. If \"false\", the background will be hidden."
+					}
+				}
+			},
+			"Operation_ConverterMarkdown": {
+				"type": "object",
+				"description": "Defines basic settings used when converting Markdown documents (text/markdown) to PDF. All attributes are optional and override the built-in defaults; unset attributes keep the default appearance. Font sizes are given in points. This is intentionally a basic set; further styling options (colors, spacing, toggles) are planned as additive extensions.",
+				"properties": {
+					"bodyFont": {
+						"type": "string",
+						"default": "",
+						"description": "Font family used for the main body text (and headings). If empty, the converter's configured default font is used."
+					},
+					"bodyFontSize": {
+						"type": "number",
+						"format": "float",
+						"default": 11,
+						"description": "Font size in points for body text."
+					},
+					"codeFontSize": {
+						"type": "number",
+						"format": "float",
+						"default": 10,
+						"description": "Font size in points for inline code and code blocks."
+					},
+					"monospaceFont": {
+						"type": "string",
+						"default": "",
+						"description": "Font family used for code. If empty, the built-in monospace base font is used."
 					}
 				}
 			},
@@ -19256,6 +19324,23 @@
 					"azure_ad"
 				]
 			},
+			"Profile": {
+				"type": "object",
+				"description": "Tenant profile containing viewer configuration options",
+				"properties": {
+					"tenantId": {
+						"type": "string",
+						"default": "",
+						"description": "Identifier of the tenant"
+					},
+					"userOptions": {
+						"$ref": "#/components/schemas/UserProfileOptions"
+					},
+					"viewerOptions": {
+						"$ref": "#/components/schemas/ViewerProfileOptions"
+					}
+				}
+			},
 			"Provider_ProviderEntry": {
 				"type": "object",
 				"properties": {
@@ -20599,6 +20684,100 @@
 						"items": {
 							"$ref": "#/components/schemas/UserConfig_User"
 						}
+					}
+				}
+			},
+			"UserProfileOptions": {
+				"type": "object",
+				"description": "User preference options for this tenant",
+				"properties": {
+					"darkmode": {
+						"type": "string",
+						"default": ""
+					},
+					"disableCloseConfirmation": {
+						"type": "boolean",
+						"default": false
+					},
+					"language": {
+						"type": "string",
+						"default": ""
+					},
+					"lengthUnit": {
+						"type": "string",
+						"default": ""
+					}
+				}
+			},
+			"ViewerProfileOptions": {
+				"type": "object",
+				"description": "Configurable viewer options for this tenant",
+				"properties": {
+					"continuous": {
+						"type": "boolean",
+						"default": false
+					},
+					"mouseMode": {
+						"type": "string",
+						"default": ""
+					},
+					"pageCover": {
+						"type": "boolean",
+						"default": false
+					},
+					"pageMode": {
+						"type": "string",
+						"default": ""
+					},
+					"pagePadding": {
+						"type": "boolean",
+						"default": false
+					},
+					"preview": {
+						"type": "boolean",
+						"default": false
+					},
+					"resolution": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0
+					},
+					"showControls": {
+						"type": "boolean",
+						"default": false
+					},
+					"showRuler": {
+						"type": "boolean",
+						"default": false
+					},
+					"sidebarLeftMode": {
+						"type": "string",
+						"default": ""
+					},
+					"sidebarRightMode": {
+						"type": "string",
+						"default": ""
+					},
+					"textWrap": {
+						"type": "boolean",
+						"default": false
+					},
+					"viewAsHTML": {
+						"type": "boolean",
+						"default": false
+					},
+					"viewAsMarkdown": {
+						"type": "boolean",
+						"default": false
+					},
+					"zoomMode": {
+						"type": "string",
+						"default": ""
+					},
+					"zoomValue": {
+						"type": "number",
+						"format": "double",
+						"default": 0
 					}
 				}
 			},

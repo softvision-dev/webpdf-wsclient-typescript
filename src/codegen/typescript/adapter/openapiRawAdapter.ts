@@ -497,7 +497,12 @@ function transformToClassModel(
 			const returnType: string = tsTypeFor(schemaProp.type);
 			if (returnType === "number" || returnType === "boolean" || returnType === "string") {
 				const defVal: string = serializeSchemaDefault(schemaProp.default, schemaProp.type);
-				staticMethods.push(`\tpublic static get${capName}Default(): ${returnType} { return ${defVal}; }`);
+				// Use prop.typeStr (the actual TS type) as the return type so that enum properties
+				// (e.g. DocMdp, MetadataFormsFormat) yield their enum type, not a bare "string".
+				// Mirrors the castSuffix logic in the constructor assignments.
+				const actualReturnType: string = prop.typeStr !== returnType ? prop.typeStr : returnType;
+				const castSuffix: string = prop.typeStr !== returnType ? ` as ${prop.typeStr}` : "";
+				staticMethods.push(`\tpublic static get${capName}Default(): ${actualReturnType} { return ${defVal}${castSuffix}; }`);
 			}
 		}
 		// Array-typed properties get a getXxxDefault() returning [] so consumers can
@@ -1984,6 +1989,27 @@ function materializeRawModels(rootDir: string, rawModelsDir: string, descriptors
 			discriminatorSubtypes.add(resolveRefClassName(ref));
 		}
 	}
+	// Object-union schema classes (type: object + oneOf, e.g. ActionEvent / DestinationEvent / BaseToolbox)
+	// receive a generated class with a dispatching fromJson() (see injectObjectUnionFromJsonDispatch), but are
+	// NOT "interface" descriptors. They must still count as hydratable so that properties — and especially
+	// Array<Union> properties (e.g. Item.actions: Array<ActionEvent>) — are reconstructed element-wise via
+	// fromJson() instead of being raw-assigned. Without this, a fromJson(toJson()) round-trip does not re-run
+	// the union dispatch, so consumer/extension fields added by clients that extend the base models (Portal
+	// adds e.g. `type` / `operation`) survive into the server request and are rejected as unknown fields.
+	const objectUnionClassNames: Set<string> = new Set<string>();
+	for (const [className, schema] of schemaByClass.entries()) {
+		if (schema["type"] === "object" && Array.isArray(schema["oneOf"])) {
+			objectUnionClassNames.add(className);
+		}
+	}
+	// The set of classes that expose a runtime fromJson()/toJson() and may therefore be hydrated on nested
+	// properties: interface-derived classes, discriminator subtypes (kept as classes for dispatch) and the
+	// object-union classes above. Plain type aliases are intentionally excluded (they have no fromJson()).
+	const hydratableClassNames: Set<string> = new Set<string>([
+		...interfaceClassNames,
+		...discriminatorSubtypes,
+		...objectUnionClassNames,
+	]);
 	const writtenExports: string[] = [];
 	const exportedSymbolsByPath: Map<string, string[]> = new Map<string, string[]>();
 	const rawWithoutSchemaTarget: string[] = [];
@@ -2063,7 +2089,7 @@ function materializeRawModels(rootDir: string, rawModelsDir: string, descriptors
 			: typeAliasTransformedContent;
 		const constEnumObjectCleaned: string = removeConstEnumObjectDeclarations(unionDispatchContent);
 		const classTransformedContent: string = descriptor.kind === "interface"
-			? transformToClassModel(constEnumObjectCleaned, expectedName, schemaModelMetaMap.get(expectedName), interfaceClassNames)
+			? transformToClassModel(constEnumObjectCleaned, expectedName, schemaModelMetaMap.get(expectedName), hydratableClassNames)
 			: constEnumObjectCleaned;
 		// Pass rawToExpected so import paths that still carry raw symbol names (e.g.
 		// ./OperationToolboxMergeMerge) are resolved to their correct adapter targets.
