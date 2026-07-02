@@ -42,8 +42,11 @@ import {
 	UserConfiguration,
 	UserConfigurationInterface,
 	UserCredentials,
-	Users
+	Users,
+	ViewerProfile,
+	ViewerProfileSummary
 } from "../../../generated-sources";
+import {wsclientConfiguration} from "../../../configuration";
 import {DataFormats} from "../../DataFormat";
 import {ClientResultException, WsclientErrors} from "../../../exception";
 import {AdministrationManager} from "./AdministrationManager";
@@ -1345,5 +1348,119 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			.buildRequest(HttpMethod.GET, metricsUrl);
 
 		return await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async fetchViewerProfiles(): Promise<Array<ViewerProfileSummary>> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/viewer/profiles"));
+
+		let profiles: Array<any> = await request.executeRequest();
+
+		return (Array.isArray(profiles) ? profiles : []).map(
+			(profile: any): ViewerProfileSummary => ViewerProfileSummary.fromJson(profile)
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async fetchViewerProfile(id: string): Promise<ViewerProfile> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/viewer/profiles/" + encodeURIComponent(id)));
+
+		return ViewerProfile.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async createViewerProfile(profile: ViewerProfile): Promise<ViewerProfile> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/viewer/profiles"),
+				this.prepareHttpEntity(profile),
+				DataFormats.JSON.getMimeType()
+			);
+
+		return ViewerProfile.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async updateViewerProfile(id: string, profile: ViewerProfile): Promise<ViewerProfile> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.PUT,
+				this.session.getURL("admin/viewer/profiles/" + encodeURIComponent(id)),
+				this.prepareHttpEntity(profile),
+				DataFormats.JSON.getMimeType()
+			);
+
+		return ViewerProfile.fromJson(await request.executeRequest());
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async deleteViewerProfile(id: string): Promise<void> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.DELETE, this.session.getURL("admin/viewer/profiles/" + encodeURIComponent(id)));
+
+		await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async uploadViewerProfileAsset(id: string, name: string, data: Blob): Promise<void> {
+		await this.validateUser();
+
+		let formData: FormData = new wsclientConfiguration.FormData();
+		formData.append("filedata", data as any, name);
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL(
+					"admin/viewer/profiles/" + encodeURIComponent(id)
+					+ "/assets/" + encodeURIComponent(name)
+				),
+				formData
+			);
+
+		await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async deleteViewerProfileAsset(id: string, name: string): Promise<void> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.DELETE,
+				this.session.getURL(
+					"admin/viewer/profiles/" + encodeURIComponent(id)
+					+ "/assets/" + encodeURIComponent(name)
+				)
+			);
+
+		await request.executeRequest();
 	}
 }

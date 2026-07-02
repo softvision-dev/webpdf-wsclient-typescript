@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-06-17T09:59:54Z)"
+		"version": "webPDF 11.0.0 (2026-07-03T06:42:07Z)"
 	},
 	"servers": [
 		{
@@ -861,6 +861,44 @@
 				]
 			}
 		},
+		"/admin/session/{sessionId}/revoke": {
+			"post": {
+				"description": "Revokes every currently valid access and refresh token of the specified session. Any subsequent request that presents one of these tokens is rejected, even if the token has not yet expired.",
+				"operationId": "revokeSessionTokens",
+				"parameters": [
+					{
+						"description": "ID of the session whose tokens are revoked.",
+						"in": "path",
+						"name": "sessionId",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"default": ""
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Session tokens successfully revoked"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Revokes all tokens of the session with the specified ID",
+				"tags": [
+					"administration"
+				]
+			}
+		},
 		"/admin/timeseries": {
 			"get": {
 				"description": "Reads time-bucketed job statistics per webservice for a fixed rolling window.",
@@ -913,6 +951,467 @@
 					}
 				],
 				"summary": "Reads historical job statistics",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/tokens": {
+			"get": {
+				"description": "Returns the entries tracked by the server-side token registry. Use the 'status' query parameter to select revoked tokens (denylist) or allowlisted tokens. Active sessions are listed via '/admin/session/table'.",
+				"operationId": "listRegistryTokens",
+				"parameters": [
+					{
+						"description": "Which registry entries to list.",
+						"in": "query",
+						"name": "status",
+						"schema": {
+							"type": "string",
+							"default": "revoked"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/TokenInfo"
+									}
+								}
+							}
+						},
+						"description": "Token registry entries of the requested status."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Lists token registry entries",
+				"tags": [
+					"administration"
+				]
+			},
+			"post": {
+				"description": "Issues a long-lived or permanent access token (PAT) for headless clients. The token authenticates REST calls via 'Authorization: Bearer <token>' without a login/logout round-trip, is restricted to the requested web-service scopes and never has the admin role. The raw token is returned once only and is not retrievable later. Permanent tokens require the server policy to allow them. Revoke via 'DELETE /admin/tokens/{jti}'.",
+				"operationId": "issueToken",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Token_PatRequest"
+							}
+						}
+					},
+					"description": "Settings for the token to issue.",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Token_PatResponse"
+								}
+							}
+						},
+						"description": "Token successfully issued; the raw token is included in the response and returned only once."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Issues a Personal/Service Access Token (PAT)",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/tokens/{jti}": {
+			"delete": {
+				"description": "Revokes the token with the specified 'jti'. An allowlisted permanent token is removed; any other token id is added to the revocation denylist. A subsequent request presenting this token is rejected, even if it has not yet expired. The 'jti' must be known (e.g. from an audit log); active tokens are not enumerable by design.",
+				"operationId": "revokeTokenById",
+				"parameters": [
+					{
+						"description": "Identifier (jti) of the token to revoke.",
+						"in": "path",
+						"name": "jti",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"default": ""
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Token successfully revoked"
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Revokes a single token by its id (jti)",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/viewer/profiles": {
+			"get": {
+				"description": "Returns a compact summary (id, name, enabled) of every stored viewer tenant profile. The full profile, including its security allowlists, is fetched per id via 'GET /admin/viewer/profiles/{id}'.",
+				"operationId": "listViewerProfiles",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/ViewerProfileSummary"
+									}
+								}
+							}
+						},
+						"description": "Summaries of all stored viewer profiles."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Lists all viewer tenant profiles",
+				"tags": [
+					"administration"
+				]
+			},
+			"post": {
+				"description": "Creates a new viewer tenant profile. The id is taken from the request body and must be a non-empty, filesystem-safe id ([A-Za-z0-9._-]). Returns HTTP 400 for a missing or invalid id and HTTP 409 if a profile with the id already exists.",
+				"operationId": "createViewerProfile",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ViewerProfile"
+							}
+						}
+					},
+					"description": "The viewer tenant profile to create.",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ViewerProfile"
+								}
+							}
+						},
+						"description": "The created viewer tenant profile."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"409": {
+						"description": "A profile with the given id already exists."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Creates a viewer tenant profile",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/viewer/profiles/{id}": {
+			"delete": {
+				"description": "Deletes the viewer tenant profile (including its assets) with the given id. Returns HTTP 404 if no profile with the id exists.",
+				"operationId": "deleteViewerProfile",
+				"parameters": [
+					{
+						"description": "The id of the viewer tenant profile to delete.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The profile has been deleted."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "No profile with the given id exists."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Deletes a viewer tenant profile",
+				"tags": [
+					"administration"
+				]
+			},
+			"get": {
+				"description": "Returns the full viewer tenant profile for the given id, including the server-internal security allowlists (admin-only). Returns HTTP 404 if no profile with the id exists.",
+				"operationId": "readViewerProfile",
+				"parameters": [
+					{
+						"description": "The id of the viewer tenant profile.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ViewerProfile"
+								}
+							}
+						},
+						"description": "The full viewer tenant profile."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "No profile with the given id exists."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Reads a single viewer tenant profile",
+				"tags": [
+					"administration"
+				]
+			},
+			"put": {
+				"description": "Replaces the viewer tenant profile with the given id. The id in the path is authoritative and overrides any id in the body. Returns HTTP 404 if no profile with the id exists.",
+				"operationId": "updateViewerProfile",
+				"parameters": [
+					{
+						"description": "The id of the viewer tenant profile to replace.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ViewerProfile"
+							}
+						}
+					},
+					"description": "The new viewer tenant profile content.",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ViewerProfile"
+								}
+							}
+						},
+						"description": "The updated viewer tenant profile."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "No profile with the given id exists."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Updates a viewer tenant profile",
+				"tags": [
+					"administration"
+				]
+			}
+		},
+		"/admin/viewer/profiles/{id}/assets/{name}": {
+			"delete": {
+				"description": "Deletes a single asset file of the viewer tenant profile with the given id. The asset name is resolved inside the profile folder with a strict path-containment check. Returns HTTP 404 if the profile or the asset does not exist.",
+				"operationId": "deleteViewerProfileAsset",
+				"parameters": [
+					{
+						"description": "The id of the viewer tenant profile.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The profile-relative asset file name.",
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The asset has been deleted."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "The profile or the asset does not exist."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Deletes a viewer profile asset",
+				"tags": [
+					"administration"
+				]
+			},
+			"post": {
+				"description": "Uploads (or replaces) an asset file (logo, custom CSS, font, …) of the viewer tenant profile with the given id. The asset name is resolved inside the profile folder with a strict path-containment check. Returns HTTP 404 if the profile does not exist and HTTP 400 for an unsafe asset name or missing data.",
+				"operationId": "uploadViewerProfileAsset",
+				"parameters": [
+					{
+						"description": "The id of the viewer tenant profile.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The profile-relative asset file name.",
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"filedata": {
+										"type": "string",
+										"format": "binary",
+										"description": "The asset file, as binary data bytes."
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The asset has been stored."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "No profile with the given id exists."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Uploads a viewer profile asset",
 				"tags": [
 					"administration"
 				]
@@ -2832,19 +3331,74 @@
 				]
 			}
 		},
-		"/viewer/{tenantId}/profile": {
+		"/viewer/{tenantId}/assets/{name}": {
 			"get": {
-				"description": "Provides profile for tenant",
-				"operationId": "readProfile",
+				"description": "Streams an asset file (logo, custom CSS, font, …) of the tenant's viewer profile. The asset name is resolved inside the profile folder with a strict path-containment check; a missing or rejected asset returns HTTP 404. The response is cacheable and carries an ETag (If-None-Match / HTTP 304). The endpoint is public and requires no authentication.",
+				"operationId": "readViewerAsset",
 				"parameters": [
 					{
-						"description": "The group of datastore files to search for the file.",
+						"description": "Identifier of the viewer tenant profile to resolve. An unknown or empty value resolves to the default profile.",
 						"in": "path",
 						"name": "tenantId",
 						"required": true,
 						"schema": {
-							"type": "string",
-							"default": "generic"
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/octet-stream": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						},
+						"description": "The asset file content."
+					},
+					"304": {
+						"description": "The asset is unchanged (matching If-None-Match / ETag)."
+					},
+					"404": {
+						"description": "The requested asset does not exist or was rejected."
+					}
+				},
+				"summary": "Provides a viewer profile asset for a tenant",
+				"tags": [
+					"portal"
+				]
+			}
+		},
+		"/viewer/{tenantId}/external": {
+			"get": {
+				"description": "Validates an external document URL the hosted viewer wants to load, given base64url-encoded in the 'target' query parameter. Only https URLs whose host is on the tenant's external URL allowlist are accepted; the server validates only and never fetches the target. An empty or unset allowlist denies every target. The endpoint is public and requires no authentication.",
+				"operationId": "validateExternalDocument",
+				"parameters": [
+					{
+						"description": "Identifier of the viewer tenant profile to resolve. An unknown or empty value resolves to the default profile.",
+						"in": "path",
+						"name": "tenantId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The external document URL, base64url-encoded (URL-safe, padding tolerated).",
+						"in": "query",
+						"name": "target",
+						"schema": {
+							"type": "string"
 						}
 					}
 				],
@@ -2853,20 +3407,62 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/Profile"
+									"$ref": "#/components/schemas/Viewer_ExternalDocument"
 								}
 							}
 						},
-						"description": "Profile request was successful"
+						"description": "The validated external document URL."
+					},
+					"400": {
+						"description": "The target is missing, not decodable, not an https URL or has no host."
+					},
+					"403": {
+						"description": "The target host is not allowlisted for the tenant."
+					}
+				},
+				"summary": "Validates an external document URL for a tenant",
+				"tags": [
+					"portal"
+				]
+			}
+		},
+		"/viewer/{tenantId}/profile": {
+			"get": {
+				"description": "Returns the public, allowlisted viewer profile for the given tenant. An unknown or empty tenant id resolves to the default profile, so this endpoint always returns a profile (HTTP 200) and never 404. The response is cacheable and carries an ETag; clients may revalidate with If-None-Match (HTTP 304). The endpoint is public and requires no authentication.",
+				"operationId": "readProfile",
+				"parameters": [
+					{
+						"description": "Identifier of the viewer tenant profile to resolve. An unknown or empty value resolves to the default profile.",
+						"in": "path",
+						"name": "tenantId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ViewerProfilePublicView"
+								}
+							}
+						},
+						"description": "The resolved public viewer profile."
+					},
+					"304": {
+						"description": "The profile is unchanged (matching If-None-Match / ETag)."
 					},
 					"400": {
 						"$ref": "#/components/responses/400BadRequest"
-					},
-					"401": {
-						"$ref": "#/components/responses/401Unauthorized"
 					}
 				},
-				"summary": "Provides profile for tenant"
+				"summary": "Provides the public viewer profile for a tenant",
+				"tags": [
+					"portal"
+				]
 			}
 		}
 	},
@@ -6947,6 +7543,9 @@
 					"default",
 					"html"
 				]
+			},
+			"JsonNode": {
+				"type": "object"
 			},
 			"KeyStore_Entry": {
 				"type": "object",
@@ -11061,10 +11660,37 @@
 			},
 			"Operation_ConverterOffice": {
 				"type": "object",
-				"description": "Defines the settings to be used when converting Office documents (e.g., docx documents).\n\n**Important:** Currently only the integrated Word document converter for docx files is supported",
+				"description": "Defines the settings to be used when converting Office documents (e.g., docx, xlsx, and pptx documents).\n\n**Important:** The integrated Office converters currently handle Word documents (docx), Excel workbooks (xlsx), and PowerPoint presentations (pptx). Other Office formats are processed by the Office bridge or by Outside In.",
 				"properties": {
+					"excel": {
+						"$ref": "#/components/schemas/Operation_ConverterOfficeExcel"
+					},
+					"powerpoint": {
+						"$ref": "#/components/schemas/Operation_ConverterOfficePowerPoint"
+					},
 					"word": {
 						"$ref": "#/components/schemas/Operation_ConverterOfficeWord"
+					}
+				}
+			},
+			"Operation_ConverterOfficeExcel": {
+				"type": "object",
+				"description": "Defines the settings to be used when converting Excel (xlsx) workbooks with the integrated Excel converter. All attributes are optional and override the built-in defaults; unset attributes keep the default behavior. This is intentionally a basic set; further options are planned as additive extensions.",
+				"properties": {
+					"plotterMode": {
+						"type": "string",
+						"default": "fitContent",
+						"description": "Selects the strategy for fitting worksheet content onto PDF pages during xlsx conversion.",
+						"enum": [
+							"fitContent",
+							"fitRows",
+							"fitColumns",
+							"expandPage",
+							"plotTable"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_ConverterOfficeExcelPlotterMode"
+						}
 					}
 				}
 			},
@@ -11076,6 +11702,17 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If \"true,\" content elements that define forms are converted into an AcroForm. Otherwise, the elements are converted as normal content."
+					}
+				}
+			},
+			"Operation_ConverterOfficePowerPoint": {
+				"type": "object",
+				"description": "Defines the settings to be used when converting PowerPoint (pptx) presentations with the integrated PowerPoint converter. All attributes are optional and override the built-in defaults; unset attributes keep the default behavior.",
+				"properties": {
+					"renderNotes": {
+						"type": "boolean",
+						"default": false,
+						"description": "If \"true,\" the speaker notes of each slide are rendered as an additional page after the corresponding slide. Otherwise, the speaker notes are omitted."
 					}
 				}
 			},
@@ -19324,23 +19961,6 @@
 					"azure_ad"
 				]
 			},
-			"Profile": {
-				"type": "object",
-				"description": "Tenant profile containing viewer configuration options",
-				"properties": {
-					"tenantId": {
-						"type": "string",
-						"default": "",
-						"description": "Identifier of the tenant"
-					},
-					"userOptions": {
-						"$ref": "#/components/schemas/UserProfileOptions"
-					},
-					"viewerOptions": {
-						"$ref": "#/components/schemas/ViewerProfileOptions"
-					}
-				}
-			},
 			"Provider_ProviderEntry": {
 				"type": "object",
 				"properties": {
@@ -19373,6 +19993,25 @@
 					},
 					"sessionStorage": {
 						"$ref": "#/components/schemas/Provider_ProviderEntry"
+					}
+				}
+			},
+			"PublicBranding": {
+				"type": "object",
+				"properties": {
+					"customCssUrl": {
+						"type": "string",
+						"default": ""
+					},
+					"fonts": {
+						"$ref": "#/components/schemas/JsonNode"
+					},
+					"logoUrl": {
+						"type": "string",
+						"default": ""
+					},
+					"theme": {
+						"$ref": "#/components/schemas/JsonNode"
 					}
 				}
 			},
@@ -19797,6 +20436,9 @@
 					},
 					"refreshToken": {
 						"$ref": "#/components/schemas/ServerConfig_SessionRefreshToken"
+					},
+					"tokenRegistry": {
+						"$ref": "#/components/schemas/ServerConfig_TokenRegistry"
 					}
 				}
 			},
@@ -19853,32 +20495,17 @@
 			},
 			"ServerConfig_Mcp": {
 				"type": "object",
-				"description": "Configures the Model Context Protocol (MCP) server embedded in webPDF.\n\nOverride any attribute via the corresponding environment variable or system property (takes precedence over XML values).",
+				"description": "Configures the Model Context Protocol (MCP) server embedded in webPDF.\n\nAuthentication is **PAT passthrough**: the MCP server holds no credential of its own. Tool execution requires the caller's own Personal/Service Access Token (PAT), sent as `Authorization: Bearer <PAT>`, which is also used for the webPDF REST calls the tools perform; a tool call without a token fails. Capability discovery (listing tools, resources, and prompts) is open and needs no token. Token validity, scope, and revocation are enforced by the webPDF REST API. There is intentionally no server-side MCP token to configure.\n\nOverride any attribute via the corresponding environment variable or system property (takes precedence over XML values).",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
 						"default": true,
 						"description": "Controls whether the MCP server is started. Defaults to `true` when the `<mcp>` element is present.\n\nThe MCP server is **disabled by default** when no `<mcp>` element is present in `server.xml` and no environment variable is set. Add `<mcp/>` to `server.xml` or set `WEBPDF_MCP_ENABLED=true` to activate the MCP server.\n\nOverride via environment variable `WEBPDF_MCP_ENABLED` or system property `webpdf.mcp.enabled`."
 					},
-					"password": {
-						"type": "string",
-						"default": "",
-						"description": "Password for authenticating MCP's internal REST API calls against webPDF. Used together with `username`.\n\nOverride via environment variable `WEBPDF_MCP_PASSWORD` or system property `webpdf.mcp.password`."
-					},
-					"token": {
-						"type": "string",
-						"default": "",
-						"description": "Bearer token required by clients calling the MCP endpoint (`/{contextPath}/mcp/message`).\n\nWhen set, every request to the MCP endpoint must carry the HTTP header `Authorization: Bearer <token>`. Requests without a valid token are rejected with HTTP 401.\n\nLeave empty to disable MCP endpoint authentication (suitable for trusted private networks or when access is controlled at network level).\n\nOverride via environment variable `WEBPDF_MCP_TOKEN` or system property `webpdf.mcp.token`."
-					},
 					"url": {
 						"type": "string",
 						"default": "",
 						"description": "Overrides the base URL of the webPDF REST API used by the MCP server for internal tool calls (e.g. `http://localhost:8080/webPDF/`).\n\nIf empty, the URL is derived automatically from the active connector and context path.\n\nIn cluster deployments, set this to the load balancer URL (e.g. `http://haproxy-internal/webPDF/`) so that tool executions are distributed across all cluster nodes.\n\nOverride via environment variable `WEBPDF_MCP_URL` or system property `webpdf.mcp.url`."
-					},
-					"username": {
-						"type": "string",
-						"default": "",
-						"description": "Username for authenticating MCP's internal REST API calls against webPDF.\n\nLeave empty for anonymous access (sufficient when webPDF authentication is disabled or when anonymous access to the REST API is permitted).\n\nIn cluster deployments where `url` points to a load balancer with authentication required, set both `username` and `password`.\n\nOverride via environment variable `WEBPDF_MCP_USERNAME` or system property `webpdf.mcp.username`."
 					}
 				}
 			},
@@ -20011,6 +20638,46 @@
 						"items": {
 							"$ref": "#/components/schemas/ServerConfig_OAuthProvider"
 						}
+					}
+				}
+			},
+			"ServerConfig_PatPolicy": {
+				"type": "object",
+				"description": "Defines the policy for Personal/Service Access Tokens (PAT). A PAT is a long-lived or permanent access token for headless clients (e.g. the MCP server, CI/CD, server-to-server integrations) that authenticates without a login/logout round-trip. PATs are issued through the administrative token endpoint, carry a scope claim restricting them to selected web services, and are never granted the admin role.",
+				"properties": {
+					"allowlistPersistenceEnabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If true, the local (single-node) registry persists its PAT allowlist to disk so issued PATs survive a server restart. In cluster mode the allowlist already lives in the shared cache and this setting has no effect."
+					},
+					"defaultLifetimeSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 7776000,
+						"description": "Default lifetime (in seconds) for a time-limited PAT when the issuing request does not specify one. The default corresponds to 90 days.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
+					},
+					"maxLifetimeSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 31536000,
+						"description": "Hard upper bound (in seconds) for a time-limited PAT lifetime. A requested lifetime is clamped to this value. The default corresponds to 365 days.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
+					},
+					"permanentTokensAllowed": {
+						"type": "boolean",
+						"default": false,
+						"description": "If true, permanent PATs (without an effective expiration) may be issued. Permanent tokens are only revocable through the registry allowlist, so this is disabled by default and should be enabled deliberately. Time-limited PATs are always available."
+					},
+					"sessionTtlSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Lifetime (in seconds) of the short-lived working session that a PAT request materializes. The PAT itself stays long-lived or permanent; only its working session is capped so processed documents do not accumulate. A value of 0 uses the server's default access-token expiration.",
+						"maximum": 9223372036854775807,
+						"minimum": 0
 					}
 				}
 			},
@@ -20254,6 +20921,51 @@
 						"type": "boolean",
 						"default": true,
 						"description": "When set to true, the server will restart upon the shutdown's completion. Otherwise, the server will be stopped after the command."
+					}
+				}
+			},
+			"ServerConfig_TokenRegistry": {
+				"type": "object",
+				"description": "Defines the settings for the server-side token registry that provides token revocation.",
+				"properties": {
+					"denylistDefaultRetentionSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 43200,
+						"description": "Retention (in seconds) for a revocation entry that is created by revoking a token by its identifier alone (when the token's expiration is unknown). Should be at least the maximum token lifetime so the entry self-cleans afterwards.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
+					},
+					"denylistMaxEntries": {
+						"type": "integer",
+						"format": "int32",
+						"default": 100000,
+						"description": "Hard upper bound for the number of revocation (denylist) entries kept by the in-memory registry. When reached, the soonest-expiring entry is evicted.",
+						"minimum": 1
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If enabled, revoked tokens are rejected during token validation. When disabled, the registry has no effect on token handling."
+					},
+					"pat": {
+						"$ref": "#/components/schemas/ServerConfig_PatPolicy"
+					},
+					"retentionSkewSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 60,
+						"description": "Additional retention time (in seconds) for a revocation entry beyond the token's expiration, to cover clock skew.",
+						"maximum": 9223372036854775807,
+						"minimum": 0
+					},
+					"sweepIntervalSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 60,
+						"description": "Interval (in seconds) of the background cleanup that removes expired revocation entries from the in-memory registry.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
 					}
 				}
 			},
@@ -20649,6 +21361,167 @@
 					}
 				}
 			},
+			"TokenInfo": {
+				"type": "object",
+				"description": "Metadata of a token tracked by the server-side token registry.",
+				"properties": {
+					"expiresAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Expiration time of the token (epoch milliseconds), if any."
+					},
+					"issuedAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Issue time of the token (epoch milliseconds)."
+					},
+					"jti": {
+						"type": "string",
+						"default": "",
+						"description": "Unique token identifier (the JWT 'jti' claim)."
+					},
+					"label": {
+						"type": "string",
+						"default": "",
+						"description": "Human-readable label of a permanent token (PAT); absent for denylist entries."
+					},
+					"owner": {
+						"type": "string",
+						"default": "",
+						"description": "Owning principal of the token (the session id in this version)."
+					},
+					"revokedAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Time the token was revoked (epoch milliseconds), if applicable."
+					},
+					"scopes": {
+						"type": "array",
+						"description": "Authorized scopes (web-service names or 'all') of a permanent token (PAT); absent for denylist entries.",
+						"items": {
+							"type": "string",
+							"description": "Authorized scopes (web-service names or 'all') of a permanent token (PAT); absent for denylist entries."
+						}
+					},
+					"status": {
+						"type": "string",
+						"default": "",
+						"description": "Registry status of the token.",
+						"enum": [
+							"ACTIVE",
+							"REVOKED"
+						]
+					},
+					"tokenKind": {
+						"type": "string",
+						"default": "",
+						"description": "Kind of token.",
+						"enum": [
+							"ACCESS",
+							"REFRESH",
+							"PERMANENT"
+						]
+					}
+				}
+			},
+			"Token_PatRequest": {
+				"type": "object",
+				"description": "Request to issue a Personal/Service Access Token (PAT).",
+				"properties": {
+					"label": {
+						"type": "string",
+						"default": "",
+						"description": "Human-readable label for tracking the token in the administrative listing.",
+						"example": "CI pipeline"
+					},
+					"lifetimeSeconds": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Lifetime in seconds for a time-limited token. 0 (or omitted) uses the server default; the value is capped at the server-configured maximum. Ignored when 'permanent' is true.",
+						"example": 7776000
+					},
+					"ownerUsername": {
+						"type": "string",
+						"default": "",
+						"description": "User name the token acts on behalf of (embedded for auditing/labeling). The token is always a non-admin user.",
+						"example": "ci-pipeline"
+					},
+					"permanent": {
+						"type": "boolean",
+						"default": false,
+						"description": "Issue a permanent token (no effective expiration). Requires the server policy to allow permanent tokens; otherwise the request is rejected.",
+						"example": false
+					},
+					"scopes": {
+						"type": "array",
+						"description": "Web services the token may use: any subset of 'converter', 'ocr', 'pdfa', 'barcode', 'signature', 'toolbox', 'urlconverter', or 'all'. Omit or pass an empty list for 'all'.",
+						"example": [
+							"converter",
+							"ocr"
+						],
+						"items": {
+							"type": "string",
+							"description": "Web services the token may use: any subset of 'converter', 'ocr', 'pdfa', 'barcode', 'signature', 'toolbox', 'urlconverter', or 'all'. Omit or pass an empty list for 'all'.",
+							"example": "[\"converter\",\"ocr\"]"
+						}
+					}
+				}
+			},
+			"Token_PatResponse": {
+				"type": "object",
+				"description": "A newly issued Personal/Service Access Token (PAT) and its metadata. The raw token is returned only once.",
+				"properties": {
+					"expiresAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Expiration time of the token (epoch milliseconds), or absent for a permanent token."
+					},
+					"issuedAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Issue time of the token (epoch milliseconds)."
+					},
+					"jti": {
+						"type": "string",
+						"default": "",
+						"description": "Unique token identifier (the JWT 'jti' claim); use it to revoke the token via DELETE /admin/tokens/{jti}."
+					},
+					"label": {
+						"type": "string",
+						"default": "",
+						"description": "Human-readable label of the token."
+					},
+					"ownerUsername": {
+						"type": "string",
+						"default": "",
+						"description": "User name the token acts on behalf of."
+					},
+					"permanent": {
+						"type": "boolean",
+						"default": false,
+						"description": "Whether the token is permanent (no effective expiration)."
+					},
+					"scopes": {
+						"type": "array",
+						"description": "Granted scopes (web-service names or 'all').",
+						"items": {
+							"type": "string",
+							"description": "Granted scopes (web-service names or 'all')."
+						}
+					},
+					"token": {
+						"type": "string",
+						"default": "",
+						"description": "The raw PAT (JWT). Returned only once and not retrievable later; store it securely and send it as 'Authorization: Bearer <token>'."
+					}
+				}
+			},
 			"UserConfig_User": {
 				"type": "object",
 				"description": "Defines the attributes of a user.",
@@ -20687,9 +21560,117 @@
 					}
 				}
 			},
-			"UserProfileOptions": {
+			"ViewerProfile": {
 				"type": "object",
-				"description": "User preference options for this tenant",
+				"properties": {
+					"branding": {
+						"$ref": "#/components/schemas/ViewerProfileBranding"
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": false
+					},
+					"id": {
+						"type": "string",
+						"default": ""
+					},
+					"name": {
+						"type": "string",
+						"default": ""
+					},
+					"security": {
+						"$ref": "#/components/schemas/ViewerProfileSecurity"
+					},
+					"userOptions": {
+						"$ref": "#/components/schemas/ViewerProfileUserOptions"
+					},
+					"version": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0
+					},
+					"viewerOptions": {
+						"$ref": "#/components/schemas/ViewerProfileViewerOptions"
+					}
+				}
+			},
+			"ViewerProfileBranding": {
+				"type": "object",
+				"properties": {
+					"customCssRef": {
+						"type": "string",
+						"default": ""
+					},
+					"fonts": {
+						"$ref": "#/components/schemas/JsonNode"
+					},
+					"logoAssetRef": {
+						"type": "string",
+						"default": ""
+					},
+					"theme": {
+						"$ref": "#/components/schemas/JsonNode"
+					}
+				}
+			},
+			"ViewerProfilePublicView": {
+				"type": "object",
+				"properties": {
+					"branding": {
+						"$ref": "#/components/schemas/PublicBranding"
+					},
+					"id": {
+						"type": "string",
+						"default": ""
+					},
+					"userOptions": {
+						"$ref": "#/components/schemas/ViewerProfileUserOptions"
+					},
+					"viewerOptions": {
+						"$ref": "#/components/schemas/ViewerProfileViewerOptions"
+					}
+				}
+			},
+			"ViewerProfileSecurity": {
+				"type": "object",
+				"properties": {
+					"embedAllowlist": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"externalUrlAllowlist": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"ViewerProfileSummary": {
+				"type": "object",
+				"description": "Compact summary of a stored viewer tenant profile (id, name, enabled state).",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Whether the profile is enabled."
+					},
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "The unique id of the viewer profile (also its on-disk folder name)."
+					},
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The human-readable display name of the profile."
+					}
+				}
+			},
+			"ViewerProfileUserOptions": {
+				"type": "object",
 				"properties": {
 					"darkmode": {
 						"type": "string",
@@ -20709,9 +21690,8 @@
 					}
 				}
 			},
-			"ViewerProfileOptions": {
+			"ViewerProfileViewerOptions": {
 				"type": "object",
-				"description": "Configurable viewer options for this tenant",
 				"properties": {
 					"continuous": {
 						"type": "boolean",
@@ -20778,6 +21758,17 @@
 						"type": "number",
 						"format": "double",
 						"default": 0
+					}
+				}
+			},
+			"Viewer_ExternalDocument": {
+				"type": "object",
+				"description": "The validated, allowlisted external https URL the viewer may load",
+				"properties": {
+					"url": {
+						"type": "string",
+						"default": "",
+						"description": "The validated external https document URL the viewer may load."
 					}
 				}
 			},

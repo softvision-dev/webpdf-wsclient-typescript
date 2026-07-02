@@ -27,7 +27,9 @@ import {
 	TimeSeries,
 	TrustStoreKeyStore,
 	UserCheck,
-	Users
+	Users,
+	ViewerProfile,
+	ViewerProfileSummary
 } from "../../../generated-sources";
 
 /**
@@ -612,4 +614,80 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @throws ResultException Shall be thrown if the request failed.
 	 */
 	fetchMetrics(): Promise<string>;
+
+	/**
+	 * Lists all stored viewer tenant profiles as compact {@link ViewerProfileSummary} entries
+	 * (id, name, enabled). The full profile, including its security allowlists, is fetched per id
+	 * via {@link AdministrationManager#fetchViewerProfile}.
+	 * <p>
+	 * Requires an authenticated administrator ({@code BearerAuth}); throws otherwise.
+	 * </p>
+	 *
+	 * @return The {@link ViewerProfileSummary} list of all stored viewer tenant profiles.
+	 * @throws ResultException Shall be thrown, if the request failed.
+	 */
+	fetchViewerProfiles(): Promise<Array<ViewerProfileSummary>>;
+
+	/**
+	 * Reads the full viewer tenant profile with the given id, including the server-internal
+	 * security allowlists (admin-only).
+	 *
+	 * @param id The id of the viewer tenant profile.
+	 * @return The full {@link ViewerProfile}.
+	 * @throws ResultException Shall be thrown, if the profile does not exist or the request failed.
+	 */
+	fetchViewerProfile(id: string): Promise<ViewerProfile>;
+
+	/**
+	 * Creates a new viewer tenant profile. The id is taken from the given {@link ViewerProfile} and
+	 * must be a non-empty, filesystem-safe id ({@code [A-Za-z0-9._-]}).
+	 *
+	 * @param profile The {@link ViewerProfile} to create.
+	 * @return The created {@link ViewerProfile}.
+	 * @throws ResultException Shall be thrown, if the id is invalid, already exists, or the request failed.
+	 */
+	createViewerProfile(profile: ViewerProfile): Promise<ViewerProfile>;
+
+	/**
+	 * Replaces the viewer tenant profile with the given id. The id argument is authoritative and
+	 * overrides any id carried by the {@link ViewerProfile} body.
+	 *
+	 * @param id      The id of the viewer tenant profile to replace.
+	 * @param profile The new {@link ViewerProfile} content.
+	 * @return The updated {@link ViewerProfile}.
+	 * @throws ResultException Shall be thrown, if the profile does not exist or the request failed.
+	 */
+	updateViewerProfile(id: string, profile: ViewerProfile): Promise<ViewerProfile>;
+
+	/**
+	 * Deletes the viewer tenant profile (including its assets) with the given id.
+	 *
+	 * @param id The id of the viewer tenant profile to delete.
+	 * @throws ResultException Shall be thrown, if the profile does not exist or the request failed.
+	 */
+	deleteViewerProfile(id: string): Promise<void>;
+
+	/**
+	 * Uploads (or replaces) an asset file (logo, custom CSS, font, …) of the viewer tenant profile
+	 * with the given id. The asset name is resolved inside the profile folder with a strict
+	 * path-containment check.
+	 *
+	 * @param id   The id of the viewer tenant profile.
+	 * @param name The profile-relative asset file name.
+	 * @param data The asset file content.
+	 * @throws ResultException Shall be thrown, if the profile does not exist, the name is unsafe,
+	 *                         or the request failed.
+	 */
+	uploadViewerProfileAsset(id: string, name: string, data: Blob): Promise<void>;
+
+	/**
+	 * Deletes a single asset file of the viewer tenant profile with the given id. The asset name is
+	 * resolved inside the profile folder with a strict path-containment check.
+	 *
+	 * @param id   The id of the viewer tenant profile.
+	 * @param name The profile-relative asset file name.
+	 * @throws ResultException Shall be thrown, if the profile or the asset does not exist, or the
+	 *                         request failed.
+	 */
+	deleteViewerProfileAsset(id: string, name: string): Promise<void>;
 }

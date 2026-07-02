@@ -4,6 +4,7 @@ import {RestWebService, WebServiceType} from "../../webservice";
 import {AxiosProgressEvent, AxiosInstance} from "axios";
 import {AdministrationManager} from "./administration";
 import {UserManager} from "./user";
+import {ViewerManager} from "./viewer";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources";
 
 /**
@@ -62,6 +63,14 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
      * @return The active {@link UserManager} of this {@link RestSession}.
      */
     getUserManager(): UserManager<T_REST_DOCUMENT>;
+
+    /**
+     * Returns the active {@link ViewerManager} of this {@link RestSession}, providing access to the
+     * public viewer tenant endpoints ({@code /viewer/...}).
+     *
+     * @return The active {@link ViewerManager} of this {@link RestSession}.
+     */
+    getViewerManager(): ViewerManager<T_REST_DOCUMENT>;
 
     /**
      * Returns the {@link UserCredentials} logged in via this {@link RestSession}.

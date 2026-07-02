@@ -8,6 +8,7 @@ import {AuthenticationProvider} from "../auth";
 import {DocumentManager, RestDocument} from "./documents";
 import {AdministrationManager} from "./administration";
 import {UserManager} from "./user";
+import {ViewerManager} from "./viewer";
 import {DataFormats} from "../DataFormat";
 import {wsclientConfiguration} from "../../configuration";
 
@@ -34,6 +35,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	protected readonly documentManager: DocumentManager<T_REST_DOCUMENT>;
 	protected administrationManager: AdministrationManager<T_REST_DOCUMENT>;
 	protected readonly userManager: UserManager<T_REST_DOCUMENT>;
+	protected readonly viewerManager: ViewerManager<T_REST_DOCUMENT>;
 
 	/**
 	 * <p>
@@ -76,6 +78,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 		this.documentManager = this.createDocumentManager();
 		this.administrationManager = this.createAdministrationManager();
 		this.userManager = this.createUserManager();
+		this.viewerManager = this.createViewerManager();
 	}
 
 	/**
@@ -112,6 +115,15 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 */
 	public getUserManager(): UserManager<T_REST_DOCUMENT> {
 		return this.userManager;
+	}
+
+	/**
+	 * Returns the active {@link ViewerManager} of this {@link RestSession}.
+	 *
+	 * @return The active {@link ViewerManager} of this {@link RestSession}.
+	 */
+	public getViewerManager(): ViewerManager<T_REST_DOCUMENT> {
+		return this.viewerManager;
 	}
 
 	/**
@@ -208,6 +220,13 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 * @return The created {@link UserManager}.
 	 */
 	protected abstract createUserManager(): UserManager<T_REST_DOCUMENT>;
+
+	/**
+	 * Creates a new {@link ViewerManager} matching this {@link RestSession}.
+	 *
+	 * @return The created {@link ViewerManager}.
+	 */
+	protected abstract createViewerManager(): ViewerManager<T_REST_DOCUMENT>;
 
 	public abstract createWebServiceInstance<T_WEBSERVICE extends RestWebService<any, any, any>>(
 		webServiceType: WebServiceType
