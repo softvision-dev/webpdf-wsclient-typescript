@@ -38,6 +38,11 @@ import {
 	SessionTable,
 	SSLKeystoreFormat,
 	TimeSeries,
+	TokenInfo,
+	TokenInfoStatusEnum,
+	TokenPatRequest,
+	TokenPatRequestInterface,
+	TokenPatResponse,
 	TrustStoreKeyStore,
 	TrustStoreKeyStoreInterface,
 	TruststoreServer,
@@ -830,5 +835,153 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		}
 
 		await session.close();
+	});
+
+	it('testAdministrationTokensLifecycle', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let session: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		// Issue a time-limited PAT (never permanent - the default server policy rejects permanent tokens).
+		let request: TokenPatRequest = new TokenPatRequest({
+			ownerUsername: testServer.getLocalUserName(),
+			label: "integration",
+			scopes: ["converter"],
+			permanent: false,
+			lifetimeSeconds: 3600
+		} as TokenPatRequestInterface);
+
+		let response: TokenPatResponse = await session.getAdministrationManager().issueToken(request);
+		expect(response, "The issued token response should exist.").to.exist;
+		expect(response.token, "The raw PAT should be returned exactly once.").to.exist;
+		expect(response.token!.length, "The raw PAT should not be empty.").to.be.greaterThan(0);
+		expect(response.jti, "The token identifier (jti) should exist.").to.exist;
+		expect(response.jti!.length, "The token identifier (jti) should not be empty.").to.be.greaterThan(0);
+		expect(response.permanent, "The issued token should not be permanent.").to.equal(false);
+		expect(response.scopes, "The granted scopes should exist.").to.exist;
+		expect(response.scopes, "The granted scopes should contain 'converter'.").to.include("converter");
+
+		let jti: string = response.jti!;
+
+		// The freshly issued PAT must appear in the allowlist as an ACTIVE entry.
+		let allowed: Array<TokenInfo> = await session.getAdministrationManager().fetchTokens("allowed");
+		expect(allowed, "The allowlist should be an array.").to.be.an("array");
+
+		let entry: TokenInfo | undefined = allowed.find((token: TokenInfo): boolean => token.jti === jti);
+		expect(entry, "The issued PAT should be listed in the allowlist.").to.exist;
+		expect(entry!.status, "The allowlisted PAT should be ACTIVE.").to.equal(TokenInfoStatusEnum.ACTIVE);
+		expect(entry!.scopes, "The allowlisted PAT should carry the 'converter' scope.").to.include("converter");
+
+		// Revoking the allowlisted PAT by its jti removes it from the allowlist.
+		await session.getAdministrationManager().revokeTokenById(jti);
+
+		let allowedAfterRevoke: Array<TokenInfo> = await session.getAdministrationManager().fetchTokens("allowed");
+		expect(
+			allowedAfterRevoke.find((token: TokenInfo): boolean => token.jti === jti),
+			"The revoked PAT should no longer be listed in the allowlist."
+		).to.not.exist;
+
+		// The default status is 'revoked' and must yield an array.
+		let revoked: Array<TokenInfo> = await session.getAdministrationManager().fetchTokens();
+		expect(revoked, "The revoked list (default status) should be an array.").to.be.an("array");
+
+		await session.close();
+	});
+
+	it('testTokensRequireAdmin', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		let userSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalUserName(), testServer.getLocalUserPassword())
+		);
+
+		let listThrown: any;
+		try {
+			await userSession.getAdministrationManager().fetchTokens("revoked");
+		} catch (ex: any) {
+			listThrown = ex;
+		}
+		expect(listThrown, "Listing tokens should not be allowed for a non-admin user.")
+			.to.be.instanceOf(ClientResultException);
+
+		let issueThrown: any;
+		try {
+			await userSession.getAdministrationManager().issueToken(new TokenPatRequest({
+				ownerUsername: testServer.getLocalUserName(),
+				label: "integration",
+				scopes: ["converter"],
+				permanent: false,
+				lifetimeSeconds: 3600
+			} as TokenPatRequestInterface));
+		} catch (ex: any) {
+			issueThrown = ex;
+		}
+		expect(issueThrown, "Issuing a token should not be allowed for a non-admin user.")
+			.to.be.instanceOf(ClientResultException);
+
+		await userSession.close();
+	});
+
+	it('testRevokeSessionTokens', async function (): Promise<void> {
+		if (!TestConfig.instance.getIntegrationTestConfig().isIntegrationTestsActive()) {
+			this.skip();
+			return;
+		}
+
+		// Controlling admin session performing the revocation.
+		let adminSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		// Independent (victim) admin session whose tokens will be revoked - a separate login owns a distinct session id.
+		let victimSession: RestSession<RestDocument> = await SessionFactory.createInstance(
+			new SessionContext(WebServiceProtocol.REST, testServer.getServer(ServerType.LOCAL)),
+			new UserAuthProvider(testServer.getLocalAdminName(), testServer.getLocalAdminPassword())
+		);
+
+		let authMaterial: AuthMaterial = await victimSession.getAuthProvider().provide(victimSession);
+		let jwtToken: any = JSON.parse(atob(authMaterial.getToken().split(".")[1]));
+		let victimSessionId: string = jwtToken.sub;
+
+		// Sanity: the victim session works before revocation.
+		let configBefore: Application = await victimSession.getAdministrationManager().fetchApplicationConfiguration();
+		expect(configBefore, "The victim session should be usable before revocation.").to.exist;
+
+		// Revoke every access/refresh token of the victim session.
+		try {
+			await adminSession.getAdministrationManager().revokeSessionTokens(victimSessionId);
+		} catch (ex: any) {
+			expect(ex, "The token revocation request did not work").to.be.undefined;
+		}
+
+		// Any subsequent request presenting a revoked token must be rejected.
+		let revokedThrown: any;
+		try {
+			await victimSession.getAdministrationManager().fetchApplicationConfiguration();
+		} catch (ex: any) {
+			revokedThrown = ex;
+		}
+		expect(revokedThrown, "A revoked session token must be rejected on the next request.")
+			.to.be.instanceOf(ClientResultException);
+
+		// The victim token is dead - closing it may fail, so guard the cleanup.
+		try {
+			await victimSession.close();
+		} catch (ex: any) {
+			// expected: the session tokens were revoked.
+		}
+
+		await adminSession.close();
 	});
 });

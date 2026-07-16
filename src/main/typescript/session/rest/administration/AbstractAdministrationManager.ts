@@ -38,6 +38,8 @@ import {
 	SupportEntryGroup,
 	TimeSeries,
 	TokenInfo,
+	TokenPatRequest,
+	TokenPatResponse,
 	TrustStoreKeyStore,
 	UserCheck,
 	UserConfiguration,
@@ -1088,6 +1090,23 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			.buildRequest(HttpMethod.DELETE, this.session.getURL("admin/tokens/" + encodeURIComponent(jti)));
 
 		await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async issueToken(request: TokenPatRequest): Promise<TokenPatResponse> {
+		await this.validateUser();
+
+		let httpRequest: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(
+				HttpMethod.POST,
+				this.session.getURL("admin/tokens"),
+				this.prepareHttpEntity(request),
+				DataFormats.JSON.getMimeType()
+			);
+
+		return TokenPatResponse.fromJson(await httpRequest.executeRequest());
 	}
 
 	/**

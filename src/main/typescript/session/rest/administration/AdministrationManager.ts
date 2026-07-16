@@ -26,6 +26,8 @@ import {
 	SupportEntryGroup,
 	TimeSeries,
 	TokenInfo,
+	TokenPatRequest,
+	TokenPatResponse,
 	TrustStoreKeyStore,
 	UserCheck,
 	Users,
@@ -520,6 +522,17 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @param jti The unique token identifier (jti) to revoke.
 	 */
 	revokeTokenById(jti: string): Promise<void>;
+
+	/**
+	 * Issues a Personal/Service Access Token (PAT) via `POST /admin/tokens`. The raw token is returned exactly
+	 * once in {@link TokenPatResponse#token} and is not stored by the server — the caller must surface it to the
+	 * user immediately and never request it again. The issued token is added to the registry allowlist and can be
+	 * listed via {@link fetchTokens} (`allowed`) and revoked via {@link revokeTokenById}.
+	 *
+	 * @param request The token request (owner, label, scopes, permanent flag, lifetime).
+	 * @return The issued token and its metadata.
+	 */
+	issueToken(request: TokenPatRequest): Promise<TokenPatResponse>;
 
 
 	/**
