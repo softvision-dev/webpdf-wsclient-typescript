@@ -37,6 +37,7 @@ import {
 	SessionTable,
 	SupportEntryGroup,
 	TimeSeries,
+	TokenInfo,
 	TrustStoreKeyStore,
 	UserCheck,
 	UserConfiguration,
@@ -1042,6 +1043,49 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(HttpMethod.POST, this.session.getURL("admin/session/" + sessionId + "/close"));
+
+		await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async revokeSessionTokens(sessionId: string): Promise<void> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.POST, this.session.getURL("admin/session/" + sessionId + "/revoke"));
+
+		await request.executeRequest();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async fetchTokens(status?: "revoked" | "allowed"): Promise<Array<TokenInfo>> {
+		await this.validateUser();
+
+		let searchParams: URLSearchParams = new URLSearchParams();
+		searchParams.append("status", status !== undefined ? status : "revoked");
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.GET, this.session.getURL("admin/tokens", searchParams));
+
+		let tokens: Array<any> = await request.executeRequest();
+
+		return (Array.isArray(tokens) ? tokens : []).map(
+			(token: any): TokenInfo => TokenInfo.fromJson(token)
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public async revokeTokenById(jti: string): Promise<void> {
+		await this.validateUser();
+
+		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
+			.buildRequest(HttpMethod.DELETE, this.session.getURL("admin/tokens/" + encodeURIComponent(jti)));
 
 		await request.executeRequest();
 	}

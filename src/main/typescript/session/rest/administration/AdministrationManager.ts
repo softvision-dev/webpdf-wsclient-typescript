@@ -25,6 +25,7 @@ import {
 	SessionTable,
 	SupportEntryGroup,
 	TimeSeries,
+	TokenInfo,
 	TrustStoreKeyStore,
 	UserCheck,
 	Users,
@@ -490,6 +491,35 @@ export interface AdministrationManager<T_REST_DOCUMENT extends RestDocument> {
 	 * @param sessionId ID of the session to be closed.
 	 */
 	closeSession(sessionId: string): Promise<void>;
+
+	/**
+	 * Revokes every currently valid access and refresh token of the session with the specified ID. Any subsequent
+	 * request that presents one of these tokens is rejected, even if the token has not yet expired. The session
+	 * itself remains listed until it expires or is closed.
+	 *
+	 * @param sessionId ID of the session whose tokens shall be revoked.
+	 */
+	revokeSessionTokens(sessionId: string): Promise<void>;
+
+	/**
+	 * Lists the entries tracked by the server-side token registry. Active access and refresh tokens are not
+	 * enumerated by the registry; they are inspected via {@link fetchSessionTable}. This endpoint exposes the
+	 * registry state, i.e. revoked tokens (denylist) or allowlisted permanent tokens, selected by the given status.
+	 *
+	 * @param status {@code revoked} lists revoked tokens (denylist), {@code allowed} lists allowlisted tokens.
+	 * 				 Defaults to {@code revoked} when omitted.
+	 * @return The requested {@link TokenInfo} entries.
+	 */
+	fetchTokens(status?: "revoked" | "allowed"): Promise<Array<TokenInfo>>;
+
+	/**
+	 * Revokes the single token with the specified {@code jti}. An allowlisted permanent token is removed; any
+	 * other token id is added to the revocation denylist. A subsequent request presenting this token is rejected,
+	 * even if it has not yet expired. The {@code jti} must be known (e.g. from {@link fetchTokens}).
+	 *
+	 * @param jti The unique token identifier (jti) to revoke.
+	 */
+	revokeTokenById(jti: string): Promise<void>;
 
 
 	/**
