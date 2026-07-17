@@ -5,6 +5,7 @@ import {
 	ClientResultException,
 	RestDocument,
 	RestSession,
+	ServerResultException,
 	SessionContext,
 	SessionFactory,
 	UserAuthProvider,
@@ -965,7 +966,10 @@ suite("RestAdministrationIntegrationTest", function (): void {
 			expect(ex, "The token revocation request did not work").to.be.undefined;
 		}
 
-		// Any subsequent request presenting a revoked token must be rejected.
+		// Any subsequent request presenting a revoked token must be rejected. The victim session is
+		// itself an admin, so the client-side validateUser() gate passes and the request reaches the
+		// server, which rejects the revoked token - i.e. a server-side fail state surfaced as a
+		// ServerResultException (client-side gating errors would be a ClientResultException instead).
 		let revokedThrown: any;
 		try {
 			await victimSession.getAdministrationManager().fetchApplicationConfiguration();
@@ -973,7 +977,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 			revokedThrown = ex;
 		}
 		expect(revokedThrown, "A revoked session token must be rejected on the next request.")
-			.to.be.instanceOf(ClientResultException);
+			.to.be.instanceOf(ServerResultException);
 
 		// The victim token is dead - closing it may fail, so guard the cleanup.
 		try {

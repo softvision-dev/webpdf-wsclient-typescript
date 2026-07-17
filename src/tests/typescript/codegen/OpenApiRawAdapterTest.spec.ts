@@ -990,8 +990,10 @@ suite("OpenApiRawAdapterTest", function (): void {
 			expect(generatedContent).to.contain("'state'?: ClusterNodeState");
 			// $ref default propagation: the referenced enum schema has default "init",
 			// so the constructor should apply it and getStateDefault() must be generated.
+			// The getter mirrors the constructor by returning the enum TS type with an explicit
+			// cast (the schema type is "string", the property type is the enum ClusterNodeState).
 			expect(generatedContent).to.contain(`data?.['state'] !== undefined ? data?.['state'] : "init" as ClusterNodeState`);
-			expect(generatedContent).to.contain(`getStateDefault(): string { return "init"; }`);
+			expect(generatedContent).to.contain(`getStateDefault(): ClusterNodeState { return "init" as ClusterNodeState; }`);
 			const generatedEnumPath: string = path.join(rootDir, "src", "main", "typescript", "generated-sources", "ClusterNodeState.ts");
 			const generatedEnumContent: string = fs.readFileSync(generatedEnumPath, "utf8");
 			expect(generatedEnumContent).to.contain("export enum ClusterNodeState {");
