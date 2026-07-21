@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-07-03T06:42:07Z)"
+		"version": "webPDF 11.0.0 (2026-07-21T06:38:20Z)"
 	},
 	"servers": [
 		{
@@ -3068,6 +3068,9 @@
 					"404": {
 						"description": "The share feature is not enabled on this server."
 					},
+					"409": {
+						"description": "The one-time-use share is currently being downloaded by another request; a concurrent redemption is rejected."
+					},
 					"410": {
 						"description": "The share token has expired, has already been used, or the shared document is no longer available."
 					}
@@ -5363,6 +5366,9 @@
 						"default": true,
 						"description": "Master switch for the complete metrics subsystem.\n\nWhen set to `false`, no metrics are collected, exported, or exposed via endpoint/filter integrations.\n\nThis setting has precedence over all other metrics options and layer flags.\n\nDefault: `true`"
 					},
+					"eventPipelineMetrics": {
+						"$ref": "#/components/schemas/ApplicationConfig_MetricsBasic"
+					},
 					"httpMetrics": {
 						"$ref": "#/components/schemas/ApplicationConfig_MetricsHttp"
 					},
@@ -5419,6 +5425,11 @@
 						"type": "boolean",
 						"default": true,
 						"description": "Enables or disables the HTTP metrics endpoint at `/metrics`.\n\nWhen disabled, metrics are still collected but not exposed via HTTP.\n\nThis is useful when using only JMX export or when metrics should not be accessible externally.\n\nDefault: `true`"
+					},
+					"logMetricsOnStartup": {
+						"type": "boolean",
+						"default": false,
+						"description": "If enabled, the effective metrics configuration is written to the application log at startup.\n\nThis is a diagnostic aid for verifying the active metrics setup; it does not affect metric collection.\n\nDefault: `false`"
 					},
 					"maxEndpoints": {
 						"type": "integer",
@@ -5482,6 +5493,17 @@
 						"type": "string",
 						"default": "prometheus",
 						"description": "Username used for Basic Auth on the metrics endpoint.\n\nDefault: `prometheus`\n\nPrimary source: XML attribute `username`.\n\nCan be overridden via `WEBPDF_METRICS_AUTH_USERNAME` or `webpdf.metrics.auth.username`."
+					}
+				}
+			},
+			"ApplicationConfig_MetricsBasic": {
+				"type": "object",
+				"description": "Base type for metric layer configuration.\n\nProvides a common `enabled` attribute to control whether the metrics collection is active for a specific layer.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enables or disables metrics collection for this layer.\n\nWhen disabled, no metrics are collected or exported, reducing overhead.\n\nDefault: `true`"
 					}
 				}
 			},
@@ -6172,8 +6194,14 @@
 						"default": false,
 						"description": "When set to true the SharePoint Online bridge shall be enabled."
 					},
+					"retry": {
+						"$ref": "#/components/schemas/ApplicationConfig_SharePointBridgeRetry"
+					},
 					"site": {
 						"$ref": "#/components/schemas/ApplicationConfig_SharePointBridgeSite"
+					},
+					"upload": {
+						"$ref": "#/components/schemas/ApplicationConfig_SharePointBridgeUpload"
 					}
 				}
 			},
@@ -6195,6 +6223,42 @@
 						"type": "string",
 						"default": "",
 						"description": "The id of the tenant to which the application belongs"
+					},
+					"tokenExpirationBufferMs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 300000,
+						"description": "Time in milliseconds before a token's expiry at which it is proactively refreshed.\n\nDefault: `300000` (5 minutes)",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
+					}
+				}
+			},
+			"ApplicationConfig_SharePointBridgeRetry": {
+				"type": "object",
+				"description": "Retry/backoff tuning for transient Microsoft Graph request failures (exponential backoff).",
+				"properties": {
+					"baseDelayMs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 1000,
+						"description": "Base backoff delay in milliseconds.\n\nDefault: `1000` (1 second)",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
+					},
+					"maxAttempts": {
+						"type": "integer",
+						"format": "int32",
+						"default": 3,
+						"description": "Maximum number of attempts for a failed transient request.\n\nDefault: `3`"
+					},
+					"maxDelayMs": {
+						"type": "integer",
+						"format": "int64",
+						"default": 10000,
+						"description": "Maximum backoff delay in milliseconds.\n\nDefault: `10000` (10 seconds)",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
 					}
 				}
 			},
@@ -6202,10 +6266,33 @@
 				"type": "object",
 				"description": "Defines the name of the Sharepoint Online site that is used for document conversion. Access to the site must be configured as a registered application on the Microsoft identity platform",
 				"properties": {
+					"siteId": {
+						"type": "string",
+						"default": "",
+						"description": "The explicit ID of the SharePoint Online site (for example `contoso.sharepoint.com,<guid>,<guid>`).\n\nWhen set, it overrides the site-name based resolution."
+					},
 					"siteName": {
 						"type": "string",
 						"default": "",
 						"description": "The name of the site to be used for converting the documents"
+					}
+				}
+			},
+			"ApplicationConfig_SharePointBridgeUpload": {
+				"type": "object",
+				"description": "Advanced upload tuning for the SharePoint Online bridge.",
+				"properties": {
+					"chunkSize": {
+						"type": "integer",
+						"format": "int32",
+						"default": 5242880,
+						"description": "Chunk size in bytes for Microsoft Graph upload sessions. The effective value is normalized to a multiple of 320 KiB.\n\nDefault: `5242880` (5 MB)"
+					},
+					"sizeLimit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 4194304,
+						"description": "Maximum file size in bytes for a simple upload; larger files use an upload session.\n\nDefault: `4194304` (4 MB)"
 					}
 				}
 			},
@@ -6814,7 +6901,7 @@
 					"stopOnError": {
 						"type": "boolean",
 						"default": false,
-						"description": "If 'true', the server node is also started if an error has occurred (e.g. when joining the cluster)."
+						"description": "If 'true' (default), the server node aborts its startup when a cluster error occurs (e.g. a join failure). If 'false', the node logs the error and continues to start as a standalone server."
 					}
 				}
 			},
@@ -14326,10 +14413,42 @@
 				"type": "object",
 				"description": "The \"OCR\" web service can be used to run character recognition in PDF documents or images. If recognition is run on images, they will be converted to PDF documents. More specifically, a page will be generated for each image in the PDF document, with this page containing the original image and a text layer with the recognized text. Character recognition on PDF documents will only work with documents that do not contain text already. Normally, these will be documents that were generated by scanners and that only have an image per page in the PDF document.",
 				"properties": {
+					"aiCorrection": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enables an optional AI post-correction of low-confidence recognized words using the configured AI chat provider (see the server `<ai>` configuration). Disabled by default. When enabled, only the text of words whose recognition confidence is below `confidenceThreshold` is rewritten; word coordinates, rotation, and the positioned (invisible) text layer stay unchanged. AI correction is advisory and fail-open: if no AI provider is configured or reachable, the original recognition result is returned unchanged. Only effective for engines that provide positioned word geometry."
+					},
+					"aiProvider": {
+						"type": "string",
+						"default": "",
+						"description": "Optional id of the AI provider used for the post-correction, overriding the per-capability default for this call. Empty (default) uses the configured default chat provider. Ignored when `aiCorrection` is `false`."
+					},
 					"checkResolution": {
 						"type": "boolean",
 						"default": true,
 						"description": "If \"true,\" then the DPI resolution of the output file will be checked. Resolutions of less than 200 DPI are rejected in this check because as a rule, they do not produce good results for character recognition."
+					},
+					"confidenceThreshold": {
+						"type": "number",
+						"format": "float",
+						"default": 0.75,
+						"description": "Confidence threshold (0..1) used when `aiCorrection` is enabled. Words with a recognition confidence below this value are candidates for AI post-correction; words without a known confidence are never corrected. Ignored when `aiCorrection` is `false`.",
+						"maximum": 1,
+						"minimum": 0
+					},
+					"engine": {
+						"type": "string",
+						"default": "tesseract",
+						"description": "Selects the character recognition engine used for the operation. The engine is pluggable; if no value is provided, the bundled default engine is used.\n\n*   tesseract = The bundled Tesseract OCR engine (default).\n*   external = An external, customer-provided OCR engine invoked as a local command-line program (Bring-your-own, not bundled with webPDF).\n*   http = An external, customer-provided OCR engine invoked over an HTTP service (Bring-your-own, not bundled with webPDF).\n*   ai-vision = A generative vision LLM (via the configured AI provider) that transcribes each page to text/markdown. Requires an enabled AI provider with a vision model; provides no per-word coordinates. For PDF output this engine has no positioned text layer: without `unpositionedTextLayer` a PDF request fails with `OCR_NO_POSITIONED_RESULT`, with it an un-positioned (not coordinate-accurate) searchable text layer is embedded. Not bundled.",
+						"enum": [
+							"tesseract",
+							"external",
+							"http",
+							"ai-vision"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_OcrEngine"
+						}
 					},
 					"failOnWarning": {
 						"type": "boolean",
@@ -14411,6 +14530,11 @@
 					},
 					"pdfa": {
 						"$ref": "#/components/schemas/Operation_Pdfa"
+					},
+					"unpositionedTextLayer": {
+						"type": "boolean",
+						"default": false,
+						"description": "Permission (opt-in) to embed an _un-positioned_, invisible text layer into the result PDF when the selected OCR engine provides no positioned (box-oriented) result (`ai-vision`, or a Bring-your-own engine configured with `provides.geometry=false`) and `outputFormat` is `pdf`. The embedded text makes the PDF full-text searchable but is **not coordinate-accurate** (selection/highlight sits at an arbitrary position). Disabled by default: with a geometry-less engine and PDF output, leaving this `false` yields the error `OCR_NO_POSITIONED_RESULT` instead of a silent image-only PDF. Ignored for engines that provide positioned geometry (the positioned layer is always used) and for `text`/`hocr` output (which already return text). For a coordinate-accurate searchable PDF use Tesseract or a box-oriented engine."
 					}
 				}
 			},
@@ -20015,6 +20139,136 @@
 					}
 				}
 			},
+			"ServerConfig_Ai": {
+				"type": "object",
+				"description": "Configuration of the AI provider integration: a list of configured providers plus the per-capability default provider selection. The integration is opt-in and disabled by default.",
+				"properties": {
+					"defaultChatProvider": {
+						"type": "string",
+						"default": "",
+						"description": "The `id` of the provider used for chat/text completions when a web service call does not select a provider explicitly."
+					},
+					"defaultVisionProvider": {
+						"type": "string",
+						"default": "",
+						"description": "The `id` of the provider used for vision (image input) requests when a web service call does not select a provider explicitly."
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Master switch for the AI integration. Defaults to `false` (opt-in). Override via environment variable `WEBPDF_AI_ENABLED` or system property `webpdf.ai.enabled`."
+					},
+					"provider": {
+						"type": "array",
+						"description": "A single AI provider (an OpenAI-compatible endpoint). Configure one or more; each is referenced by its `id`.",
+						"items": {
+							"$ref": "#/components/schemas/ServerConfig_AiProvider"
+						}
+					}
+				}
+			},
+			"ServerConfig_AiProvider": {
+				"type": "object",
+				"description": "A single configured AI provider. Each attribute is overridable through the standard server-configuration environment / system-property mechanism, with the provider addressed by its index in the list (for example `webpdf.ai.provider[0].chatModel`, or the equivalent environment variable `WEBPDF_AI_PROVIDER_0_CHATMODEL`).",
+				"properties": {
+					"allowedHosts": {
+						"type": "string",
+						"default": "",
+						"description": "Comma-separated list of allowed hosts used when `targetPolicyEnabled` is set (for example a private sidecar host)."
+					},
+					"apiKey": {
+						"type": "string",
+						"default": "",
+						"description": "API key / bearer token for the endpoint. Stored **encrypted** in the configuration file; may alternatively be supplied through the standard environment override for this attribute (for example `WEBPDF_AI_PROVIDER_0_APIKEY`), which supports the `file:` resolver for container secrets. Masked in logs."
+					},
+					"chatModel": {
+						"type": "string",
+						"default": "",
+						"description": "Model name used for chat/text completions."
+					},
+					"embeddingModel": {
+						"type": "string",
+						"default": "",
+						"description": "Model name used for embeddings (reserved; embeddings are a later capability)."
+					},
+					"endpointUrl": {
+						"type": "string",
+						"default": "",
+						"description": "Base URL of the OpenAI-compatible endpoint (for example `http://localhost:11434/v1` for Ollama, or the IONOS inference URL)."
+					},
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "Unique identifier of this provider, referenced by the per-capability default attributes and by per-call provider selection."
+					},
+					"maxInputTokens": {
+						"type": "integer",
+						"format": "int32",
+						"default": 32000,
+						"description": "Upper bound on the estimated number of input tokens; larger requests are rejected."
+					},
+					"maxOutputTokens": {
+						"type": "integer",
+						"format": "int32",
+						"default": 2048,
+						"description": "Upper bound on the number of output tokens requested from the model."
+					},
+					"rateLimitPerMinute": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "Optional per-provider request rate limit per minute; `0` disables the limit."
+					},
+					"requestTimeoutMs": {
+						"type": "integer",
+						"format": "int32",
+						"default": 30000,
+						"description": "Per-request timeout in milliseconds."
+					},
+					"retryBaseDelayMs": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1000,
+						"description": "Base delay in milliseconds for the exponential backoff between retries."
+					},
+					"retryMaxAttempts": {
+						"type": "integer",
+						"format": "int32",
+						"default": 3,
+						"description": "Maximum number of attempts for transient failures (timeouts, connection errors, HTTP 429/5xx). Client (4xx) and authentication errors are never retried."
+					},
+					"retryMaxDelayMs": {
+						"type": "integer",
+						"format": "int32",
+						"default": 10000,
+						"description": "Maximum delay in milliseconds between retries."
+					},
+					"targetPolicyEnabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enables the outbound SSRF target policy for this provider's requests (off by default)."
+					},
+					"type": {
+						"type": "string",
+						"default": "openai-compatible",
+						"description": "The provider transport kind. Currently only the OpenAI-compatible wire protocol is supported; it covers local/Ollama, IONOS, OpenAI, Azure OpenAI and vLLM via the endpoint URL.\n\n*   openai-compatible = an endpoint speaking the OpenAI HTTP API.",
+						"enum": [
+							"openai-compatible"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "ServerConfig_AiProviderKind"
+						}
+					},
+					"visionModel": {
+						"type": "string",
+						"default": "",
+						"description": "Model name used for vision (image input) requests."
+					}
+				},
+				"required": [
+					"id"
+				]
+			},
 			"ServerConfig_Apr": {
 				"type": "object",
 				"description": "Configures an [APR Lifecycle Listener](https://tomcat.apache.org/tomcat-10.0-doc/config/listeners.html) for the underlying tomcat server.",
@@ -20790,6 +21044,9 @@
 				"type": "object",
 				"description": "The server element defines settings for the server such as the ports, user sources or authorization settings. Some of these changes might require a server restart to take effect.",
 				"properties": {
+					"ai": {
+						"$ref": "#/components/schemas/ServerConfig_Ai"
+					},
 					"apr": {
 						"$ref": "#/components/schemas/ServerConfig_Apr"
 					},
