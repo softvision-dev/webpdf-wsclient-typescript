@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-07-21T06:38:20Z)"
+		"version": "webPDF 11.0.0 (2026-07-22T13:12:09Z)"
 	},
 	"servers": [
 		{
@@ -1003,7 +1003,7 @@
 				]
 			},
 			"post": {
-				"description": "Issues a long-lived or permanent access token (PAT) for headless clients. The token authenticates REST calls via 'Authorization: Bearer <token>' without a login/logout round-trip, is restricted to the requested web-service scopes and never has the admin role. The raw token is returned once only and is not retrievable later. Permanent tokens require the server policy to allow them. Revoke via 'DELETE /admin/tokens/{jti}'.",
+				"description": "Issues a Personal/Service Access Token (PAT) - a long-lived or optionally permanent access token for headless clients. The token authenticates REST calls via 'Authorization: Bearer <token>' without a login/logout round-trip, is restricted to the requested web-service scopes and never has the admin role. The raw token is returned once only and is not retrievable later. Permanent tokens require the server policy to allow them. Revoke via 'DELETE /admin/tokens/{jti}'.",
 				"operationId": "issueToken",
 				"requestBody": {
 					"content": {
@@ -6023,6 +6023,11 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If disabled, then the \"scale pages\" dialog is deactivated."
+					},
+					"shareDocument": {
+						"type": "boolean",
+						"default": true,
+						"description": "If disabled, then the \"share document\" function is deactivated."
 					},
 					"showHelp": {
 						"type": "boolean",
@@ -19728,6 +19733,52 @@
 					}
 				}
 			},
+			"Portal_Ai": {
+				"type": "object",
+				"description": "Secret-free projection of the AI integration for the portal: the enabled flag, the per-capability default providers, and the configured providers.",
+				"properties": {
+					"defaultChatProvider": {
+						"type": "string",
+						"default": ""
+					},
+					"defaultVisionProvider": {
+						"type": "string",
+						"default": ""
+					},
+					"enabled": {
+						"type": "boolean",
+						"default": false
+					},
+					"providers": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Portal_AiProvider"
+						}
+					}
+				},
+				"readOnly": true
+			},
+			"Portal_AiProvider": {
+				"type": "object",
+				"description": "Secret-free projection of a configured AI provider for the portal: its id, display name, and supported capabilities (chat / vision).",
+				"properties": {
+					"capabilities": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"displayName": {
+						"type": "string",
+						"default": ""
+					},
+					"id": {
+						"type": "string",
+						"default": ""
+					}
+				},
+				"readOnly": true
+			},
 			"Portal_Environment": {
 				"type": "object",
 				"properties": {
@@ -19904,6 +19955,11 @@
 						"default": true,
 						"description": "If disabled, then the \"scale pages\" dialog is deactivated."
 					},
+					"shareDocument": {
+						"type": "boolean",
+						"default": true,
+						"description": "If disabled, then the \"share document\" function is deactivated."
+					},
 					"showHelp": {
 						"type": "boolean",
 						"default": true,
@@ -19941,6 +19997,9 @@
 				"type": "object",
 				"description": "Provides information for building and controlling the portal page.",
 				"properties": {
+					"ai": {
+						"$ref": "#/components/schemas/Portal_Ai"
+					},
 					"environment": {
 						"$ref": "#/components/schemas/Portal_Environment"
 					},
@@ -19995,6 +20054,10 @@
 						"default": false
 					},
 					"enabled": {
+						"type": "boolean",
+						"default": false
+					},
+					"shareEnabled": {
 						"type": "boolean",
 						"default": false
 					},
@@ -20185,6 +20248,11 @@
 						"type": "string",
 						"default": "",
 						"description": "Model name used for chat/text completions."
+					},
+					"displayName": {
+						"type": "string",
+						"default": "",
+						"description": "The displayed name for this AI provider (e.g., in the portal). When empty, the `id` is shown."
 					},
 					"embeddingModel": {
 						"type": "string",
