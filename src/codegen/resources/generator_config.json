@@ -112,6 +112,8 @@
 			"prefix": "Portal_",
 			"location": "portal/",
 			"preservePrefix": [
+				"Portal_Ai",
+				"Portal_AiProvider",
 				"Portal_Settings",
 				"Portal_UserInterface"
 			]
