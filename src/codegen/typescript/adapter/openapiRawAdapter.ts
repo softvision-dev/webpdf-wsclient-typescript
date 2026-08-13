@@ -362,6 +362,35 @@ function rewriteTypeImportsToValue(content: string, symbolNames: Set<string>): s
  *
  * Returns the original `content` unchanged when no matching interface is found.
  */
+/**
+ * Builds the `implements` clause for a generated model class.
+ *
+ * The interface and the class answer different questions. `<Model>Interface` is the **construction**
+ * contract — it is the constructor's parameter type, and its `required` members come from the schema, so
+ * it states what a caller has to supply to build a valid document. The class is the **instance** type:
+ * what an object actually holds after `fromJson` ran over a payload that may omit keys.
+ *
+ * For most properties the two coincide and the `implements` check is worth keeping: it catches drift
+ * between the raw interface and the class body the adapter writes. For the properties in
+ * {@link mayStayUndefined} they provably cannot coincide, because the constructor has no value to put
+ * there. Rather than dropping the check for the whole class, or relaxing the construction contract —
+ * which would stop the compiler from demanding, say, the `protocol` list when a `ProtocolsSSL` is built
+ * — the clause omits exactly those members and keeps the check for every other one. The omission is
+ * spelled out in the generated code, so the exceptions are readable rather than implied.
+ *
+ * @param modelName The model class name
+ * @param mayStayUndefined Properties whose hydration can leave them `undefined`
+ * @return The type expression to place after `implements`
+ */
+function implementsClauseFor(modelName: string, mayStayUndefined: Set<string>): string {
+	if (mayStayUndefined.size === 0) {
+		return `${modelName}Interface`;
+	}
+
+	const omitted: string = [...mayStayUndefined].map((name: string): string => `"${name}"`).join(" | ");
+	return `Omit<${modelName}Interface, ${omitted}>`;
+}
+
 function transformToClassModel(
 	content: string,
 	modelName: string,
@@ -422,14 +451,36 @@ function transformToClassModel(
 	const allValueSymbols: Set<string> = new Set<string>([...modelClassSymbols, ...arrayItemClassSymbols]);
 	const transformedHeader: string = rewriteTypeImportsToValue(header, allValueSymbols);
 
-	const propDecls: string[] = props.map(
-		(prop: ParsedProperty): string => `\t'${prop.name}'${prop.optional ? "?" : ""}: ${prop.typeStr};`,
-	);
+	// Property names whose constructor assignment below can leave the value `undefined`.
+	//
+	// The declaration is derived from this set rather than from the schema's `required` list, because
+	// the two answer different questions. `required` says what a *valid document* must contain; the
+	// declaration says what an *instance of this class* actually holds. They diverge whenever the
+	// constructor has no way to produce a value for an absent key: a nested model is hydrated with
+	// `T.fromJson(data?.['x'])`, and `fromJson(undefined)` returns `undefined`.
+	//
+	// Declaring such a property non-optional makes the type assert something the object need not hold,
+	// and that is worse than an inconvenience: it is invisible. `data.rest.accessToken` then compiles
+	// cleanly and throws at runtime, and no amount of care at the call site helps, because the type
+	// says there is nothing to guard. Consumers cannot even find the affected places — the compiler
+	// reports none.
+	//
+	// Only the emitted declaration changes; every assignment stays exactly as it was, so no instance
+	// and no `toJson` payload differs. What changes is that reading such a property now requires a
+	// guard, which is precisely the check that was missing.
+	const mayStayUndefined: Set<string> = new Set<string>();
 
 	const assignments: string[] = [];
 	for (const prop of props) {
 		const schemaProp: SchemaPropertyMeta | undefined = schemaMeta?.properties.get(prop.name);
 		if (modelClassSymbols.has(prop.typeStr)) {
+			// `fromJson(undefined)` returns `undefined`, so a required nested model is absent in the
+			// instance whenever the payload omits it. Only *required* properties are recorded: an
+			// already-optional one raises no conflict, and listing it would pad the omission with
+			// members that never changed.
+			if (!prop.optional) {
+				mayStayUndefined.add(prop.name);
+			}
 			assignments.push(`\t\tthis['${prop.name}'] = ${prop.typeStr}.fromJson(data?.['${prop.name}']);`);
 		} else if (prop.optional && schemaProp?.hasExplicitDefault && schemaProp.type !== undefined) {
 			const primitiveType: string = tsTypeFor(schemaProp.type);
@@ -458,6 +509,9 @@ function transformToClassModel(
 		} else if (!prop.optional && prop.typeStr === "boolean") {
 			assignments.push(`\t\tthis['${prop.name}'] = data?.['${prop.name}'] ?? false;`);
 		} else if (!prop.optional) {
+			// Required but neither a model class nor a primitive with a fallback — arrays, enums and
+			// unions land here. The cast asserts a value that an absent payload key does not provide.
+			mayStayUndefined.add(prop.name);
 			assignments.push(`\t\tthis['${prop.name}'] = data?.['${prop.name}'] as ${prop.typeStr};`);
 		} else if (prop.typeStr.startsWith("Array<")) {
 			// Arrays whose element type is a model class are hydrated via fromJson and
@@ -479,6 +533,11 @@ function transformToClassModel(
 			assignments.push(`\t\tthis['${prop.name}'] = data?.['${prop.name}'];`);
 		}
 	}
+
+	const propDecls: string[] = props.map(
+		(prop: ParsedProperty): string =>
+			`\t'${prop.name}'${prop.optional || mayStayUndefined.has(prop.name) ? "?" : ""}: ${prop.typeStr};`,
+	);
 
 	const staticMethods: string[] = [];
 	for (const prop of props) {
@@ -559,7 +618,7 @@ function transformToClassModel(
 
 	const classLines: string[] = [
 		``,
-		`export class ${modelName} implements ${modelName}Interface {`,
+		`export class ${modelName} implements ${implementsClauseFor(modelName, mayStayUndefined)} {`,
 		...propDecls,
 		``,
 		`\tconstructor(data?: ${modelName}Interface) {`,
@@ -902,12 +961,97 @@ function resolveSchemaProperties(schemaObj: OpenApiSchemaObject): SchemaResolved
  *   properties from the `fromJson` hydration path.
  * @param classToPath    - Full class-to-path map, used for import path resolution.
  */
+/**
+ * Whether the constructor assignment emitted for a schema-resolved property can leave it `undefined`.
+ *
+ * Mirrors the branch order of the assignment loop in {@link buildSchemaFirstClassModel} one for one;
+ * the two must stay in step, which is why the classification lives here rather than being spelled out
+ * twice.
+ *
+ * @param property The resolved schema property
+ * @param enumClassNames The class names that are enums rather than models
+ * @return True when hydration can leave the property absent
+ */
+function schemaPropertyMayStayUndefined(
+	property: SchemaResolvedProperty, enumClassNames: Set<string>,
+): boolean {
+	const refIsEnum: boolean = !!property.refClassName && enumClassNames.has(property.refClassName);
+	if ((property.isArrayOfRef || property.isMapOfRef) && property.refClassName) {
+		// Model elements are hydrated into a `[]` / `{}` fallback; enum elements are taken raw.
+		return refIsEnum;
+	}
+	if (property.refClassName) {
+		// `fromJson(undefined)` returns `undefined`, and an enum reference is assigned raw.
+		return true;
+	}
+
+	return property.defaultValue === undefined
+		&& !["string", "number", "boolean"].includes(property.typeStr);
+}
+
+/**
+ * The hydration-optional properties a model inherits through its `allOf` base chain.
+ *
+ * A derived class does not redeclare an inherited property: it inherits the base *class* member, which
+ * the base's own analysis may already have relaxed. Its interface, however, inherits the base
+ * *interface* member, which stays required. Without this, the `implements` check of every derived class
+ * would fail on the base's discriminator — measured on `checkType`, `configurationMode`, `metadataType`
+ * and `fileGroup`.
+ *
+ * Resolved from the schema rather than from previously emitted models, so the result does not depend on
+ * the order in which models happen to be generated.
+ *
+ * @param schemaObj The schema of the derived model
+ * @param schemaByClass All schemas by class name
+ * @param enumClassNames The class names that are enums rather than models
+ * @return The inherited property names whose hydration can leave them `undefined`
+ */
+function inheritedHydrationOptionalKeys(
+	schemaObj: OpenApiSchemaObject,
+	schemaByClass: Map<string, OpenApiSchemaObject>,
+	enumClassNames: Set<string>,
+): Set<string> {
+	const inherited: Set<string> = new Set<string>();
+	const visited: Set<string> = new Set<string>();
+
+	let current: OpenApiSchemaObject | undefined = schemaObj;
+	while (current) {
+		const allOf: OpenApiSchemaObject[] = ((current["allOf"] ?? []) as OpenApiSchemaObject[]);
+		const baseRef: string | undefined = (allOf[0]?.["$ref"] as string | undefined);
+		if (!baseRef) {
+			break;
+		}
+
+		const baseName: string = resolveRefClassName(baseRef);
+		if (visited.has(baseName)) {
+			break;
+		}
+		visited.add(baseName);
+
+		const baseSchema: OpenApiSchemaObject | undefined = schemaByClass.get(baseName);
+		if (!baseSchema) {
+			break;
+		}
+
+		for (const property of resolveSchemaProperties(baseSchema)) {
+			if (property.required && schemaPropertyMayStayUndefined(property, enumClassNames)) {
+				inherited.add(property.name);
+			}
+		}
+
+		current = baseSchema;
+	}
+
+	return inherited;
+}
+
 function buildSchemaFirstClassModel(
 	expectedName: string,
 	targetNoExt: string,
 	schemaObj: OpenApiSchemaObject,
 	enumClassNames: Set<string>,
 	classToPath: Map<string, string>,
+	schemaByClass: Map<string, OpenApiSchemaObject>,
 ): string | undefined {
 	if (expectedName === "Info" || expectedName === "InfoForm") {
 		return undefined;
@@ -953,15 +1097,22 @@ function buildSchemaFirstClassModel(
 		importSymbols.add(resolveRefClassName(ref));
 	}
 
-	const propDecls: string[] = properties.map((p: SchemaResolvedProperty): string =>
-		`    ${p.name}${p.required ? "" : "?"}: ${p.typeStr};`,
-	);
+	// See the sibling set in transformToClassModel: the declaration follows what the constructor can
+	// actually deliver, not what the schema marks as required.
+	const mayStayUndefined: Set<string> = new Set<string>();
 
 	const assignments: string[] = [];
 	for (const p of properties) {
 		const refIsEnum: boolean = !!p.refClassName && enumClassNames.has(p.refClassName);
+		// Only required properties are recorded — see the sibling comment in transformToClassModel.
+		const record: () => void = (): void => {
+			if (p.required) {
+				mayStayUndefined.add(p.name);
+			}
+		};
 		if (p.isArrayOfRef && p.refClassName) {
 			if (refIsEnum) {
+				record();
 				assignments.push(`        this.${p.name} = data?.${p.name};`);
 			} else {
 				assignments.push(`        this.${p.name} = (data?.${p.name} || []).map(`);
@@ -972,6 +1123,7 @@ function buildSchemaFirstClassModel(
 		}
 		if (p.isMapOfRef && p.refClassName) {
 			if (refIsEnum) {
+				record();
 				assignments.push(`        this.${p.name} = data?.${p.name};`);
 			} else {
 				assignments.push(`        this.${p.name} = Object.entries(data?.${p.name} ?? {}).reduce((acc: { [key: string]: ${p.refClassName}; }, [key, value]) => {`);
@@ -982,9 +1134,11 @@ function buildSchemaFirstClassModel(
 			continue;
 		}
 		if (p.refClassName) {
+			record();
 			if (refIsEnum) {
 				assignments.push(`        this.${p.name} = data?.${p.name};`);
 			} else {
+				// `fromJson(undefined)` returns `undefined` — same as in transformToClassModel.
 				assignments.push(`        this.${p.name} = ${p.refClassName}.fromJson(data?.${p.name});`);
 			}
 			continue;
@@ -1009,8 +1163,26 @@ function buildSchemaFirstClassModel(
 			assignments.push(`        this.${p.name} = typeof data?.${p.name} !== "undefined" ? data?.${p.name} : ${p.name}Default;`);
 			continue;
 		}
+		record();
 		assignments.push(`        this.${p.name} = data?.${p.name};`);
 	}
+
+	// The construction contract keeps the schema's `required`; the instance type follows what the
+	// constructor can deliver. See implementsClauseFor for why the two are kept apart.
+	const interfacePropDecls: string[] = properties.map((p: SchemaResolvedProperty): string =>
+		`    ${p.name}${p.required ? "" : "?"}: ${p.typeStr};`,
+	);
+	const classPropDecls: string[] = properties.map((p: SchemaResolvedProperty): string =>
+		`    ${p.name}${p.required && !mayStayUndefined.has(p.name) ? "" : "?"}: ${p.typeStr};`,
+	);
+
+	// The class declares only its own properties, but it *inherits* the base class members — which the
+	// base's own analysis may have relaxed. The `implements` check sees both, so the omission covers
+	// both; see inheritedHydrationOptionalKeys.
+	const omittedFromInterface: Set<string> = new Set<string>([
+		...mayStayUndefined,
+		...inheritedHydrationOptionalKeys(schemaObj, schemaByClass, enumClassNames),
+	]);
 
 	const defaultMethods: string[] = [];
 	const descriptionMethods: string[] = [];
@@ -1139,11 +1311,11 @@ function buildSchemaFirstClassModel(
 		"",
 		`export interface ${expectedName}Interface${interfaceExt}{`,
 		"",
-		...propDecls,
+		...interfacePropDecls,
 		"",
 		"}",
-		`export class ${expectedName}${classExtends} implements ${expectedName}Interface, Parameter {`,
-		...propDecls,
+		`export class ${expectedName}${classExtends} implements ${implementsClauseFor(expectedName, omittedFromInterface)}, Parameter {`,
+		...classPropDecls,
 		"",
 		"    constructor(data?: any) {",
 		...(baseClassName ? ["        super(data);", ""] : []),
@@ -2023,6 +2195,7 @@ function materializeRawModels(rootDir: string, rawModelsDir: string, descriptors
 			schemaByClass.get(expectedName) ?? {},
 			enumClassNames,
 			classToPath,
+			schemaByClass,
 		);
 		if (adminSchemaFirst) {
 			const targetPath: string = path.resolve(generatedBaseDir, `${targetNoExt}.ts`);

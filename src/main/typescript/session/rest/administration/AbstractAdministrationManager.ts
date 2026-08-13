@@ -106,6 +106,29 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 	}
 
 	/**
+	 * Returns the configuration carried by an administration response envelope, or throws when it is
+	 * absent.
+	 *
+	 * The envelope models declare their `configuration` as required, but hydration cannot honour that:
+	 * `fromJson(undefined)` returns `undefined`, so a response without the member yields an envelope
+	 * without a configuration. The fetch methods promise a configuration, so there are only two honest
+	 * outcomes — return one, or fail. Returning `undefined` under a non-optional return type is what
+	 * this replaces: the caller then holds something its own type says cannot exist, and the failure
+	 * surfaces somewhere else entirely.
+	 *
+	 * @param configuration The configuration member of the response envelope.
+	 * @return The configuration, guaranteed to be present.
+	 * @throws ResultException Shall be thrown when the response carried no configuration.
+	 */
+	private requireConfiguration<T_CONFIGURATION>(configuration?: T_CONFIGURATION): T_CONFIGURATION {
+		if (configuration === undefined || configuration === null) {
+			throw new ClientResultException(WsclientErrors.ADMIN_CONFIGURATION_MISSING);
+		}
+
+		return configuration;
+	}
+
+	/**
 	 * Returns the byte size of the current log or a specific log file of the server. If the date query parameter
 	 * is specified, an explicitly selected log will be read.
 	 *
@@ -247,10 +270,11 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			await request.executeRequest()
 		);
 
-		this.applicationConfiguration = applicationConfiguration.configuration;
+		let configuration: Application = this.requireConfiguration(applicationConfiguration.configuration);
+		this.applicationConfiguration = configuration;
 		this.globalKeyStore = applicationConfiguration.globalKeyStore;
 
-		return this.applicationConfiguration;
+		return configuration;
 	}
 
 	/**
@@ -372,11 +396,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			await request.executeRequest()
 		);
 
-		this.serverConfiguration = serverConfiguration.configuration;
+		let configuration: Server = this.requireConfiguration(serverConfiguration.configuration);
+		this.serverConfiguration = configuration;
 		this.connectorKeyStore = serverConfiguration.connectorKeyStore;
 		this.trustStoreKeyStore = serverConfiguration.trustStoreKeyStore;
 
-		return this.serverConfiguration;
+		return configuration;
 	}
 
 	/**
@@ -496,11 +521,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(HttpMethod.GET, this.session.getURL("admin/configuration/user"));
 
-		this.userConfiguration = UserConfiguration.fromJson(
+		let configuration: Users = this.requireConfiguration(UserConfiguration.fromJson(
 			await request.executeRequest()
-		).configuration;
+		).configuration);
+		this.userConfiguration = configuration;
 
-		return this.userConfiguration;
+		return configuration;
 	}
 
 	/**
@@ -615,11 +641,12 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 		let request: HttpRestRequest = await HttpRestRequest.createRequest(this.session)
 			.buildRequest(HttpMethod.GET, this.session.getURL("admin/configuration/log"));
 
-		this.logConfiguration = LogConfiguration.fromJson(
+		let configuration: LogFileConfiguration = this.requireConfiguration(LogConfiguration.fromJson(
 			await request.executeRequest()
-		).configuration
+		).configuration);
+		this.logConfiguration = configuration;
 
-		return this.logConfiguration;
+		return configuration;
 	}
 
 	/**
@@ -1142,9 +1169,10 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			await request.executeRequest()
 		);
 
-		this.clusterConfiguration = clusterConfiguration.configuration;
+		let configuration: ClusterSettings = this.requireConfiguration(clusterConfiguration.configuration);
+		this.clusterConfiguration = configuration;
 
-		return this.clusterConfiguration;
+		return configuration;
 	}
 
 	/**
@@ -1262,9 +1290,10 @@ export abstract class AbstractAdministrationManager<T_REST_DOCUMENT extends Rest
 			await request.executeRequest()
 		);
 
-		this.providerConfiguration = providerConfiguration.configuration;
+		let configuration: ProviderSettings = this.requireConfiguration(providerConfiguration.configuration);
+		this.providerConfiguration = configuration;
 
-		return this.providerConfiguration;
+		return configuration;
 	}
 
 	/**

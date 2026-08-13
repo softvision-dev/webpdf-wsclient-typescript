@@ -167,12 +167,12 @@ suite("RestWebserviceIntegrationTest", function (): void {
 
 			switch (pageCount) {
 				case 1:
-					expect(Math.round(page.boxes.mediaBox.height || 0)).to.equal(595);
-					expect(Math.round(page.boxes.mediaBox.width || 0)).to.equal(842);
+					expect(Math.round(page.boxes?.mediaBox?.height || 0)).to.equal(595);
+					expect(Math.round(page.boxes?.mediaBox?.width || 0)).to.equal(842);
 					break;
 				case 2:
-					expect(Math.round(page.boxes.mediaBox.height || 0)).to.equal(842);
-					expect(Math.round(page.boxes.mediaBox.width || 0)).to.equal(595);
+					expect(Math.round(page.boxes?.mediaBox?.height || 0)).to.equal(842);
+					expect(Math.round(page.boxes?.mediaBox?.width || 0)).to.equal(595);
 					break;
 			}
 		}
@@ -440,8 +440,8 @@ suite("RestWebserviceIntegrationTest", function (): void {
 		);
 
 		let resultDocument: RestDocument | undefined = await webService.process(uploadedFile);
-		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.part).to.equal("3");
-		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information.pdfa.conformance).to.equal("b");
+		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information?.pdfa?.part).to.equal("3");
+		expect((resultDocument!.getDocumentFile().metadata as MetadataPdf).information?.pdfa?.conformance).to.equal("b");
 
 		let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 

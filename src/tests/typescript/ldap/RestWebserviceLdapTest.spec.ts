@@ -36,7 +36,7 @@ suite("RestWebserviceLdapTest", function (): void {
 		expect(user.isUser, "User should be user.").to.be.true;
 		certificates = await session.getCertificates();
 		expect(certificates, "User should have certificates object.").to.exist;
-		expect(certificates.keyStores.length, "User should have keystores.").to.be.greaterThan(0);
+		expect(certificates.keyStores?.length, "User should have keystores.").to.be.greaterThan(0);
 
 		for (let keystore of certificates?.keyStores || []) {
 			if (keystore.keyStoreName!.indexOf("PRINCIPAL") !== -1) {
@@ -45,12 +45,12 @@ suite("RestWebserviceLdapTest", function (): void {
 			}
 		}
 
-		expect(certificates!.certificates.length, "User should have certificates.").to.be.greaterThan(0);
+		expect(certificates!.certificates?.length, "User should have certificates.").to.be.greaterThan(0);
 
 		let freshCertificates: UserCertificates = await session.getUserManager().readCertificates();
 		expect(freshCertificates, "readCertificates should not return null.").to.exist;
-		expect(freshCertificates.keyStores.length, "readCertificates should return keystores.").to.be.greaterThan(0);
-		expect(freshCertificates.certificates.length, "readCertificates should return certificates.").to.be.greaterThan(0);
+		expect(freshCertificates.keyStores?.length, "readCertificates should return keystores.").to.be.greaterThan(0);
+		expect(freshCertificates.certificates?.length, "readCertificates should return certificates.").to.be.greaterThan(0);
 
 		// check errorneous
 		parameter = KeyStorePassword.fromJson({
@@ -83,7 +83,7 @@ suite("RestWebserviceLdapTest", function (): void {
 		} as KeyStorePassword);
 		certificates = await session.updateCertificates(keyStoreName, parameter);
 		expect(certificates, "User should have certificates object.").to.exist;
-		expect(certificates!.keyStores.length, "User should have a keystore.").to.be.greaterThan(0);
+		expect(certificates!.keyStores?.length, "User should have a keystore.").to.be.greaterThan(0);
 
 		for (let keystore of certificates?.keyStores || []) {
 			if (keystore.keyStoreName === keyStoreName) {
@@ -92,9 +92,9 @@ suite("RestWebserviceLdapTest", function (): void {
 			}
 		}
 
-		expect(certificates!.certificates.length, "User should have certificates.").to.be.greaterThan(0);
+		expect(certificates!.certificates?.length, "User should have certificates.").to.be.greaterThan(0);
 
-		for (let certificate of certificates!.certificates) {
+		for (let certificate of certificates!.certificates!) {
 			if (certificate.aliasName === "billymiller") {
 				expect(certificate.keyStoreName, "keystore name should match this certificate.").to.equal(keyStoreName);
 				expect(certificate.hasPrivateKey, "this certificate should have a private key.").to.be.true;
@@ -114,7 +114,7 @@ suite("RestWebserviceLdapTest", function (): void {
 			keyStorePassword: "bmi"
 		});
 		certificates = await session.updateCertificates(keyStoreName, parameter);
-		for (let certificate of certificates!.certificates) {
+		for (let certificate of certificates!.certificates!) {
 			if (certificate.aliasName === "billymiller") {
 				expect(certificate.isPrivateKeyReadable, "this certificates private key should not be readable.").to.be.false;
 			}
@@ -129,7 +129,7 @@ suite("RestWebserviceLdapTest", function (): void {
 			keyStorePassword: "bmi"
 		});
 		certificates = await session.updateCertificates(keyStoreName, parameter);
-		for (let certificate of certificates!.certificates) {
+		for (let certificate of certificates!.certificates!) {
 			if (certificate.aliasName === "billymiller") {
 				expect(certificate.isPrivateKeyReadable, "this certificates private key should be readable.").to.be.true;
 			}
@@ -138,8 +138,8 @@ suite("RestWebserviceLdapTest", function (): void {
 		// verify updateCertificatePasswords mirrors updateCertificates
 		let viaUserManager: UserCertificates = await session.getUserManager().updateCertificatePasswords(keyStoreName, parameter);
 		expect(viaUserManager, "updateCertificatePasswords should not return null.").to.exist;
-		expect(viaUserManager.keyStores.length, "updateCertificatePasswords should return keystores.").to.be.greaterThan(0);
-		expect(viaUserManager.certificates.length, "updateCertificatePasswords should return certificates.").to.be.greaterThan(0);
+		expect(viaUserManager.keyStores?.length, "updateCertificatePasswords should return keystores.").to.be.greaterThan(0);
+		expect(viaUserManager.certificates?.length, "updateCertificatePasswords should return certificates.").to.be.greaterThan(0);
 
 		await session.close();
 	});

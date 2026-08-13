@@ -221,5 +221,13 @@ export const WsclientErrors: Record<string, WsclientError> = {
     /**
      * User access violation. An Administration role user is required.
      */
-    ADMIN_PERMISSION_ERROR: new WsclientError(-55, "Admin permission required.")
+    ADMIN_PERMISSION_ERROR: new WsclientError(-55, "Admin permission required."),
+
+    /**
+     * A configuration response did not carry the configuration itself. The request succeeded and the
+     * payload parsed, but its `configuration` member was absent, so there is nothing to return or to
+     * cache. Reported instead of handing out an empty or absent configuration, which the caller would
+     * have no way to tell apart from a real one.
+     */
+    ADMIN_CONFIGURATION_MISSING: new WsclientError(-56, "The server response contained no configuration.")
 }

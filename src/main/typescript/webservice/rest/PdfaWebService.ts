@@ -28,7 +28,11 @@ export class PdfaWebService<T_REST_DOCUMENT extends RestDocument>
 	 * @return The {@link Pdfa} operation parameters.
 	 */
 	public getOperationParameters(): Pdfa {
-		return this.getOperationData().pdfa;
+		// Non-null: the operation element is seeded by this class' own initOperation() below, which
+		// the base constructor calls before any caller can reach this getter. The generated model
+		// declares it optional because hydration from a payload that omits it would leave it absent —
+		// which cannot happen here, because the operation is built rather than received.
+		return this.getOperationData().pdfa!;
 	}
 
 	/**

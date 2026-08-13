@@ -241,9 +241,9 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		let serverConfig: Server = await session.getAdministrationManager().getServerConfiguration();
 		expect(serverConfig, "Server configuration should exist.").to.exist;
-		expect(serverConfig.host.name, "Host name should be localhost.").to.equal("localhost");
+		expect(serverConfig.host?.name, "Host name should be localhost.").to.equal("localhost");
 
-		serverConfig.host.name = "custom";
+		serverConfig.host!.name = "custom";
 
 		try {
 			await session.getAdministrationManager().updateServerConfiguration(serverConfig);
@@ -253,10 +253,10 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		serverConfig = await session.getAdministrationManager().fetchServerConfiguration();
 		expect(serverConfig, "Server configuration should exist.").to.exist;
-		expect(serverConfig.host.name, "Host name should be custom.").to.equal("custom");
+		expect(serverConfig.host?.name, "Host name should be custom.").to.equal("custom");
 
 		// reset host name
-		serverConfig.host.name = "localhost";
+		serverConfig.host!.name = "localhost";
 		await session.getAdministrationManager().updateServerConfiguration(serverConfig);
 
 		await session.close();
@@ -275,16 +275,16 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		let applicationConfig: Application = await session.getAdministrationManager().getApplicationConfiguration();
 		expect(applicationConfig, "Application configuration should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface, "UserInterface should exist.").to.exist;
+		expect(applicationConfig.portal?.userInterface, "UserInterface should exist.").to.exist;
 
-		applicationConfig.portal.userInterface = new ApplicationConfigPortalUserInterface({
+		applicationConfig.portal!.userInterface = new ApplicationConfigPortalUserInterface({
 			limits: {
 				displayDiskSpace: true
 			}
 		} as ApplicationConfigPortalUserInterfaceInterface);
-		expect(applicationConfig.portal.userInterface, "UserInterface should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface!.limits, "Limits should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface!.limits!.displayDiskSpace, "DisplayDiskSpace should be true.").to.equal(true);
+		expect(applicationConfig.portal?.userInterface, "UserInterface should exist.").to.exist;
+		expect(applicationConfig.portal?.userInterface!.limits, "Limits should exist.").to.exist;
+		expect(applicationConfig.portal?.userInterface!.limits!.displayDiskSpace, "DisplayDiskSpace should be true.").to.equal(true);
 
 		try {
 			await session.getAdministrationManager().updateApplicationConfiguration(applicationConfig);
@@ -294,12 +294,12 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		applicationConfig = await session.getAdministrationManager().fetchApplicationConfiguration();
 		expect(applicationConfig, "Application configuration should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface, "UserInterface should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface!.limits, "Limits should exist.").to.exist;
-		expect(applicationConfig.portal.userInterface!.limits!.displayDiskSpace, "DisplayDiskSpace should be true.").to.equal(true);
+		expect(applicationConfig.portal?.userInterface, "UserInterface should exist.").to.exist;
+		expect(applicationConfig.portal?.userInterface!.limits, "Limits should exist.").to.exist;
+		expect(applicationConfig.portal?.userInterface!.limits!.displayDiskSpace, "DisplayDiskSpace should be true.").to.equal(true);
 
 		// reset displayDiskSpace
-		applicationConfig.portal.userInterface!.limits = undefined;
+		applicationConfig.portal!.userInterface!.limits = undefined;
 		await session.getAdministrationManager().updateApplicationConfiguration(applicationConfig);
 
 		await session.close();
@@ -641,7 +641,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 
 		let serverConfig: Server = await session.getAdministrationManager().getServerConfiguration();
 		expect(serverConfig, "Server configuration should exist.").to.exist;
-		expect(serverConfig.connectors.connector![1].ssl!.keystore.file, "Keystore should be default.").to.equal("ssl.jks");
+		expect(serverConfig.connectors?.connector![1].ssl!.keystore?.file, "Keystore should be default.").to.equal("ssl.jks");
 
 		let connectorKeyStores: {
 			[key: string]: ConnectorKeyStore;
@@ -649,7 +649,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		expect(connectorKeyStores["ssl.jks"], "Default keystore should exist.").to.exist;
 		expect(connectorKeyStores["ssl.jks"].certificates?.length, "Keystore certificates should exist.").to.be.greaterThan(0);
 
-		serverConfig.connectors.connector![1].ssl!.keystore = KeystoreSSL.fromJson({
+		serverConfig.connectors!.connector![1].ssl!.keystore = KeystoreSSL.fromJson({
 			type: SSLKeystoreFormat.JKS,
 			file: sslKeystoreFilename,
 			password: "webpdf"
@@ -667,15 +667,15 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		}
 
 		expect(serverConfig, "Server configuration should exist.").to.exist;
-		expect(serverConfig.connectors.connector![1].ssl!.keystore, "Keystore should exist.").to.exist;
+		expect(serverConfig.connectors?.connector![1].ssl!.keystore, "Keystore should exist.").to.exist;
 
 		connectorKeyStores = await session.getAdministrationManager().fetchConnectorKeyStore();
 		expect(connectorKeyStores[sslKeystoreFilename], "New keystore should exist.").to.exist;
 		expect(connectorKeyStores[sslKeystoreFilename].certificates?.length, "Keystore certificates should exist.").to.be.greaterThan(0);
 
 		// reset keystore
-		serverConfig.connectors.connector![1].ssl!.keystore.type = SSLKeystoreFormat.JKS;
-		serverConfig.connectors.connector![1].ssl!.keystore.file = "ssl.jks";
+		serverConfig.connectors!.connector![1].ssl!.keystore!.type = SSLKeystoreFormat.JKS;
+		serverConfig.connectors!.connector![1].ssl!.keystore!.file = "ssl.jks";
 		delete connectorKeyStores[sslKeystoreFilename];
 		session.getAdministrationManager().setConnectorKeyStore(connectorKeyStores);
 		await session.getAdministrationManager().updateServerConfiguration(serverConfig);
