@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-07-22T13:12:09Z)"
+		"version": "webPDF 11.0.0 (2026-08-21T13:52:24Z)"
 	},
 	"servers": [
 		{
@@ -20018,6 +20018,9 @@
 							"$ref": "#/components/schemas/Auth_Provider"
 						}
 					},
+					"ocrEngines": {
+						"$ref": "#/components/schemas/Portal_OcrEngines"
+					},
 					"serverMode": {
 						"$ref": "#/components/schemas/Cluster_Mode"
 					},
@@ -20083,6 +20086,21 @@
 						"items": {
 							"$ref": "#/components/schemas/ApplicationConfig_NewsPanelEntry"
 						}
+					}
+				},
+				"readOnly": true
+			},
+			"Portal_OcrEngines": {
+				"type": "object",
+				"description": "Availability of the optional bring-your-own OCR engines on the node that answered: whether the engine is registered there, which is what an OCR call resolves against. The bundled 'tesseract' engine is always available; for 'ai-vision' see the 'ai' projection.",
+				"properties": {
+					"external": {
+						"type": "boolean",
+						"default": false
+					},
+					"http": {
+						"type": "boolean",
+						"default": false
 					}
 				},
 				"readOnly": true
@@ -20817,17 +20835,28 @@
 			},
 			"ServerConfig_Mcp": {
 				"type": "object",
-				"description": "Configures the Model Context Protocol (MCP) server embedded in webPDF.\n\nAuthentication is **PAT passthrough**: the MCP server holds no credential of its own. Tool execution requires the caller's own Personal/Service Access Token (PAT), sent as `Authorization: Bearer <PAT>`, which is also used for the webPDF REST calls the tools perform; a tool call without a token fails. Capability discovery (listing tools, resources, and prompts) is open and needs no token. Token validity, scope, and revocation are enforced by the webPDF REST API. There is intentionally no server-side MCP token to configure.\n\nOverride any attribute via the corresponding environment variable or system property (takes precedence over XML values).",
+				"description": "Configures the Model Context Protocol (MCP) server embedded in webPDF.\n\nAuthentication is **PAT passthrough**: the MCP server holds no credential of its own. **Every** request to the endpoint requires the caller's own Personal/Service Access Token (PAT), sent as `Authorization: Bearer <PAT>` - capability discovery included. The same token is used for the document operations the tools perform. A request without a valid token is answered with `401` and a `WWW-Authenticate: Bearer` challenge, as the MCP specification requires (\"authorization MUST be included in every HTTP request from client to server\"). Token validity, scope, and revocation are enforced centrally by the webPDF session resolution. There is intentionally no server-side MCP token to configure.\n\nOverride any attribute via the corresponding environment variable or system property (takes precedence over XML values).",
 				"properties": {
+					"allowedHosts": {
+						"type": "string",
+						"default": "",
+						"description": "Comma-separated list of values the `Host` header of a request to the MCP endpoint may carry. A request whose host is not listed is answered with the status `421 Misdirected Request`. This is defense in depth against DNS rebinding, in addition to `allowedOrigins`.\n\n**Empty by default, which disables the check**, because a webPDF server is reached under whatever host name its deployment uses - possibly several, and possibly a different one in front of a reverse proxy than on the connector. Configure it only when the set of valid host names is known and fixed.\n\nEach entry is either an exact host (`webpdf.example.com:8080`) or a host with a port wildcard (`webpdf.example.com:*`). Entries are compared to the header **character by character**, so write host names in lower case - a mixed-case entry never matches and the request is rejected.\n\nOverride via environment variable `WEBPDF_MCP_ALLOWEDHOSTS` or system property `webpdf.mcp.allowedHosts`."
+					},
+					"allowedOrigins": {
+						"type": "string",
+						"default": "",
+						"description": "Comma-separated list of browser origins that may call the MCP endpoint. The MCP specification requires the `Origin` header to be validated on every connection to prevent DNS rebinding attacks, and a present but disallowed origin to be answered with `403 Forbidden`.\n\n**The empty default is the secure one:** it rejects every request that carries an `Origin` header at all - that is, every request made from a browser page. Programmatic MCP clients (agents, CLI tools) send no `Origin` header and are therefore unaffected. Configure this only to permit a browser-based MCP client.\n\nEach entry is either an exact origin (`https://agent.example.com:8443`) or an origin with a port wildcard (`https://agent.example.com:*`). Entries are compared to the header **character by character**, so write host names in lower case - a mixed-case entry never matches and the request is rejected.\n\nOverride via environment variable `WEBPDF_MCP_ALLOWEDORIGINS` or system property `webpdf.mcp.allowedOrigins`."
+					},
 					"enabled": {
 						"type": "boolean",
 						"default": true,
 						"description": "Controls whether the MCP server is started. Defaults to `true` when the `<mcp>` element is present.\n\nThe MCP server is **disabled by default** when no `<mcp>` element is present in `server.xml` and no environment variable is set. Add `<mcp/>` to `server.xml` or set `WEBPDF_MCP_ENABLED=true` to activate the MCP server.\n\nOverride via environment variable `WEBPDF_MCP_ENABLED` or system property `webpdf.mcp.enabled`."
 					},
-					"url": {
-						"type": "string",
-						"default": "",
-						"description": "Overrides the base URL of the webPDF REST API used by the MCP server for internal tool calls (e.g. `http://localhost:8080/webPDF/`).\n\nIf empty, the URL is derived automatically from the active connector and context path.\n\nIn cluster deployments, set this to the load balancer URL (e.g. `http://haproxy-internal/webPDF/`) so that tool executions are distributed across all cluster nodes.\n\nOverride via environment variable `WEBPDF_MCP_URL` or system property `webpdf.mcp.url`."
+					"maxRequestSizeBytes": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1048576,
+						"description": "Upper bound in bytes for the body of a single request to the MCP endpoint. A larger request is rejected with `413 Payload Too Large` before it is read.\n\nThe MCP endpoint carries JSON-RPC messages only - document content is never sent through it, but uploaded out-of-band and referenced by a share reference - so the default of 1 MiB is ample. Raise it only if a tool call legitimately carries larger arguments. A value of `0` or less disables the limit, which is discouraged: the transport reads the whole body into memory before parsing it.\n\nOverride via environment variable `WEBPDF_MCP_MAXREQUESTSIZEBYTES` or system property `webpdf.mcp.maxRequestSizeBytes`."
 					}
 				}
 			},
