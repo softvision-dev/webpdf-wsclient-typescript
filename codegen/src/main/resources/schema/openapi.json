@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.5 (2026-05-05T07:21:32Z)"
+		"version": "webPDF 10.0.7 (2026-08-27T10:03:04Z)"
 	},
 	"servers": [
 		{
@@ -5881,7 +5881,7 @@
 					"stopOnError": {
 						"type": "boolean",
 						"default": false,
-						"description": "If 'true', the server node is also started if an error has occurred (e.g. when joining the cluster)."
+						"description": "If 'true' (default), the server node aborts its startup when a cluster error occurs (e.g. a join failure). If 'false', the node logs the error and continues to start as a standalone server."
 					}
 				}
 			},
@@ -8089,12 +8089,12 @@
 					"conformance": {
 						"type": "string",
 						"default": "",
-						"description": "The PDF/A conformance level."
+						"description": "The PDF/A conformance level claimed by the document, in lower case, for example \"a\", \"b\" or \"u\".\n\nThe conformance level is optional and this attribute may be empty even for a valid PDF/A document: PDF/A-4 (ISO 19005-4) declares none at all, and only its variants PDF/A-4e and PDF/A-4f add \"e\" respectively \"f\". Do not use this attribute to decide whether a document is a PDF/A document - use `part` for that."
 					},
 					"part": {
 						"type": "string",
 						"default": "",
-						"description": "The ISO-19005 part number."
+						"description": "The ISO-19005 part number claimed by the document, for example \"1\", \"2\", \"3\" or \"4\".\n\nThis attribute decides whether the document claims PDF/A conformance at all: it is empty when the document declares no part number, or one that can not be read as a positive number. An empty value therefore means \"this is not a PDF/A document\"."
 					}
 				}
 			},
@@ -18566,7 +18566,7 @@
 					"version": {
 						"type": "string",
 						"default": "v10Comfort",
-						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions from 1.0 to 2.3 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRECHNUNG\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical, and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung\n*   v23Minimum\n*   v23BasicWL\n*   v23Basic\n*   v23EN16931\n*   v23Extended\n*   v23XRechnung",
+						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions from 1.0 to 2.5 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRECHNUNG\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical, and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung\n*   v23Minimum\n*   v23BasicWL\n*   v23Basic\n*   v23EN16931\n*   v23Extended\n*   v23XRechnung\n*   v24Minimum\n*   v24BasicWL\n*   v24Basic\n*   v24EN16931\n*   v24Extended\n*   v24XRechnung\n*   v25Minimum\n*   v25BasicWL\n*   v25Basic\n*   v25EN16931\n*   v25Extended\n*   v25XRechnung",
 						"enum": [
 							"v10Comfort",
 							"v20Minimum",
@@ -18591,7 +18591,19 @@
 							"v23Basic",
 							"v23EN16931",
 							"v23Extended",
-							"v23XRechnung"
+							"v23XRechnung",
+							"v24Minimum",
+							"v24BasicWL",
+							"v24Basic",
+							"v24EN16931",
+							"v24Extended",
+							"v24XRechnung",
+							"v25Minimum",
+							"v25BasicWL",
+							"v25Basic",
+							"v25EN16931",
+							"v25Extended",
+							"v25XRechnung"
 						],
 						"x-webpdf-codegen": {
 							"enumName": "Operation_ZugferdVersion"
@@ -19933,7 +19945,7 @@
 					"certificatesTrustMode": {
 						"type": "string",
 						"default": "validate",
-						"description": "Specifies the mode for handling the certificates presented by the LDAP server when establishing a connection.\n\n*   validate = Only certificates that can be verified as publicly valid are classified as trusted. It may be necessary to place the certificate or the issuer's certificate in the server's truststore. Self-signed certificates (e.g., from an own certificate authority) are excluded if they cannot be verified via a configured truststore.\n*   acceptAll = All certificates are classified as trusted, including expired, unverifiable, invalid or self-signed certificates.",
+						"description": "Specifies the mode for handling the certificates presented by the LDAP server when establishing a connection.\n\n*   validate = Only certificates that can be verified as publicly valid are classified as trusted. It may be necessary to place the certificate or the issuer's certificate in the server's truststore. Self-signed certificates (e.g., from an own certificate authority) are excluded if they cannot be verified via a configured truststore.\n*   acceptAll = All certificates are classified as trusted, including expired, unverifiable, invalid or self-signed certificates. The host name of the LDAP server is not verified in this mode either, and the server writes a warning to the log.\n\nWhether the certificate has to name the contacted host is decided separately, by \"verifyHostName\".",
 						"enum": [
 							"validate",
 							"acceptAll"
@@ -19965,6 +19977,9 @@
 					"keepAlive": {
 						"$ref": "#/components/schemas/ServerConfig_UserKeepAliveLdap"
 					},
+					"referralPolicy": {
+						"$ref": "#/components/schemas/ServerConfig_UserLdapReferralPolicy"
+					},
 					"roleBase": {
 						"type": "string",
 						"default": "",
@@ -19995,6 +20010,39 @@
 						"type": "string",
 						"default": "",
 						"description": "The LDAP request used to find the user's login name with. (e.g. \"(sAMAccountName={0})\".)"
+					},
+					"verifyHostName": {
+						"type": "boolean",
+						"default": false,
+						"description": "When set to true, an encrypted connection (\"ldaps\") additionally verifies that the certificate presented by the LDAP server actually names the host from \"connectionURL\". This is an axis of its own, independent of \"certificatesTrustMode\": the trust mode decides whether the certificate chain is trusted, this setting decides whether the certificate belongs to the contacted server. Without it, any certificate accepted by the trust mode is sufficient, including one issued for an entirely different host.\n\nA host name is matched against the subject alternative names of the certificate (DNS, URI and IP entries) and against the common name of its subject. Wildcard names such as \"\\*.example.local\" are accepted. An IP address in \"connectionURL\" is matched against the IP entries; a certificate without a matching entry is rejected.\n\nA connection to a loopback address (for example \"ldaps://127.0.0.1\") is exempt from the check and is accepted without a matching certificate entry. A loopback connection cannot be redirected by an attacker on the network, so there is no identity to verify; this follows the \"potentially trustworthy origin\" rule of the W3C Secure Contexts specification. Note that the host name \"localhost\" is **not** covered by this exception and is matched normally.\n\nThe setting has no effect for unencrypted connections (\"ldap\") and no effect when \"certificatesTrustMode\" is set to \"acceptAll\". When an encrypted connection is used without host name verification, the server writes a warning to the log.\n\nThe check can also be switched on globally for the underlying LDAP library through its own system property. Setting this attribute to \"false\" does not switch such a global setting off - it only refrains from switching the check on. The one case in which the server does override it is \"certificatesTrustMode\" set to \"acceptAll\": a certificate that is trusted unconditionally has no identity worth verifying, so that mode installs the permissive verifier of the LDAP library regardless of the global setting."
+					}
+				}
+			},
+			"ServerConfig_UserLdapReferralPolicy": {
+				"type": "object",
+				"description": "Restricts the targets that the server may be sent to when it follows an LDAP referral (\"followReferral\"). A referral target is supplied by the directory service and is contacted with the credentials of the LDAP service account, so an unrestricted referral hands those credentials to a host that webPDF was never configured for.\n\nA target is evaluated in a fixed order: a denied host always wins, then a referral that would downgrade an encrypted base connection (\"ldaps\") to an unencrypted connection (\"ldap\") is rejected, then an allowed host is accepted, and finally the same-host restriction is applied. The downgrade rule compares against the configured connection, not against the previous referral, and it also rejects the rare case of a referral that names the \"ldap\" scheme but the TLS port of the same server.\n\nThe lists are host based. A directory service that also controls DNS can point a name that is not denied at an address that is; only the same-host restriction bounds that case, which is why it is the primary control and the deny list an addition.",
+				"properties": {
+					"allowedHosts": {
+						"type": "string",
+						"default": "",
+						"description": "A comma-separated list of additionally permitted referral hosts. An entry starting with a dot (e.g. \".example.local\") matches the bare domain and all of its sub-domains, every other entry is matched exactly. A leading \"\\*\" is not a supported wildcard. IP addresses may be used directly and are compared as addresses, so alternative notations of the same address match the same entry."
+					},
+					"deniedHosts": {
+						"type": "string",
+						"default": "",
+						"description": "A comma-separated list of referral hosts that are never contacted. The same matching rules as for \"allowedHosts\" apply. A denied host is rejected even when it is listed in \"allowedHosts\" or is the host of \"connectionURL\"."
+					},
+					"maxHops": {
+						"type": "integer",
+						"format": "int32",
+						"default": 5,
+						"description": "The maximum number of referrals that are followed for a single request. The value shown is the same one the underlying LDAP library uses. The setting is applied only when the attribute is actually present, so a limit configured globally for that library keeps working while the attribute is absent.",
+						"minimum": 1
+					},
+					"restrictToSameHost": {
+						"type": "boolean",
+						"default": false,
+						"description": "When set to true, a referral may only be followed to the host of \"connectionURL\" or to a host listed in \"allowedHosts\". When set to false, every host that is not denied is permitted; the server then writes a warning to the log as long as \"followReferral\" is switched on."
 					}
 				}
 			},
