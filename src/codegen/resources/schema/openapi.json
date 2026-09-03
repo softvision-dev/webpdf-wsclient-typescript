@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-08-27T06:39:41Z)"
+		"version": "webPDF 11.0.0 (2026-09-03T12:10:21Z)"
 	},
 	"servers": [
 		{
@@ -5022,6 +5022,12 @@
 					"bridges": {
 						"$ref": "#/components/schemas/ApplicationConfig_BridgesApplication"
 					},
+					"contentStreamLimits": {
+						"$ref": "#/components/schemas/ApplicationConfig_ContentStreamLimits"
+					},
+					"invoiceValidation": {
+						"$ref": "#/components/schemas/ApplicationConfig_InvoiceValidation"
+					},
 					"keystore": {
 						"$ref": "#/components/schemas/ApplicationConfig_Keystore"
 					},
@@ -5213,6 +5219,36 @@
 					}
 				}
 			},
+			"ApplicationConfig_ContentStreamLimits": {
+				"type": "object",
+				"description": "Defines the maximum sizes, in bytes, for the content streams of a processed PDF document. Exceeding a limit ends the request with error code `-5031`. Where a document is only examined for information and not processed, the affected content stream is skipped instead.\n\nThe three limits are independent, because compressed data can expand: the decoded size of a single content stream, the size the same content stream occupies in the file, and the total size of all content streams of a single page.",
+				"properties": {
+					"maxDecodedStreamSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 13631488,
+						"description": "Maximum size, in bytes, of a single decoded content stream. Default: `13631488` (13 MiB).\n\nThis limit also applies to the combined content of a page that is read as a whole. It bounds the amount of decoded content the server accepts for further processing, and with it the working memory that processing requires.\n\nNote which of the two per-content-stream limits protects what: a content stream has to be decompressed before its decoded size is known, so it is \"maxEncodedStreamSize\" that limits how much data a single request can cause to be decompressed at all, while this limit bounds what is then processed. To reduce the memory a compressed content stream can demand, lower \"maxEncodedStreamSize\"; lowering this limit alone does not achieve it. A value of `0` or less disables the limit, which is not recommended.\n\nOverride via environment variable `WEBPDF_CONTENTSTREAMLIMITS_MAXDECODEDSTREAMSIZE` or system property `webpdf.contentStreamLimits.maxDecodedStreamSize`.",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
+					},
+					"maxEncodedStreamSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 8388608,
+						"description": "Maximum size, in bytes, of a single content stream as it is stored in the file, checked before the content stream is decoded. Default: `8388608` (8 MiB).\n\nIndependent of \"maxDecodedStreamSize\", which limits the result of the decoding instead. This is the limit that decides how much a single request can cause to be decompressed, and therefore the one to lower when compressed content streams have to demand less memory and processing time.\n\nNote that an uncompressed content stream occupies as much space in the file as it does decoded, so a very large uncompressed content stream is refused by this limit even though its decoded size would be accepted. A value of `0` or less disables the limit.\n\nOverride via environment variable `WEBPDF_CONTENTSTREAMLIMITS_MAXENCODEDSTREAMSIZE` or system property `webpdf.contentStreamLimits.maxEncodedStreamSize`.",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
+					},
+					"maxPageContentSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 67108864,
+						"description": "Maximum total size, in bytes, of the decoded content of a single page. Default: `67108864` (64 MiB).\n\nApplies where the content of a page is copied instead of being analysed: the \"toolbox\" web service's \"annotation\" operation, when the appearance of an annotation is created from a page of a second PDF document. Such a page may distribute its content over several content streams, and this limit applies to their sum. A value of `0` or less disables the limit.\n\nOverride via environment variable `WEBPDF_CONTENTSTREAMLIMITS_MAXPAGECONTENTSIZE` or system property `webpdf.contentStreamLimits.maxPageContentSize`.",
+						"maximum": 9223372036854775807,
+						"minimum": -9223372036854775808
+					}
+				}
+			},
 			"ApplicationConfig_ConverterWebservice": {
 				"type": "object",
 				"description": "Defines a set of options specific for the \"Converter\" web service.",
@@ -5263,6 +5299,95 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					}
+				}
+			},
+			"ApplicationConfig_InvoiceRuleSet": {
+				"type": "object",
+				"description": "One rule package entry. Either overrides a built-in identifier (\"xrechnung\" / \"zugferd\") or, together with an explicit \"location\", introduces an additional, operator-provided rule package.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Activates or deactivates this rule package entry without a code change."
+					},
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "The rule package identifier. An entry whose \"id\" is neither a built-in identifier nor accompanied by a \"location\" is a misconfiguration (most likely a typo) and is rejected when the configuration is read: it is NOT registered, and the rejection is logged at ERROR."
+					},
+					"location": {
+						"type": "string",
+						"default": "",
+						"description": "Path to the folder holding the rule package's \"scenarios.xml\", relative to the server's schema resource folder. Omit this attribute to keep a built-in identifier's built-in location while only overriding \"enabled\" or its position in the selection order. A location that cannot be resolved to a readable rule package is a misconfiguration: the entry is NOT registered, the rejection is logged at ERROR, and requests that reference it end in \"notEvaluable\"."
+					}
+				},
+				"required": [
+					"id"
+				]
+			},
+			"ApplicationConfig_InvoiceValidation": {
+				"type": "object",
+				"description": "Server-wide settings for the invoice rule validation engine. The feature is opt-in per request via \"pdfa > convert > zugferd > invoiceRuleValidation/@mode\" and via \"pdfa > analyze > invoiceRuleValidation/@mode\"; there is no separate top-level \"enabled\" attribute here. The two built-in rule packages are available unless explicitly disabled below.",
+				"properties": {
+					"maxActiveRuleSets": {
+						"type": "integer",
+						"format": "int32",
+						"default": 4,
+						"description": "Upper limit of simultaneously active rule packages (built-in plus configured). A package beyond this limit is not registered; requests that reference it end in \"notEvaluable\".",
+						"minimum": 0
+					},
+					"maxAttachmentCandidates": {
+						"type": "integer",
+						"format": "int32",
+						"default": 64,
+						"description": "Upper limit of the embedded file entries considered while looking for an invoice attachment in an uploaded PDF/A document (\"pdfa > analyze\"). A document carrying more candidate entries than this is not evaluated (notEvaluable, reason \"tooManyAttachments\") rather than having its candidates silently truncated. The same limit caps how many nodes of the document's embedded-file name tree are visited while looking, so a document cannot spread few entries over arbitrarily many nodes.",
+						"minimum": 1
+					},
+					"maxAttachmentCompressedSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 2097152,
+						"description": "Upper size limit, in bytes, of the RAW, still compressed stream of an invoice attachment extracted from an uploaded PDF/A document (\"pdfa > analyze\"), checked before anything is decompressed. A larger attachment is not evaluated (notEvaluable, reason \"invoiceAttachmentTooLarge\"). Independent of \"maxDocumentSize\", which bounds the decompressed invoice document instead.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
+					},
+					"maxDocumentDepth": {
+						"type": "integer",
+						"format": "int32",
+						"default": 100,
+						"description": "Upper limit of the nesting depth of the already-parsed invoice document. A more deeply nested document is not evaluated (notEvaluable, reason \"documentTooDeep\").",
+						"minimum": 1
+					},
+					"maxDocumentSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 8388608,
+						"description": "Upper size limit, in bytes, of an invoice document that is checked against a rule package. A larger document is not evaluated (notEvaluable, reason \"documentTooLarge\"). Also bounds the INFLATION of an invoice attachment extracted from an uploaded PDF/A document (\"pdfa > analyze\"): exceeding it while decompressing the attachment ends the check the same way, before the engine is even reached.",
+						"maximum": 9223372036854775807,
+						"minimum": 1
+					},
+					"maxOriginalReportSize": {
+						"type": "integer",
+						"format": "int64",
+						"default": 8388608,
+						"description": "Upper size limit, in bytes, of the original rule-package report (VARL) handed out to a caller on request, measured against the RAW payload before it is base64-encoded. Independent of the six limits above, which bound what the server accepts: this one bounds the ANSWER, which grows with the number of findings an untrusted document produces and can grow by orders of magnitude beyond webPDF's own report. A payload exceeding this limit is omitted rather than truncated, and the verdict itself is unaffected.\n\nThe limit bounds the WORK as well as the answer: a payload is produced under it rather than measured after the fact, so production stops as soon as the limit is passed and an over-large report is never materialised in full. \"0\" switches the delivery off entirely - nothing is produced at all - the same fail-closed reading the limits above already have. The limit applies to the human-readable HTML view (\"originalReportHtml\") the same way and separately, each payload against its own raw size. Prefer delivering a large report as a linked file over embedding it in an error message when this limit is a concern.",
+						"maximum": 9223372036854775807,
+						"minimum": 0
+					},
+					"ruleSet": {
+						"type": "array",
+						"description": "Overrides the order, activation or location of a rule package. Entries not listed here keep their built-in default (enabled, built-in location). When entries ARE present, they define the automatic selection order; a built-in identifier not mentioned here is appended after the listed entries, in its built-in default order. See \"invoiceValidation\" above for why the order between the two built-in packages is meaningful, not arbitrary.",
+						"items": {
+							"$ref": "#/components/schemas/ApplicationConfig_InvoiceRuleSet"
+						}
+					},
+					"timeout": {
+						"type": "integer",
+						"format": "int32",
+						"default": 60,
+						"description": "Soft time budget, in seconds, for one invoice check as a whole. In \"pdfa > analyze\" that covers locating and reading the invoice attachment as well as the rule validation itself - the two share this budget, they do not each receive one. Checked at phase boundaries (not by aborting an in-flight XSLT transformation); the effective budget is the smaller of this value and the remaining time of the surrounding web service request (\"webservices/@maxLatency\" in application.xml). Exceeding it ends the validation as \"notEvaluable\", reason \"timeBudgetExceeded\". Exceeding the surrounding request's own \"maxLatency\" is the existing, unrelated worker timeout and does not produce this reason.",
+						"minimum": 1
 					}
 				}
 			},
@@ -10244,8 +10369,11 @@
 			},
 			"Operation_AnalyzePdfa": {
 				"type": "object",
-				"description": "Used to define the parameters for the PDF/A conversion.",
+				"description": "Used to validate an existing PDF/A document.",
 				"properties": {
+					"invoiceRuleValidation": {
+						"$ref": "#/components/schemas/Operation_InvoiceRuleValidation"
+					},
 					"level": {
 						"type": "string",
 						"default": "3b",
@@ -13781,6 +13909,59 @@
 				},
 				"x-webpdf-codegen": {
 					"extends": "Operation_ActionEvent"
+				}
+			},
+			"Operation_InvoiceRuleValidation": {
+				"type": "object",
+				"description": "Optionally validates a ZUGFeRD/Factur-X/XRechnung invoice XML against an official e-invoicing rule package (KoSIT XRechnung 3.0.2 or Landrix ZUGFeRD 2.5). Two elements use this type, and the same parameters trigger the same check in both: \"convert > zugferd > invoiceRuleValidation\" checks the invoice supplied with the request, before it is embedded, and \"analyze > invoiceRuleValidation\" checks an invoice that is already embedded in the uploaded PDF/A document. In \"analyze\" the invoice is located in the document itself: an attachment named by the XMP \"DocumentFileName\" pointer, or carrying one of the canonical invoice file names, or marked as an associated file. A document that carries no such attachment, more than one equally qualified one, or one that cannot be read is reported as \"state=notEvaluable\" with the corresponding reason.\n\nThis is independent of and in addition to webPDF's own XSD validation of the ZUGFeRD schema variant (error code -410), which always runs first in the \"convert\" branch and is unaffected by this element: a document can be valid against webPDF's own schema and still be rejected here, because the official rule packages check business rules the schema alone cannot express - and vice versa, a document that fails the rule package's own, stricter schema step is reported through the error code documented below (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR), never through -410 itself.\n\nThe two branches differ in how \"mode=enforce\" surfaces a rejection, because they differ in what the operation returns. In \"convert\", a rejection aborts the operation with the error code documented on the \"zugferd\" web service response (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR) instead of embedding the invoice; that single error code does NOT by itself distinguish a genuine rule violation from a document that could not be evaluated at all, a distinction available only in the invoice validation report (see \"report/invoice.xsd\", attributes \"state\" and \"reason\") and in a single WARN log entry per request. In \"analyze\", the operation always returns its analysis report and never a dedicated error code for this check; the rejection decision is instead recorded as \"enforcement\" on that report's \"invoice\" element (see \"report/pdfa.xsd\").",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"default": "disabled",
+						"description": "\"disabled\" (default): no rule package is loaded and behaviour is byte-identical to a request without this element at all.\n\n\"report\": the invoice is checked against a rule package and the outcome is added to the \"invoice\" element of the PDF/A report, but the outcome NEVER changes the result of the operation - in \"convert\" a rule-violating invoice is still embedded, in \"analyze\" the document is still analysed and its report still delivered. In \"convert\" the result is only VISIBLE when a report was additionally requested via \"errorReport\" and/or \"successReport\" (both default to \"none\"); in \"analyze\" the report IS always the response, so the result is always visible there.\n\n\"enforce\": a document whose rule package assessment is \"reject\" is, in \"convert\", rejected with error code -416 instead of being embedded. In \"analyze\" there is no dedicated error code and the operation still returns its report; the rejection is instead recorded as \"enforcement=rejected\" on that report's \"invoice\" element. Whether a document that could not be evaluated at all is also rejected is governed separately by \"notEvaluable\".",
+						"enum": [
+							"disabled",
+							"report",
+							"enforce"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceValidationMode"
+						}
+					},
+					"notEvaluable": {
+						"type": "string",
+						"default": "reject",
+						"description": "Only effective under \"mode=enforce\". Governs the enforcement decision for a document that could NOT be evaluated at all - no rule package matched, a size or depth limit was exceeded, the time budget was exceeded, the configured rule package could not be loaded, or (in \"analyze\") no invoice attachment could be identified or read at all. \"reject\" (default, fail-closed): such a document is treated the same as a genuine rule violation - rejected with error code -416 in \"convert\", or reported as \"enforcement=rejected\" in \"analyze\". \"accept\": such a document is embedded (\"convert\") or reported as \"enforcement=passed\" (\"analyze\") instead. Either way, this attribute NEVER rescues a document that WAS evaluated and rejected by the rule package itself - it only covers the \"could not be evaluated\" case.",
+						"enum": [
+							"reject",
+							"accept"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceNotEvaluable"
+						}
+					},
+					"originalReport": {
+						"type": "string",
+						"default": "none",
+						"description": "Whether the rule package's OWN report - the \"Validation Artefact Result List\" the package produces while checking the document, and which webPDF otherwise discards - is delivered alongside webPDF's own invoice validation result, and in which form. \"none\" (default): it is not delivered, and the answer is exactly the answer of a request that does not name this attribute at all. \"embedded\": it is delivered base64-encoded in the \"originalReport\" element of the invoice validation result (see \"report/invoice.xsd\") - complete and unaltered, including its own XML declaration, so that a recipient can hand it to another tool as the standalone document the rule package produced. webPDF neither rewrites nor abridges it, and it is delivered IN ADDITION to webPDF's own result, never instead of it.\n\nThe payload travels wherever the invoice validation result itself travels, and only there - it is part of the report, not a second response. Under \"mode=disabled\" no rule package is loaded at all, so there is neither a result nor a payload. In \"analyze\" the report IS the response, so an evaluated document carries the payload unless one of the reasons named below removes it. In \"convert\" a report is delivered only when one was requested - through \"successReport\" for a document that was embedded, or through \"errorReport\" for a document rejected under \"mode=enforce\" - so with both of those at \"none\" the payload has nowhere to travel and is simply not produced. That is a documented interaction and not an error: asking for the payload never turns a request into a failure, and never makes the operation deliver a report that was not asked for.\n\nThe ABSENCE of the payload therefore carries no verdict information of its own - \"state\", \"assessment\", \"reason\" and the finding counters are unaffected by it. Every reason it can be absent is described at the element itself in \"report/invoice.xsd\". The one worth naming here: it is absent whenever no rule package evaluation produced a report at all, which is every \"state=notEvaluable\" outcome whatever its reason - including the ordinary \"analyze\" case of a document that carries no invoice attachment. Under \"mode=enforce\" with \"notEvaluable=reject\" such a document is still rejected; the rejection and the absent payload are independent statements.\n\n**Size:** the rule package's own report is a multiple of webPDF's own result, it grows with the number of findings the checked document produces, and the base64 encoding adds to that again - a response can grow by orders of magnitude. For large reports use \"errorReport=file\", which delivers the report as a response document, rather than \"errorReport=message\". A server administrator can additionally cap the payload (see \"invoiceValidation\" in the application configuration schema); above that ceiling the payload is omitted while the verdict and the operation's result stay exactly as they are.\n\n**Important, when combined with \"errorReport=message\":** the rule package's report carries invoice CONTENT - among other things the supplier, the invoice number, the invoice date and a table of element values taken from the checked document. With \"errorReport=message\" that content is delivered in the ERROR channel (the REST error body, the SOAP fault) instead of as a report document, and error channels are routinely logged and forwarded by callers, middleware and monitoring. The combination is served rather than refused, but choose it deliberately: \"errorReport=file\" delivers the same report, with the same payload, as a response document instead.",
+						"enum": [
+							"none",
+							"embedded"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceOriginalReport"
+						}
+					},
+					"originalReportHtml": {
+						"type": "boolean",
+						"default": false,
+						"description": "Whether the human-readable HTML view the rule package embeds in its OWN report is ADDITIONALLY delivered as a payload of its own, in the \"originalReportHtml\" element of the invoice validation result (see \"report/invoice.xsd\") - the same element name as this attribute, deliberately. \"false\" (default): the view is not delivered separately, and the answer is exactly the answer of a request that does not name this attribute at all.\n\nOnly effective when \"originalReport\" is not \"none\": this attribute decides only WHETHER the view travels, never in which form - its delivery form always follows \"originalReport\". With \"originalReport=none\" there is no rule package report to take a view out of, so \"originalReportHtml\" has no effect and asking for it is not an error, exactly like every other documented interaction of this element.\n\nThe view is EXTRACTED from the rule package's own report, never re-rendered: it is the very HTML fragment that report already embeds. It is delivered UTF-8 encoded and, being a fragment of an XML document rather than a standalone HTML file, carries no character-set declaration of its own - a recipient that serves or stores it as HTML has to state UTF-8 itself. Its absence carries no verdict information of its own; every reason it can be absent is described at the element itself in \"report/invoice.xsd\". None of them changes \"state\", \"assessment\", \"reason\" or the finding counters, and asking for the view never turns a request into a failure.\n\nSubject to the same operator size ceiling as \"originalReport\" (see \"invoiceValidation\" in the application configuration schema), measured against the view's own raw, not-yet-encoded size and applied independently of it: a ceiling that suppresses the (larger) report does not by itself suppress the (smaller) view."
+					},
+					"ruleSet": {
+						"type": "string",
+						"default": "",
+						"description": "Forces a specific configured rule package identifier (for example \"xrechnung\" or \"zugferd\") instead of the automatic, ordered selection. Selects a PACKAGE, not a scenario within it: if the forced package has no scenario matching the document, the outcome is \"notEvaluable\" - it does NOT fall back to another package.\n\nBoth built-in packages can declare a matching scenario for the SAME EN 16931-based document (guideline identifier \"urn:cen.eu:en16931:2017\"); without this override, the server-configured selection order decides which one is used (see \"invoiceValidation\" in the application configuration schema). Use this attribute when the caller, not the server's default order, must decide which of the two packages such a document is checked against."
+					}
 				}
 			},
 			"Operation_Item": {
@@ -19664,6 +19845,9 @@
 				"type": "object",
 				"description": "This element can be optionally used to integrate a ZUGFeRD document. The document must at least be converted to PDF/A-3 format.",
 				"properties": {
+					"invoiceRuleValidation": {
+						"$ref": "#/components/schemas/Operation_InvoiceRuleValidation"
+					},
 					"xmlFile": {
 						"$ref": "#/components/schemas/Operation_ZugferdFileData"
 					}
