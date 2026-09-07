@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-09-03T12:10:21Z)"
+		"version": "webPDF 11.0.0 (2026-09-07T06:47:20Z)"
 	},
 	"servers": [
 		{
@@ -5266,7 +5266,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts/truetype`.\n\n**Note:** On Linux, the home directory of the user under which the server is running is also always used in addition. The environment variable `user.home` with the subdirectory `.fonts` is used.\n\n**Important:** This setting is supported only by the built-in document converter OutsideIn."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting is supported only by the built-in document converter OutsideIn. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\" or \"Toolbox\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -5879,7 +5879,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path of the server from which to retrieve installed fonts."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Pdfa\" web service only and does not change the fonts used by the \"Converter\" or \"Toolbox\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -6495,6 +6495,11 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If enabled, then the web service is activated."
+					},
+					"fontPath": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Toolbox\" web service only and does not change the fonts used by the \"Converter\" or \"Pdfa\" web service."
 					},
 					"instances": {
 						"type": "integer",
