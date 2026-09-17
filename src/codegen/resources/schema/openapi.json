@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-09-07T06:47:20Z)"
+		"version": "webPDF 11.0.0 (2026-09-17T07:12:07Z)"
 	},
 	"servers": [
 		{
@@ -6541,8 +6541,8 @@
 				"properties": {
 					"hashAlgorithm": {
 						"type": "string",
-						"default": "SHA-1",
-						"description": "The hashing algorithm used to check the validity of the timestamp.",
+						"default": "SHA-256",
+						"description": "The hashing algorithm used to build the message imprint of the timestamp request.\n\nThe default is `SHA-256`. `MD5` and `SHA-1` are deprecated for this purpose: collisions can be produced for them, and current signature validators (ETSI EN 319 102-1 / PAdES) reject a timestamp built on them. Both values remain selectable only for compatibility with an existing TSA service and may be removed in a future main version.",
 						"enum": [
 							"MD5",
 							"SHA-1",
@@ -10267,7 +10267,7 @@
 					"fieldName": {
 						"type": "string",
 						"default": "Signature1",
-						"description": "Defines the name of the field (in the document) in which the signature will be saved. If a field name that is not unique is declared, then a unique name will be automatically created."
+						"description": "Defines the name of the field (in the document) in which the signature will be saved. If a field name that is not unique is declared, then a unique name will be automatically created.\n\n**Be aware:** The field name is matched **case-insensitively**, and so is the check for a naming collision. Addressing a field the document already provides therefore selects that field even when the casing differs - `signature2` signs an existing field named `Signature2`, and no second field is created. For the same reason a requested `text1` is created as `text1_1` next to an existing field named `Text1`. Field names are case-sensitive in the PDF specification; webPDF relaxes that intentionally, so that a field a document already provides is not missed over a difference in spelling."
 					},
 					"keyName": {
 						"type": "string",
@@ -19889,7 +19889,7 @@
 					"version": {
 						"type": "string",
 						"default": "v10Comfort",
-						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions from 1.0 to 2.5 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRECHNUNG\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical, and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung\n*   v23Minimum\n*   v23BasicWL\n*   v23Basic\n*   v23EN16931\n*   v23Extended\n*   v23XRechnung\n*   v24Minimum\n*   v24BasicWL\n*   v24Basic\n*   v24EN16931\n*   v24Extended\n*   v24XRechnung\n*   v25Minimum\n*   v25BasicWL\n*   v25Basic\n*   v25EN16931\n*   v25Extended\n*   v25XRechnung",
+						"description": "Used to define the version of the ZUGFeRD XML file that should be embedded with \"xmlFile\". Versions from 1.0 to 2.5 are supported. Only the \"Comfort\" profile is available for version 1.0. Meanwhile, the \"Minimum\", \"Basic WL\", \"Basic\", \"EN16931\" (Comfort), and \"Extended\" profiles are supported for version 2.0.\n\n**Note:** Since version 2.x, the referenced profile \"XRechnung\" is additionally available. This profile has been included specifically to include invoices for Germany, based on and under the sole responsibility of KoSIT, Germany's central coordination agency for IT's e-invoice CIUS \"XRechnung\". It is defined as the Standard for electronic invoices issued to public administrations, and essentially adds specific business rules to EN 16931 in order to comply with national laws and regulations.\n\n**Note:** Since version 2.1.1 ZUGFeRD and Factur-X are technically identical, and both formats use Factur-X as common identification.\n\nList of versions with the corresponding profiles:\n\n*   v10Comfort\n*   v20Minimum\n*   v20BasicWL\n*   v20Basic\n*   v20EN16931\n*   v20Extended\n*   v21Minimum\n*   v21BasicWL\n*   v21Basic\n*   v21EN16931\n*   v21Extended\n*   v21XRechnung\n*   v22Minimum\n*   v22BasicWL\n*   v22Basic\n*   v22EN16931\n*   v22Extended\n*   v22XRechnung\n*   v23Minimum\n*   v23BasicWL\n*   v23Basic\n*   v23EN16931\n*   v23Extended\n*   v23XRechnung\n*   v24Minimum\n*   v24BasicWL\n*   v24Basic\n*   v24EN16931\n*   v24Extended\n*   v24XRechnung\n*   v25Minimum\n*   v25BasicWL\n*   v25Basic\n*   v25EN16931\n*   v25Extended\n*   v25XRechnung",
 						"enum": [
 							"v10Comfort",
 							"v20Minimum",
