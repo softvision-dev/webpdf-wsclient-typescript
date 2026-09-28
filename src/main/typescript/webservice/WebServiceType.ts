@@ -1,5 +1,5 @@
-import {Barcode, BaseToolbox, Converter, Ocr, Pdfa, Signature, UrlConverter} from "../generated-sources";
-import {WebService} from "./WebService";
+import {Barcode, BaseToolbox, Converter, Ocr, Pdfa, Signature, UrlConverter} from "../generated-sources/index.js";
+import {WebService} from "./WebService.js";
 
 /**
  * Represents a single Webservice type with its unique endpoint

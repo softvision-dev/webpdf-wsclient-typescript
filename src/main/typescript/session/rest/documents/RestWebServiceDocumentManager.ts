@@ -1,9 +1,9 @@
-import {RestWebServiceDocument} from "./RestWebServiceDocument";
-import {AbstractDocumentManager} from "./AbstractDocumentManager";
-import {RestSession} from "../RestSession";
-import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState";
-import {DocumentManager} from "./DocumentManager";
-import {DocumentFile} from "../../../generated-sources";
+import {RestWebServiceDocument} from "./RestWebServiceDocument.js";
+import {AbstractDocumentManager} from "./AbstractDocumentManager.js";
+import {RestSession} from "../RestSession.js";
+import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState.js";
+import {DocumentManager} from "./DocumentManager.js";
+import {DocumentFile} from "../../../generated-sources/index.js";
 
 /**
  * An instance of {@link RestWebServiceDocumentManager} allows to monitor and interact with the

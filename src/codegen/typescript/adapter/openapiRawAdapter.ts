@@ -1,6 +1,7 @@
 ﻿import fs from "node:fs";
 import path from "node:path";
-import {ModelName} from "./ModelName";
+import {fullySpecifyGeneratedSources} from "./EsmImportSpecifiers.js";
+import {ModelName} from "./ModelName.js";
 
 /** Minimal OpenAPI 3.x document shape used for schema extraction. */
 type OpenApiSpec = {
@@ -2043,7 +2044,7 @@ function extendClassToPathFromRawDescriptors(
 	// type references in generated files and to resolve import paths for raw-named imports.
 	const rawToExpected: Map<string, string> = new Map<string, string>();
 	type Pkg = { prefix: string; location: string };
-	const configPath: string = path.resolve(__dirname, "../../resources/generator_config.json");
+	const configPath: string = path.resolve(import.meta.dirname, "../../resources/generator_config.json");
 	const { packages } = JSON.parse(fs.readFileSync(configPath, "utf8")) as { packages: Pkg[] };
 	const prefixMaps: Array<{ pascal: string; loc: string }> = packages
 		.map((p: Pkg): { pascal: string; loc: string } => ({ pascal: p.prefix.replace("_", ""), loc: p.location }))
@@ -3007,6 +3008,9 @@ function verifyRawModelCoverage(rootDir: string, rawModelsDir: string): string[]
  *    `fromJson`/`toJson`/`clone` lifecycle methods, and writes the result to
  *    `generated-sources/`.
  * 6. **Summary** — writes `build/codegen/adapter/adapter-summary.json` with coverage metrics.
+ * 7. **ESM specifier normalization** — the final pass ({@link fullySpecifyGeneratedSources}):
+ *    appends `.js` to every relative import/export specifier written above, so the compiled
+ *    package can be loaded by the native Node.js ESM resolver.
  *
  * @param rootDir - Absolute path to the repository root.
  */
@@ -3034,5 +3038,11 @@ export function adaptOpenApiRawOutput(
 		const summary: AdapterSummary = materializeRawModels(rootDir, rawModelsDir, descriptors);
 		summary.missingFromRaw = Array.from(new Set<string>([...summary.missingFromRaw, ...missingFromCoverage])).sort((a: string, b: string): number => a.localeCompare(b));
 		writeAdapterSummary(rootDir, summary);
+
+		// Final normalization pass: the ESM-only package needs every relative specifier in the
+		// generated sources fully specified (native Node.js resolves neither missing extensions nor
+		// directory imports). Runs once, after every other rewrite of the generated output above.
+		const rewrittenSpecifiers: number = fullySpecifyGeneratedSources(path.resolve(rootDir, "src/main/typescript/generated-sources"));
+		console.log(`[codegen] Fully specified ${rewrittenSpecifiers} relative import specifier(s) in generated-sources/.`);
 	}
 }

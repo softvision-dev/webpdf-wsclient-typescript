@@ -1,11 +1,14 @@
-import {Auth0Config, Auth0Provider, AzureConfig, AzureProvider, ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
+import {Auth0Config, Auth0Provider, AzureConfig, AzureProvider, ServerType, TestConfig, TestResources, TestServer} from "./testsuite/index.js";
 import {expect} from "chai";
-import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
-import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
+import {PdfaWebService, RestDocument, RestSession, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript/index.js";
+import {ConvertPdfa, ConvertPdfaInterface, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
-const fs: any = require('fs');
-const tmp: any = require('tmp');
+import fs from "node:fs";
+import {createRequire} from "node:module";
+
+const require: NodeJS.Require = createRequire(import.meta.url);
+const tmp: any = require("tmp");
 
 suite("Oauth2TokenIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');

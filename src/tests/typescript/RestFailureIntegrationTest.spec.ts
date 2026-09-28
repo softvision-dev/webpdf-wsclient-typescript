@@ -1,7 +1,7 @@
-import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite/index.js";
 import {expect} from "chai";
-import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
-import {BaseToolbox, Signature, SignatureInterface} from "../../main/typescript/generated-sources";
+import {ConverterWebService, RestDocument, RestSession, ServerResultException, SessionContext, SessionFactory, ToolboxWebService, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript/index.js";
+import {BaseToolbox, Signature, SignatureInterface} from "../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
 suite("RestFailureIntegrationTest", function (): void {

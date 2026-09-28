@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite/index.js";
 import {
 	BarcodeWebService,
 	ConverterWebService,
@@ -17,7 +17,7 @@ import {
 	WebServiceProtocol,
 	WebServiceTypes,
 	wsclientConfiguration
-} from "../../main/typescript";
+} from "../../main/typescript/index.js";
 import {
 	AnnotationRectangle,
 	Barcode,
@@ -51,11 +51,14 @@ import {
 	UrlConverterInterface,
 	UserCredentials,
 	MetadataPdf
-} from "../../main/typescript/generated-sources";
+} from "../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
-const fs: any = require('fs');
-const tmp: any = require('tmp');
+import fs from "node:fs";
+import {createRequire} from "node:module";
+
+const require: NodeJS.Require = createRequire(import.meta.url);
+const tmp: any = require("tmp");
 
 suite("RestWebserviceIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');

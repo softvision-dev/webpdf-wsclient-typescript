@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import {expect} from "chai";
 import {it, suite} from "mocha";
-import {adaptOpenApiRawOutput} from "../../../codegen/typescript/adapter/openapiRawAdapter";
+import {adaptOpenApiRawOutput} from "../../../codegen/typescript/adapter/openapiRawAdapter.js";
 
 function createTempRoot(): string {
 	const tempRoot: string = fs.mkdtempSync(path.join(os.tmpdir(), "webpdf-openapi-raw-adapter-test-"));
@@ -1143,6 +1143,57 @@ suite("OpenApiRawAdapterTest", function (): void {
 			// Loop serializes values via toJson() where available, not raw own-property enumeration.
 			expect(generatedContent).to.contain("for (const key of keys) {");
 			expect(generatedContent).to.contain("i?.toJson?.() ?? i");
+		} finally {
+			fs.rmSync(rootDir, {recursive: true, force: true});
+		}
+	});
+
+	it("fully specifies every relative module specifier in all generated sources", function (): void {
+		const rootDir: string = createTempRoot();
+		try {
+			writeNestedModelHydrationSpec(rootDir);
+			fs.writeFileSync(path.join(rootDir, "build", "codegen", "raw", "models", "Barcode.ts"), [
+				"import type { AddBarcode } from './AddBarcode';",
+				"export interface Barcode {",
+				"  'add'?: AddBarcode;",
+				"}",
+				"",
+			].join("\n"), "utf8");
+			fs.writeFileSync(path.join(rootDir, "build", "codegen", "raw", "models", "AddBarcode.ts"), [
+				"export interface AddBarcode {",
+				"  'text'?: string;",
+				"}",
+				"",
+			].join("\n"), "utf8");
+
+			adaptOpenApiRawOutput(rootDir);
+
+			// Native Node.js ESM resolution neither guesses extensions nor resolves directories, so the
+			// published package only loads when every relative specifier names its .js file.
+			const generatedBaseDir: string = path.join(rootDir, "src", "main", "typescript", "generated-sources");
+			const generatedFiles: string[] = (fs.readdirSync(generatedBaseDir, {recursive: true}) as string[])
+				.filter((file: string): boolean => file.endsWith(".ts"))
+				.map((file: string): string => file.split(path.sep).join("/"))
+				.sort((a: string, b: string): number => a.localeCompare(b));
+			const specifierPattern: RegExp = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])(\.{1,2}\/[^"']*)\1/g;
+			const specifiers: string[] = [];
+			for (const file of generatedFiles) {
+				const content: string = fs.readFileSync(path.join(generatedBaseDir, file), "utf8");
+				for (const match of content.matchAll(specifierPattern)) {
+					specifiers.push(`${file}: ${match[2]}`);
+				}
+			}
+
+			expect(generatedFiles).to.include.members(["index.ts", "Parameter.ts", "operation/AddBarcode.ts", "operation/Barcode.ts"]);
+			// The barrel carries every specifier form the adapter writes itself.
+			for (const barrelPrefix of ["index.ts: ./operation/", "index.ts: ./Parameter", "index.ts: ../openapi/RestOperationData"]) {
+				expect(specifiers.some((entry: string): boolean => entry.startsWith(barrelPrefix)), `${barrelPrefix} in ${JSON.stringify(specifiers)}`)
+					.to.equal(true);
+			}
+			expect(specifiers.some((entry: string): boolean => entry.startsWith("operation/Barcode.ts: ")), "model imports of Barcode.ts")
+				.to.equal(true);
+			const notFullySpecified: string[] = specifiers.filter((entry: string): boolean => !entry.endsWith(".js"));
+			expect(notFullySpecified, "relative specifiers without .js extension").to.deep.equal([]);
 		} finally {
 			fs.rmSync(rootDir, {recursive: true, force: true});
 		}

@@ -1,6 +1,6 @@
 import fs from "fs";
-import {ConverterWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript";
-import {Converter, ConverterInterface, ConverterPage, Metrics} from "../../../../src/main/typescript/generated-sources";
+import {ConverterWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript/index.js";
+import {Converter, ConverterInterface, ConverterPage, Metrics} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link ConverterWebService} demonstrating the conversion of
@@ -73,7 +73,7 @@ class ConvertDocumentsToPdf {
 
 			/** Execute the webservice and download your result document: */
 			let resultDocument: RestDocument | undefined = await converterWebService.process(restDocument);
-			let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+			let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 			/** This is the node variant of writing the file. You could also just download the file contents in browser. */
 			fs.writeFileSync(targetDocument, downloadedFile);
 

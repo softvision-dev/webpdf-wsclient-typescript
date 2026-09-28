@@ -1,3 +1,5 @@
+import NodeFormData from "form-data";
+
 const globals: any = typeof globalThis !== "undefined"
 	? globalThis
 	: (typeof self !== "undefined" ? self : {});
@@ -16,7 +18,7 @@ class WsclientConfiguration {
 		// init defaults
 		const isNodeRuntime: boolean = typeof process !== "undefined" && !!process.versions?.node;
 		if (isNodeRuntime) {
-			this._FormData = require("form-data");
+			this._FormData = NodeFormData as unknown as new (options?: any) => FormData;
 			this._btoa = btoa;
 		} else {
 			this._FormData = typeof FormData !== "undefined" ? FormData : globals.FormData;

@@ -19,6 +19,26 @@ yarn add @softvision/webpdf-wsclient-typescript
 npm install @softvision/webpdf-wsclient-typescript
 ```
 
+## Module Format and Compatibility
+
+Starting with version 11, this package is published as an **ECMAScript module (ESM) only** package (`"type": "module"` in `package.json`).
+
+### Supported consumption styles and minimum versions
+
+- **ESM `import`**: supported from Node.js 20.19.0 or 22.12.0 onward.
+- **CommonJS `require`**: also supported from Node.js 20.19.0 or 22.12.0 onward, via Node's `require(esm)` support. 20.19.0+ and 22.13.0+ load it without a warning; 22.12.x prints a one-time `ExperimentalWarning` for `require()`-ing an ES module, which is harmless; Node 23 (end-of-life) is not tested.
+- **TypeScript**: `moduleResolution: "nodenext"` (both ESM and CommonJS consumers; CommonJS consumers need TypeScript 5.8 or newer for `require(esm)` support) or `moduleResolution: "bundler"` are supported. `moduleResolution: "node16"` or `"node18"` from a CommonJS file are **not** supported for a static `require`; use a dynamic `import()` instead.
+- **Bundlers** (webpack, esbuild, Vite, Parcel, ...) that bundle this package for the browser must honor the `browser` field of its dependencies (`form-data`, `axios`) — this package itself has no `browser` field.
+
+### Behavior change compared to 10.x
+
+- The package is now **ESM-only**; there is no separate `lib/esm/` build anymore.
+- **Deep imports** (e.g. `@softvision/webpdf-wsclient-typescript/lib/...`) worked in 10.x because that release had no `exports` field. In 11, only `.` and `./package.json` are exported; any other subpath fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
+
+### Jest
+
+Using this package from Jest in its default CommonJS mode (without ESM support and without transforming `node_modules`) has **not been verified**. No guarantee is made for that configuration.
+
 ## Usage
 You will find some [usage examples](https://github.com/softvision-dev/webpdf-wsclient-typescript/wiki/Usage) in the wiki.
 
@@ -45,7 +65,12 @@ The following topics are covered:
 | `toolbox`        | Watermark, annotations, attachments, description, display options, encryption  |
 | `urlconverter`   | Convert a URL to PDF                                                           |
 
-> **Note:** The examples import directly from the library source. Adapt the server URL and credentials in each file before running.
+> **Note:** The `examples/typescript/node/` examples import directly from the library source using fully specified `.js` import paths (required by Node's ESM resolver). Adapt the server URL and credentials in each file before running. (The browser examples under `examples/js/` are not part of this and still import directories.)
+
+Run a Node.js example directly from the repository root, for example:
+```bash
+node --no-experimental-strip-types --import ./scripts/register-ts-node.js examples/typescript/node/administration/GetServerStatus.ts
+```
 
 ## Documentation
 Have a look at our [wiki](https://github.com/softvision-dev/webpdf-wsclient-typescript/wiki) for examples and details.
@@ -144,8 +169,11 @@ CI should run the same commands:
 
 | Suite | Command | Server required |
 |---|---|---|
-| Codegen unit tests (30 tests) | `yarn mocha --config .mocharc.json "src/tests/typescript/codegen/**/*.spec.ts"` | No |
+| Codegen unit tests (41 tests) | `yarn mocha --config .mocharc.json "src/tests/typescript/codegen/**/*.spec.ts"` | No |
+| Package smoke test | `yarn run test:package` | No |
 | Full integration suite (62 tests) | `yarn mocha --config .mocharc.json` | Yes |
+
+> **Note:** The package smoke test does not build the package itself — it requires an already built `lib/` (`yarn run build` runs it as its last step). It needs `npm` and `tar` on `PATH`. Optional additional Node.js binaries to cover can be listed in `WSCLIENT_SMOKE_NODE_BINARIES`, separated by the platform's path separator (`;` on Windows, `:` elsewhere).
 
 ### Test configuration
 
@@ -193,7 +221,7 @@ Controls which integration test groups are active.
 
 ## Publishing
 
-`yarn run build` must complete successfully before publishing. It cleans the output directories, regenerates sources via codegen, and compiles TypeScript to `lib/`.
+`yarn run build` must complete successfully before publishing. It cleans the output directories, regenerates sources via codegen, compiles TypeScript to `lib/`, and finally verifies the packed output with the package smoke test.
 
 ### Local (Nexus)
 

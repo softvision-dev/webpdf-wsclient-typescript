@@ -1,6 +1,6 @@
-import {AbstractViewerManager} from "./AbstractViewerManager";
-import {ViewerManager} from "./ViewerManager";
-import {RestWebServiceDocument} from "../documents";
+import {AbstractViewerManager} from "./AbstractViewerManager.js";
+import {ViewerManager} from "./ViewerManager.js";
+import {RestWebServiceDocument} from "../documents/index.js";
 
 /**
  * Concrete {@link ViewerManager} for {@link RestWebServiceDocument}-based sessions.

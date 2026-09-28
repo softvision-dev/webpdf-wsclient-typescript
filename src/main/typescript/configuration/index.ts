@@ -1,1 +1,1 @@
-export * from "./WsclientConfiguration";
+export * from "./WsclientConfiguration.js";

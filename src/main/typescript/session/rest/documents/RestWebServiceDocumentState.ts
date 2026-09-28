@@ -1,9 +1,9 @@
-import {RestDocumentState} from "./RestDocumentState";
-import {RestWebServiceDocument} from "./RestWebServiceDocument";
-import {DocumentFile, HistoryEntry} from "../../../generated-sources";
-import {DocumentManager} from "./DocumentManager";
-import {RestWebServiceDocumentManager} from "./RestWebServiceDocumentManager";
-import {ClientResultException, WsclientErrors} from "../../../exception";
+import {RestDocumentState} from "./RestDocumentState.js";
+import {RestWebServiceDocument} from "./RestWebServiceDocument.js";
+import {DocumentFile, HistoryEntry} from "../../../generated-sources/index.js";
+import {DocumentManager} from "./DocumentManager.js";
+import {RestWebServiceDocumentManager} from "./RestWebServiceDocumentManager.js";
+import {ClientResultException, WsclientErrors} from "../../../exception/index.js";
 
 /**
  * <p>

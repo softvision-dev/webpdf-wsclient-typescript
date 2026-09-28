@@ -5,7 +5,7 @@ import {
 	AuthMaterial,
 	AuthResultException,
 	WSClientSessionToken
-} from "../../../main/typescript";
+} from "../../../main/typescript/index.js";
 
 /**
  * Minimal concrete subclass that exposes the protected/private internals needed to assert

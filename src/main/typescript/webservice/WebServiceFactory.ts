@@ -1,8 +1,8 @@
-import {WebService} from "./WebService";
-import {Document, instanceOfRestSession, RestDocument, RestSession, Session} from "../session";
-import {WebServiceType, WebServiceTypes} from "./WebServiceType";
-import {WebServiceProtocol} from "./WebServiceProtocol";
-import {ClientResultException, WsclientErrors} from "../exception";
+import {WebService} from "./WebService.js";
+import {Document, instanceOfRestSession, RestDocument, RestSession, Session} from "../session/index.js";
+import {WebServiceType, WebServiceTypes} from "./WebServiceType.js";
+import {WebServiceProtocol} from "./WebServiceProtocol.js";
+import {ClientResultException, WsclientErrors} from "../exception/index.js";
 import {
 	Barcode,
 	BarcodeOperation,
@@ -25,8 +25,8 @@ import {
 	UrlConverter,
 	UrlConverterOperation,
 	UrlConverterOperationInterface
-} from "../generated-sources";
-import {RestOperationData} from "../openapi";
+} from "../generated-sources/index.js";
+import {RestOperationData} from "../openapi/index.js";
 import {
 	BarcodeWebService,
 	ConverterWebService,
@@ -36,7 +36,7 @@ import {
 	SignatureWebService,
 	ToolboxWebService,
 	UrlConverterWebService
-} from "./rest";
+} from "./rest/index.js";
 
 /**
  * An instance of {@link WebServiceFactory} produces {@link WebService} instances that establish connections to

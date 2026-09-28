@@ -1,2 +1,2 @@
-export * from "./Document";
-export * from "./AbstractDocument";
+export * from "./Document.js";
+export * from "./AbstractDocument.js";

@@ -1,7 +1,7 @@
-import {Document, Session} from "../session";
-import {WebService} from "./WebService";
-import {WebServiceType} from "./WebServiceType";
-import {Parameter} from "../generated-sources";
+import {Document, Session} from "../session/index.js";
+import {WebService} from "./WebService.js";
+import {WebServiceType} from "./WebServiceType.js";
+import {Parameter} from "../generated-sources/index.js";
 
 /**
  * An instance of {@link AbstractWebService} wraps a wsclient connection to a specific webPDF webservice endpoint

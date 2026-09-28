@@ -1,5 +1,5 @@
-import {RestDocument} from "../documents";
-import {RestSession} from "../RestSession";
+import {RestDocument} from "../documents/index.js";
+import {RestSession} from "../RestSession.js";
 import {
 	AdminClusterConfiguration,
 	AdminClusterConfigurationInterface,
@@ -48,12 +48,12 @@ import {
 	Users,
 	ViewerProfile,
 	ViewerProfileSummary
-} from "../../../generated-sources";
-import {wsclientConfiguration} from "../../../configuration";
-import {DataFormats} from "../../DataFormat";
-import {ClientResultException, WsclientErrors} from "../../../exception";
-import {AdministrationManager} from "./AdministrationManager";
-import {HttpHeaders, HttpMethod, HttpRestRequest} from "../../connection";
+} from "../../../generated-sources/index.js";
+import {wsclientConfiguration} from "../../../configuration/index.js";
+import {DataFormats} from "../../DataFormat.js";
+import {ClientResultException, WsclientErrors} from "../../../exception/index.js";
+import {AdministrationManager} from "./AdministrationManager.js";
+import {HttpHeaders, HttpMethod, HttpRestRequest} from "../../connection/index.js";
 import {AxiosProgressEvent, AxiosResponse} from "axios";
 
 /**

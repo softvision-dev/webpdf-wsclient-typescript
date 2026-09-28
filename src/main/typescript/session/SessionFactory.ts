@@ -1,9 +1,9 @@
-import {Session} from "./Session";
-import {WebServiceProtocol} from "../webservice";
-import {RestWebServiceSession} from "./rest";
-import {ClientResultException, WsclientErrors} from "../exception";
-import {SessionContext} from "./connection";
-import {AnonymousAuthProvider, AuthenticationProvider} from "./auth";
+import {Session} from "./Session.js";
+import {WebServiceProtocol} from "../webservice/index.js";
+import {RestWebServiceSession} from "./rest/index.js";
+import {ClientResultException, WsclientErrors} from "../exception/index.js";
+import {SessionContext} from "./connection/index.js";
+import {AnonymousAuthProvider, AuthenticationProvider} from "./auth/index.js";
 
 /**
  * <p>

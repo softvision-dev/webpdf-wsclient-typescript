@@ -8,14 +8,14 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WsclientError
-} from "../../../../src/main/typescript";
+} from "../../../../src/main/typescript/index.js";
 import {
 	Server,
 	TrustStoreKeyStore,
 	TrustStoreKeyStoreInterface,
 	TruststoreServer,
 	TruststoreServerInterface
-} from "../../../../src/main/typescript/generated-sources";
+} from "../../../../src/main/typescript/generated-sources/index.js";
 import fs from "fs";
 
 /**

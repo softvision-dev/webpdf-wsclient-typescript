@@ -1,4 +1,4 @@
-import {OAuthConfig} from "./OAuthConfig";
+import {OAuthConfig} from "./OAuthConfig.js";
 
 /**
  * <p>

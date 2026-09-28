@@ -8,8 +8,8 @@ import {
 	SessionFactory,
 	WebServiceProtocol,
 	WsclientError,
-} from "../../../../src/main/typescript";
-import {FileCompress, FileExtract, HistoryEntry} from "../../../../src/main/typescript/generated-sources";
+} from "../../../../src/main/typescript/index.js";
+import {FileCompress, FileExtract, HistoryEntry} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link DocumentManager} demonstrating how you can
@@ -70,7 +70,7 @@ class UseDocumentManager {
 			await specificDocument.renameDocument("new name");
 
 			/** download a {@link RestDocument} to {@link File} */
-			let downloadedFile: Buffer = await documentManager.downloadDocument(specificDocument.getDocumentId());
+			let downloadedFile: Uint8Array = await documentManager.downloadDocument(specificDocument.getDocumentId());
 			/** you can also download the file directly */
 			downloadedFile = await specificDocument.downloadDocument();
 			fs.writeFileSync(targetDocument, downloadedFile);

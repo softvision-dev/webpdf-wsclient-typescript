@@ -8,7 +8,7 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WsclientError
-} from "../../../../src/main/typescript";
+} from "../../../../src/main/typescript/index.js";
 import fs from "fs";
 
 /**
@@ -45,7 +45,7 @@ class GetServerSupport {
 			let administrationManager: AdministrationManager<RestDocument> = session.getAdministrationManager();
 
 			/** download the support information */
-			let serverStatus: Buffer = await administrationManager.buildSupportPackage();
+			let serverStatus: Uint8Array = await administrationManager.buildSupportPackage();
 			fs.writeFileSync(targetDocument, serverStatus);
 
 			await session.close();

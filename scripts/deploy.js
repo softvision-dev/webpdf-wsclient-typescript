@@ -1,13 +1,12 @@
-'use strict';
+import "dotenv/config";
 
-require('dotenv').config();
+import {execSync} from "node:child_process";
+import fs from "node:fs";
+import {URL} from "node:url";
+import FormData from "form-data";
+import axios from "axios";
 
-const {execSync} = require('child_process');
-const {URL} = require('url');
-const fs = require('fs');
-const FormData = require('form-data');
-const axios = require('axios');
-const packageJson = require('../package.json');
+const packageJson = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 const PUBLISH_TARGETS = new Set(['local', 'public']);
 

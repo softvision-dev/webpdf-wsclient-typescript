@@ -1,5 +1,5 @@
-import {AuthMaterial} from "./material";
-import {Session} from "../Session";
+import {AuthMaterial} from "./material/index.js";
+import {Session} from "../Session.js";
 
 /**
  * <p>

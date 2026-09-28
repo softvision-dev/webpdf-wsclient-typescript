@@ -1,1 +1,1 @@
-export * from "./RestOperationData";
+export * from "./RestOperationData.js";

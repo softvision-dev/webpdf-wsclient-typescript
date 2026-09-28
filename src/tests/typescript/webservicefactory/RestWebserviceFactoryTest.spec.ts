@@ -1,4 +1,4 @@
-import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite/index.js";
 import {expect} from "chai";
 import {
 	BarcodeWebService,
@@ -17,7 +17,7 @@ import {
 	WebServiceProtocol,
 	WebServiceType,
 	WebServiceTypes
-} from "../../../main/typescript";
+} from "../../../main/typescript/index.js";
 import {
 	BarcodeOperation,
 	CertificationLevel,
@@ -39,7 +39,7 @@ import {
 	ToolboxRotate,
 	ToolboxWatermark,
 	UrlConverterOperation
-} from "../../../main/typescript/generated-sources";
+} from "../../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
 suite("RestWebserviceFactoryTest", function (): void {

@@ -1,4 +1,4 @@
-import {WebServiceProtocol} from "../../webservice";
+import {WebServiceProtocol} from "../../webservice/index.js";
 import {AxiosProxyConfig} from "axios";
 import {Agent} from "https";
 

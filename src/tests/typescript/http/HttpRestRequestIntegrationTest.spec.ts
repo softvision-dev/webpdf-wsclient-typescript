@@ -1,7 +1,7 @@
-import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite/index.js";
 import {expect} from "chai";
-import {ClientResultException, HttpMethod, HttpRestRequest, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol, wsclientConfiguration, WsclientErrors} from "../../../main/typescript";
-import {DocumentFile} from "../../../main/typescript/generated-sources";
+import {ClientResultException, HttpMethod, HttpRestRequest, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, UserAuthProvider, WebServiceProtocol, wsclientConfiguration, WsclientErrors} from "../../../main/typescript/index.js";
+import {DocumentFile} from "../../../main/typescript/generated-sources/index.js";
 import {AxiosResponse} from "axios";
 import {it, suite} from "mocha";
 

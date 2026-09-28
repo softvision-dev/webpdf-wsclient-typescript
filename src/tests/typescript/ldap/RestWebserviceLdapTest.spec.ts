@@ -7,9 +7,9 @@ import {
 	SessionFactory,
 	UserAuthProvider,
 	WebServiceProtocol
-} from "../../../main/typescript";
-import {ServerType, TestConfig, TestServer} from "../testsuite";
-import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources";
+} from "../../../main/typescript/index.js";
+import {ServerType, TestConfig, TestServer} from "../testsuite/index.js";
+import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
 suite("RestWebserviceLdapTest", function (): void {

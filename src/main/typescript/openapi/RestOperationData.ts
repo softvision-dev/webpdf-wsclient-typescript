@@ -10,7 +10,7 @@ import {
 	Settings,
 	Signature,
 	UrlConverter
-} from "../generated-sources";
+} from "../generated-sources/index.js";
 
 /**
  * <p>

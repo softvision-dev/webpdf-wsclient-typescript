@@ -1,0 +1,12 @@
+{
+	"_comment": "The loader line is duplicated verbatim in .mocharc.json because Mocha configs cannot extend/inherit one another; whoever changes the loader must change both files. This config deliberately has no \"require\" on bootstrap.ts: the package smoke test packs and installs the built package into a throwaway consumer directory and must not start the integration test's Docker container.",
+	"spec": [
+		"src/tests/typescript/package/**/*.smoke.ts"
+	],
+	"timeout": 600000,
+	"parallel": false,
+	"node-option": [
+		"no-experimental-strip-types",
+		"import=./scripts/register-ts-node.js"
+	]
+}

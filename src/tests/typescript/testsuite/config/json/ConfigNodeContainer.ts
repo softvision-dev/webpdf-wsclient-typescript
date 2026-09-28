@@ -1,5 +1,5 @@
-import {ConfigNode} from "./ConfigNode";
-import {JsonConfigNode} from "./JsonConfigNode";
+import {ConfigNode} from "./ConfigNode.js";
+import {JsonConfigNode} from "./JsonConfigNode.js";
 
 export abstract class ConfigNodeContainer implements ConfigNode {
 	private readonly node: JsonConfigNode;

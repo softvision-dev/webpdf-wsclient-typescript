@@ -1,4 +1,4 @@
-import {Document} from "./Document";
+import {Document} from "./Document.js";
 
 /**
  * An instance of {@link AbstractDocument} represents a document as it is processed/created by a {@link WebService} or

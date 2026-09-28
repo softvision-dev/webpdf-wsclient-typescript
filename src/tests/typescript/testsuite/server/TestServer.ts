@@ -1,11 +1,10 @@
-import {TestConfig} from "../config";
-import {ServerType} from "./ServerType";
-import {TransferProtocol} from "./TransferProtocol";
+import {TestConfig} from "../config/index.js";
+import {ServerType} from "./ServerType.js";
+import {TransferProtocol} from "./TransferProtocol.js";
 import {DetailedPeerCertificate, TLSSocket} from "tls";
 import {DockerComposeEnvironment, StartedDockerComposeEnvironment, Wait} from "testcontainers";
 import path from "path";
-
-const https: any = require('https');
+import https from "node:https";
 
 export class TestServer {
 	private localServer: URL;
@@ -104,7 +103,7 @@ export class TestServer {
 		}
 
 		try {
-			this.environment = await new DockerComposeEnvironment(path.join(__dirname, this.composeFilePath), this.composeFile)
+			this.environment = await new DockerComposeEnvironment(path.join(import.meta.dirname, this.composeFilePath), this.composeFile)
 				.withWaitStrategy("testapp-webpdf-wsclient-ldap", Wait.forListeningPorts())
 				.withWaitStrategy("testapp-webpdf-wsclient-proxy", Wait.forListeningPorts())
 				.withWaitStrategy("testapp-webpdf-wsclient-server", Wait.forListeningPorts())

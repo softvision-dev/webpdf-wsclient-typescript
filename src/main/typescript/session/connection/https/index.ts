@@ -1,1 +1,1 @@
-export * from "./TLSProtocol";
+export * from "./TLSProtocol.js";

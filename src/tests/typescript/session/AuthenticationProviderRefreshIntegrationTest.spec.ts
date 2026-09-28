@@ -1,4 +1,4 @@
-import {ServerType, TestConfig, TestServer} from "../testsuite";
+import {ServerType, TestConfig, TestServer} from "../testsuite/index.js";
 import {expect} from "chai";
 import {
 	AbstractAuthenticationProvider,
@@ -9,7 +9,7 @@ import {
 	SessionFactory,
 	WebServiceProtocol,
 	WSClientSessionToken
-} from "../../../main/typescript";
+} from "../../../main/typescript/index.js";
 import {it, suite} from "mocha";
 
 /**

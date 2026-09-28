@@ -8,8 +8,8 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WsclientError
-} from "../../../../src/main/typescript";
-import {SessionTableEntry, SessionTable} from "../../../../src/main/typescript/generated-sources";
+} from "../../../../src/main/typescript/index.js";
+import {SessionTableEntry, SessionTable} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link AdministrationManager} demonstrating how you can

@@ -1,10 +1,10 @@
-import {RestDocument} from "../documents";
-import {RestSession} from "../RestSession";
-import {ViewerExternalDocument, ViewerProfilePublicView} from "../../../generated-sources";
-import {DataFormats} from "../../DataFormat";
-import {ViewerManager} from "./ViewerManager";
-import {HttpMethod, HttpRestRequest} from "../../connection";
-import {wsclientConfiguration} from "../../../configuration";
+import {RestDocument} from "../documents/index.js";
+import {RestSession} from "../RestSession.js";
+import {ViewerExternalDocument, ViewerProfilePublicView} from "../../../generated-sources/index.js";
+import {DataFormats} from "../../DataFormat.js";
+import {ViewerManager} from "./ViewerManager.js";
+import {HttpMethod, HttpRestRequest} from "../../connection/index.js";
+import {wsclientConfiguration} from "../../../configuration/index.js";
 
 /**
  * An instance of {@link ViewerManager} provides access to the public, unauthenticated viewer tenant

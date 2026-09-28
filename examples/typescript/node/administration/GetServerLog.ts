@@ -8,7 +8,7 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WsclientError
-} from "../../../../src/main/typescript";
+} from "../../../../src/main/typescript/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link AdministrationManager} demonstrating how you can

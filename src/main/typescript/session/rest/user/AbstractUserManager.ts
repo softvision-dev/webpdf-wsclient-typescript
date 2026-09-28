@@ -1,10 +1,10 @@
-import {RestSession} from "../RestSession";
-import {RestDocument} from "../documents";
-import {UserManager} from "./UserManager";
-import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../generated-sources";
-import {HttpMethod, HttpRestRequest} from "../../connection";
-import {DataFormats} from "../../DataFormat";
-import {ClientResultException, WsclientErrors} from "../../../exception";
+import {RestSession} from "../RestSession.js";
+import {RestDocument} from "../documents/index.js";
+import {UserManager} from "./UserManager.js";
+import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../generated-sources/index.js";
+import {HttpMethod, HttpRestRequest} from "../../connection/index.js";
+import {DataFormats} from "../../DataFormat.js";
+import {ClientResultException, WsclientErrors} from "../../../exception/index.js";
 
 /**
  * Implements {@link UserManager} by delegating all operations to the webPDF server

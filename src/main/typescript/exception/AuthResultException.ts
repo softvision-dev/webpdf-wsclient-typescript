@@ -1,5 +1,5 @@
-import {WsclientErrors} from "./WsclientError";
-import {ResultException} from "./ResultException";
+import {WsclientErrors} from "./WsclientError.js";
+import {ResultException} from "./ResultException.js";
 
 /**
  * <p>

@@ -1,7 +1,7 @@
-import {RestSession} from "../RestSession";
-import {RestDocument} from "../documents";
+import {RestSession} from "../RestSession.js";
+import {RestDocument} from "../documents/index.js";
 import {AxiosProgressEvent} from "axios";
-import {HttpRestRequest} from "../../connection";
+import {HttpRestRequest} from "../../connection/index.js";
 import {
 	Application,
 	ApplicationCheck,
@@ -33,7 +33,7 @@ import {
 	Users,
 	ViewerProfile,
 	ViewerProfileSummary
-} from "../../../generated-sources";
+} from "../../../generated-sources/index.js";
 
 /**
  * A class implementing {@link AdministrationManager} administrates and monitors the webPDF server configurations.

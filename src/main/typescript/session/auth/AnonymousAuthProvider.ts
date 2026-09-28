@@ -1,5 +1,5 @@
-import {AbstractAuthenticationProvider} from "./AbstractAuthenticationProvider";
-import {AnonymousMaterial, AuthMaterial} from "./material";
+import {AbstractAuthenticationProvider} from "./AbstractAuthenticationProvider.js";
+import {AnonymousMaterial, AuthMaterial} from "./material/index.js";
 
 /**
  * <p>

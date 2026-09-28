@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} from "./testsuite";
+import {ServerType, TestConfig, TestResources, TestServer, TransferProtocol} from "./testsuite/index.js";
 import {
 	ConverterWebService,
 	RestDocument,
@@ -9,13 +9,16 @@ import {
 	WebServiceFactory,
 	WebServiceProtocol,
 	WebServiceTypes
-} from "../../main/typescript";
+} from "../../main/typescript/index.js";
 import {Agent, AgentOptions} from "https";
 import {it, suite} from "mocha";
 import {DetailedPeerCertificate} from "tls";
 
-const fs: any = require('fs');
-const tmp: any = require('tmp');
+import fs from "node:fs";
+import {createRequire} from "node:module";
+
+const require: NodeJS.Require = createRequire(import.meta.url);
+const tmp: any = require("tmp");
 
 suite("WebserviceTLSIntegrationTest", function (): void {
 	const CERT_START: string = '-----BEGIN CERTIFICATE-----\n';

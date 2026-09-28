@@ -1,6 +1,6 @@
-import {RestSession} from "../RestSession";
-import {RestDocument} from "../documents";
-import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../generated-sources";
+import {RestSession} from "../RestSession.js";
+import {RestDocument} from "../documents/index.js";
+import {KeyStorePassword, UserCertificates, UserCredentials} from "../../../generated-sources/index.js";
 
 /**
  * A class implementing {@link UserManager} provides access to authentication user operations

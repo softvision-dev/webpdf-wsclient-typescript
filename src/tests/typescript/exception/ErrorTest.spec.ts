@@ -1,5 +1,5 @@
 import {expect} from "chai";
-import {WsclientError, WsclientErrors} from "../../../main/typescript";
+import {WsclientError, WsclientErrors} from "../../../main/typescript/index.js";
 import {it, suite} from "mocha";
 
 suite("ErrorTest", function (): void {

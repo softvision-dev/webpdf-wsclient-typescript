@@ -1,3 +1,3 @@
-export * from "./Auth0Config";
-export * from "./OAuthConfig";
-export * from "./AzureConfig";
+export * from "./Auth0Config.js";
+export * from "./OAuthConfig.js";
+export * from "./AzureConfig.js";

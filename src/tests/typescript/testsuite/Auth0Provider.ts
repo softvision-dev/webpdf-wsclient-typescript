@@ -1,4 +1,4 @@
-import {AuthResultException, OAuth2Provider, OAuth2Token, Session} from "../../../main/typescript";
+import {AuthResultException, OAuth2Provider, OAuth2Token, Session} from "../../../main/typescript/index.js";
 import {AuthenticationClient} from "auth0";
 
 export class Auth0Provider implements OAuth2Provider {

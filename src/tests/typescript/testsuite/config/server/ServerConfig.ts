@@ -1,4 +1,4 @@
-import {ConfigNodeContainer} from "../json";
+import {ConfigNodeContainer} from "../json/index.js";
 
 export class ServerConfig extends ConfigNodeContainer {
 	public static readonly SERVER_CONFIG_NODE: string = "/server";

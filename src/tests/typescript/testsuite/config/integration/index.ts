@@ -1,2 +1,2 @@
-export * from "./oauth";
-export * from "./IntegrationTestConfig";
+export * from "./oauth/index.js";
+export * from "./IntegrationTestConfig.js";

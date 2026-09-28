@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {it, suite} from "mocha";
-import {models, RestViewerManager} from "../../../main/typescript";
+import {models, RestViewerManager} from "../../../main/typescript/index.js";
 
 /**
  * Captured shape of the last HTTP request the manager issued through the stub session.

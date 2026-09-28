@@ -35,6 +35,7 @@ This project standardizes on **Node.js 24** (`.nvmrc`) and **Yarn 4 / Berry**
 | Regenerate models | `yarn run codegen` |
 | Build package | `yarn run build` |
 | Codegen unit tests (no server) | `yarn mocha --config .mocharc.json "src/tests/typescript/codegen/**/*.spec.ts"` |
+| Package smoke test (needs a built `lib/`, `npm`+`tar` on `PATH`; runs as the last step of `yarn run build`; optional extra Node.js binaries via `WSCLIENT_SMOKE_NODE_BINARIES`, separated by the platform's path separator) | `yarn run test:package` |
 | Full integration suite (server required) | `yarn mocha --config .mocharc.json` |
 
 See `README.md` for prerequisites, environment variables, and the publishing

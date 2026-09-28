@@ -1,7 +1,7 @@
-import {AbstractDocument} from "../../documents";
-import {RestDocument} from "./RestDocument";
-import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState";
-import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources";
+import {AbstractDocument} from "../../documents/index.js";
+import {RestDocument} from "./RestDocument.js";
+import {RestWebServiceDocumentState} from "./RestWebServiceDocumentState.js";
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources/index.js";
 import {AxiosProgressEvent} from "axios";
 
 /**

@@ -1,7 +1,7 @@
-import {AbstractAuthenticationProvider} from "./AbstractAuthenticationProvider";
-import {AuthenticationMaterial, AuthMaterial} from "./material";
-import {ClientResultException, WsclientErrors} from "../../exception";
-import {AuthenticationProvider} from "./AuthenticationProvider";
+import {AbstractAuthenticationProvider} from "./AbstractAuthenticationProvider.js";
+import {AuthenticationMaterial, AuthMaterial} from "./material/index.js";
+import {ClientResultException, WsclientErrors} from "../../exception/index.js";
+import {AuthenticationProvider} from "./AuthenticationProvider.js";
 
 /**
  * <p>

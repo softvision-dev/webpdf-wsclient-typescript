@@ -1,6 +1,6 @@
-import {AbstractAdministrationManager} from "./AbstractAdministrationManager";
-import {AdministrationManager} from "./AdministrationManager";
-import {RestWebServiceDocument} from "../documents";
+import {AbstractAdministrationManager} from "./AbstractAdministrationManager.js";
+import {AdministrationManager} from "./AdministrationManager.js";
+import {RestWebServiceDocument} from "../documents/index.js";
 
 /**
  * A class implementing {@link RestAdministrationManager} administrates and monitors the webPDF server configurations.

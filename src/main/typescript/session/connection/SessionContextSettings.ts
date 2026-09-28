@@ -1,5 +1,5 @@
-import {WebServiceProtocol} from "../../webservice";
-import {SessionContext} from "./SessionContext";
+import {WebServiceProtocol} from "../../webservice/index.js";
+import {SessionContext} from "./SessionContext.js";
 import {AxiosProxyConfig} from "axios";
 import {Agent} from "https";
 

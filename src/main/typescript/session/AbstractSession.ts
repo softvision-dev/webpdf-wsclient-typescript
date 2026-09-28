@@ -1,8 +1,8 @@
-import {Session} from "./Session";
-import {WebServiceProtocol} from "../webservice";
-import {ClientResultException, WsclientErrors} from "../exception";
-import {SessionContext, SessionContextSettings} from "./connection";
-import {AuthenticationProvider} from "./auth";
+import {Session} from "./Session.js";
+import {WebServiceProtocol} from "../webservice/index.js";
+import {ClientResultException, WsclientErrors} from "../exception/index.js";
+import {SessionContext, SessionContextSettings} from "./connection/index.js";
+import {AuthenticationProvider} from "./auth/index.js";
 
 /**
  * <p>

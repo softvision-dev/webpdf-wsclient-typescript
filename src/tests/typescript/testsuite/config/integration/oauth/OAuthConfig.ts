@@ -1,4 +1,4 @@
-import {ConfigNodeContainer} from "../../json";
+import {ConfigNodeContainer} from "../../json/index.js";
 
 /**
  * <p>

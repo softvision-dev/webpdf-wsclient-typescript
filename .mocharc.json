@@ -3,11 +3,12 @@
 	"timeout": 30000,
 	"_comment": "// parallel currently not supported by idea: https://youtrack.jetbrains.com/issue/WEB-46034/Add-support-for-mocha-parallel",
 	"parallel": false,
+	"_comment_loader": "The loader line is duplicated verbatim in .mocharc.package.json because Mocha configs cannot extend/inherit one another; whoever changes the loader must change both files.",
 	"node-option": [
-		"no-experimental-strip-types"
+		"no-experimental-strip-types",
+		"import=./scripts/register-ts-node.js"
 	],
 	"require": [
-		"ts-node/register",
 		"./src/tests/typescript/bootstrap.ts"
 	]
 }

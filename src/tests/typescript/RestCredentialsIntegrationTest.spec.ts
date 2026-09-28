@@ -1,11 +1,14 @@
-import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite/index.js";
 import {expect} from "chai";
-import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript";
-import {Converter, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources";
+import {ConverterWebService, RestDocument, RestSession, SessionContext, SessionFactory, UserAuthProvider, WebServiceFactory, WebServiceProtocol, WebServiceTypes} from "../../main/typescript/index.js";
+import {Converter, PdfaErrorReport, PdfaLevel} from "../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
-const fs: any = require('fs');
-const tmp: any = require('tmp');
+import fs from "node:fs";
+import {createRequire} from "node:module";
+
+const require: NodeJS.Require = createRequire(import.meta.url);
+const tmp: any = require("tmp");
 
 suite("RestCredentialsIntegrationTest", function (): void {
 	let testResources: TestResources = new TestResources('integration/files');

@@ -1,6 +1,6 @@
 import fs from "fs";
-import {PdfaWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript";
-import {ConvertPdfa, Pdfa, PdfaErrorReport, PdfaInterface, PdfaLevel, PdfaSuccessReport} from "../../../../src/main/typescript/generated-sources";
+import {PdfaWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript/index.js";
+import {ConvertPdfa, Pdfa, PdfaErrorReport, PdfaInterface, PdfaLevel, PdfaSuccessReport} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link PdfaWebService} demonstrating how you can a PDF document
@@ -82,7 +82,7 @@ class ConvertPdfsToPdfa {
 
 			/** Execute the webservice and download your result document: */
 			let resultDocument: RestDocument | undefined = await pdfaWebService.process(restDocument);
-			let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+			let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 			/** This is the node variant of writing the file. You could also just download the file contents in browser. */
 			fs.writeFileSync(targetDocument, downloadedFile);
 

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import {PackagePrefix} from "./PackagePrefix";
+import {PackagePrefix} from "./PackagePrefix.js";
 
 /**
  * Generator configuration read from `src/codegen/resources/generator_config.json`.
@@ -33,7 +33,7 @@ function initPackageInfo(): PackagePrefix[] {
 		return packagePrefixes;
 	}
 
-	const configPath: string = path.resolve(__dirname, "../../resources/generator_config.json");
+	const configPath: string = path.resolve(import.meta.dirname, "../../resources/generator_config.json");
 	const raw: string = fs.readFileSync(configPath, "utf8");
 	const parsed: GeneratorConfig = JSON.parse(raw) as GeneratorConfig;
 

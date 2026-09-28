@@ -1,7 +1,7 @@
-import {AbstractAuthMaterial} from "./AbstractAuthMaterial";
-import {Credentials} from "./token";
-import {AuthMethods} from "./AuthMethod";
-import {wsclientConfiguration} from "../../../configuration";
+import {AbstractAuthMaterial} from "./AbstractAuthMaterial.js";
+import {Credentials} from "./token/index.js";
+import {AuthMethods} from "./AuthMethod.js";
+import {wsclientConfiguration} from "../../../configuration/index.js";
 
 /**
  * <p>

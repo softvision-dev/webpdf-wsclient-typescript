@@ -1,4 +1,4 @@
-import {WsclientError} from "./WsclientError";
+import {WsclientError} from "./WsclientError.js";
 
 /**
  * <p>

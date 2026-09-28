@@ -1,6 +1,6 @@
-import {WebServiceProtocol} from "../webservice";
-import {AuthenticationProvider} from "./auth";
-import {SessionContextSettings} from "./connection";
+import {WebServiceProtocol} from "../webservice/index.js";
+import {AuthenticationProvider} from "./auth/index.js";
+import {SessionContextSettings} from "./connection/index.js";
 
 export interface Session {
 	/**

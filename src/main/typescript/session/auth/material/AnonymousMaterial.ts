@@ -1,7 +1,7 @@
-import {AuthMaterial} from "./AuthMaterial";
-import {AbstractAuthMaterial} from "./AbstractAuthMaterial";
+import {AuthMaterial} from "./AuthMaterial.js";
+import {AbstractAuthMaterial} from "./AbstractAuthMaterial.js";
 import {AxiosRequestHeaders} from "axios";
-import {Credentials} from "./token";
+import {Credentials} from "./token/index.js";
 
 /**
  * <p>

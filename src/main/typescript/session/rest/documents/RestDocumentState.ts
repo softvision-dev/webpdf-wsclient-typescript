@@ -1,6 +1,6 @@
-import {RestDocument} from "./RestDocument";
-import {DocumentFile, HistoryEntry} from "../../../generated-sources";
-import {DocumentManager} from "./DocumentManager";
+import {RestDocument} from "./RestDocument.js";
+import {DocumentFile, HistoryEntry} from "../../../generated-sources/index.js";
+import {DocumentManager} from "./DocumentManager.js";
 
 /**
  * <p>

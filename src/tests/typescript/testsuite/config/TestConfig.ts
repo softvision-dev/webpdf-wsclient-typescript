@@ -1,9 +1,8 @@
-import {ServerConfig} from "./server";
-import {IntegrationTestConfig} from "./integration";
-import {JsonNode} from "./json";
-
-const fs: any = require('fs');
-const path: any = require('path');
+import fs from "node:fs";
+import path from "node:path";
+import {ServerConfig} from "./server/index.js";
+import {IntegrationTestConfig} from "./integration/index.js";
+import {JsonNode} from "./json/index.js";
 
 export class TestConfig {
 	private static readonly TEST_CONFIG_LOCATION: string = "config/testConfig.json";
@@ -12,7 +11,7 @@ export class TestConfig {
 	private readonly integrationTestConfig: IntegrationTestConfig;
 
 	private constructor() {
-		let configPath: string = path.join(__dirname, "../../../../../", TestConfig.TEST_CONFIG_LOCATION);
+		let configPath: string = path.join(import.meta.dirname, "../../../../../", TestConfig.TEST_CONFIG_LOCATION);
 
 		let configNode: any;
 		if (fs.existsSync(configPath) && fs.lstatSync(configPath).isFile()) {

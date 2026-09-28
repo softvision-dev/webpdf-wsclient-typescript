@@ -1,5 +1,5 @@
-import {ConfigNode} from "./ConfigNode";
-import {JsonNode} from "./JsonNode";
+import {ConfigNode} from "./ConfigNode.js";
+import {JsonNode} from "./JsonNode.js";
 
 export class JsonConfigNode implements ConfigNode {
 	private readonly node: any;

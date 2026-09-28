@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {it, suite} from "mocha";
-import {models} from "../../../main/typescript";
+import {models} from "../../../main/typescript/index.js";
 
 suite("ConsumerExportsRegressionTest", function (): void {
 	it("keeps CertificateEntry static defaults API", function (): void {

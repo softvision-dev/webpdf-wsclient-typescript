@@ -1,4 +1,4 @@
-import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "../testsuite/index.js";
 import {expect} from "chai";
 import {
 	ConverterWebService,
@@ -13,7 +13,7 @@ import {
 	WebServiceFactory,
 	WebServiceProtocol,
 	WebServiceTypes
-} from "../../../main/typescript";
+} from "../../../main/typescript/index.js";
 import {
 	BaseToolbox,
 	FileCompress,
@@ -28,7 +28,7 @@ import {
 	PdfPassword,
 	PdfPasswordInterface,
 	ShareRequestOptions
-} from "../../../main/typescript/generated-sources";
+} from "../../../main/typescript/generated-sources/index.js";
 import AdmZip from "adm-zip";
 import {it, suite} from "mocha";
 

@@ -1,4 +1,4 @@
-import {ClientResultException, WsclientErrors} from "../../../exception";
+import {ClientResultException, WsclientErrors} from "../../../exception/index.js";
 
 /**
  * A single body part of a parsed {@code multipart/*} message.

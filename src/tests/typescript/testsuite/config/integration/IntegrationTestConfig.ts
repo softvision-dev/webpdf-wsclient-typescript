@@ -1,5 +1,5 @@
-import {ConfigNodeContainer, JsonNode} from "../json";
-import {Auth0Config, AzureConfig} from "./oauth";
+import {ConfigNodeContainer, JsonNode} from "../json/index.js";
+import {Auth0Config, AzureConfig} from "./oauth/index.js";
 
 export class IntegrationTestConfig extends ConfigNodeContainer {
 	public static readonly INTEGRATION_TEST_CONFIG: string = "/integrationTests";

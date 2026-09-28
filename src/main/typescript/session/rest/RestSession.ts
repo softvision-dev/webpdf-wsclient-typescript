@@ -1,11 +1,11 @@
-import {Session} from "../Session";
-import {DocumentManager, RestDocument} from "./documents";
-import {RestWebService, WebServiceType} from "../../webservice";
+import {Session} from "../Session.js";
+import {DocumentManager, RestDocument} from "./documents/index.js";
+import {RestWebService, WebServiceType} from "../../webservice/index.js";
 import {AxiosProgressEvent, AxiosInstance} from "axios";
-import {AdministrationManager} from "./administration";
-import {UserManager} from "./user";
-import {ViewerManager} from "./viewer";
-import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources";
+import {AdministrationManager} from "./administration/index.js";
+import {UserManager} from "./user/index.js";
+import {ViewerManager} from "./viewer/index.js";
+import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources/index.js";
 
 /**
  * <p>

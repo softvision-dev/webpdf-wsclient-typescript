@@ -1,6 +1,6 @@
-import {AbstractUserManager} from "./AbstractUserManager";
-import {UserManager} from "./UserManager";
-import {RestWebServiceDocument} from "../documents";
+import {AbstractUserManager} from "./AbstractUserManager.js";
+import {UserManager} from "./UserManager.js";
+import {RestWebServiceDocument} from "../documents/index.js";
 
 /**
  * Concrete {@link UserManager} for {@link RestWebServiceDocument}-based sessions.

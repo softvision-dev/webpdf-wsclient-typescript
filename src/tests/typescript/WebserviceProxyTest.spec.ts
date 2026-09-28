@@ -1,4 +1,4 @@
-import {IntegrationTestConfig, TestConfig, TestServer} from "./testsuite";
+import {IntegrationTestConfig, TestConfig, TestServer} from "./testsuite/index.js";
 import {expect} from "chai";
 import {
 	RestDocument,
@@ -9,14 +9,17 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WebServiceTypes
-} from "../../main/typescript";
+} from "../../main/typescript/index.js";
 import {AxiosProxyConfig} from "axios";
-import {UrlConverter, UrlConverterInterface} from "../../main/typescript/generated-sources";
+import {UrlConverter, UrlConverterInterface} from "../../main/typescript/generated-sources/index.js";
 import {Agent} from "https";
 import {it, suite} from "mocha";
 
-const fs: any = require('fs');
-const tmp: any = require('tmp');
+import fs from "node:fs";
+import {createRequire} from "node:module";
+
+const require: NodeJS.Require = createRequire(import.meta.url);
+const tmp: any = require("tmp");
 
 suite("WebserviceProxyTest", function (): void {
 	let testServer: TestServer = new TestServer();

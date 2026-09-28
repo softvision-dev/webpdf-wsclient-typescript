@@ -1,5 +1,5 @@
-import {RestDocument} from "./RestDocument";
-import {RestSession} from "../RestSession";
+import {RestDocument} from "./RestDocument.js";
+import {RestSession} from "../RestSession.js";
 import {
 	DocumentFile,
 	FileCompress,
@@ -9,7 +9,7 @@ import {
 	InfoType,
 	PdfPassword,
 	ShareRequestOptions
-} from "../../../generated-sources";
+} from "../../../generated-sources/index.js";
 import {AxiosProgressEvent} from "axios";
 
 /**

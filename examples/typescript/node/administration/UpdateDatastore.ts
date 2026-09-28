@@ -8,8 +8,8 @@ import {
 	UserAuthProvider,
 	WebServiceProtocol,
 	WsclientError
-} from "../../../../src/main/typescript";
-import {FileGroupDataStore, LogoFileDataStore} from "../../../../src/main/typescript/generated-sources";
+} from "../../../../src/main/typescript/index.js";
+import {FileGroupDataStore, LogoFileDataStore} from "../../../../src/main/typescript/generated-sources/index.js";
 import fs from "fs";
 
 /**

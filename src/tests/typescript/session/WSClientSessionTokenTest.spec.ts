@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {it, suite} from "mocha";
-import {WSClientSessionToken} from "../../../main/typescript";
+import {WSClientSessionToken} from "../../../main/typescript/index.js";
 
 suite("WSClientSessionTokenTest", function (): void {
 	it("isExpired returns false for a non-expired token with zero skew",

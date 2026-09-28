@@ -1,6 +1,6 @@
 import fs from "fs";
-import {RestDocument, RestSession, ResultException, SessionContext, SessionFactory, ToolboxWebService, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript";
-import {ToolboxDescription, ToolboxDescriptionDescription, ToolboxDescriptionInterface} from "../../../../src/main/typescript/generated-sources";
+import {RestDocument, RestSession, ResultException, SessionContext, SessionFactory, ToolboxWebService, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript/index.js";
+import {ToolboxDescription, ToolboxDescriptionDescription, ToolboxDescriptionInterface} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link ToolboxWebService} demonstrating how you can change the
@@ -81,7 +81,7 @@ class ChangePdfDescription {
 
 			/** Execute the webservice and download your result document: */
 			let resultDocument: RestDocument | undefined = await toolboxWebService.process(restDocument);
-			let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+			let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 			/** This is the node variant of writing the file. You could also just download the file contents in browser. */
 			fs.writeFileSync(targetDocument, downloadedFile);
 

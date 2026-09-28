@@ -6,13 +6,13 @@ import {
 	AxiosResponse,
 	RawAxiosRequestHeaders
 } from "axios";
-import {RestSession} from "../../rest";
-import {DataFormats} from "../../DataFormat";
-import {HttpMethod} from "./HttpMethod";
-import {AuthMaterial} from "../../auth";
-import {ClientResultException, ResultException, ServerResultException, WsclientErrors} from "../../../exception";
-import HttpStatusCode from "./httpStatusCode";
-import {HttpHeaders} from "./HttpHeader";
+import {RestSession} from "../../rest/index.js";
+import {DataFormats} from "../../DataFormat.js";
+import {HttpMethod} from "./HttpMethod.js";
+import {AuthMaterial} from "../../auth/index.js";
+import {ClientResultException, ResultException, ServerResultException, WsclientErrors} from "../../../exception/index.js";
+import HttpStatusCode from "./httpStatusCode.js";
+import {HttpHeaders} from "./HttpHeader.js";
 
 /**
  * An instance of {@link HttpRestRequest} monitors and executes a webPDF wsclient request executed within a

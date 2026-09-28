@@ -1,3 +1,3 @@
-export * from "./ViewerManager";
-export * from "./AbstractViewerManager";
-export * from "./RestViewerManager";
+export * from "./ViewerManager.js";
+export * from "./AbstractViewerManager.js";
+export * from "./RestViewerManager.js";

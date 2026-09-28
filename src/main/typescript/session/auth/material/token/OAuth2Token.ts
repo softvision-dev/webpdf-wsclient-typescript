@@ -1,4 +1,4 @@
-import {AbstractJWTToken} from "./AbstractJWTToken";
+import {AbstractJWTToken} from "./AbstractJWTToken.js";
 
 /**
  * <p>

@@ -1,6 +1,6 @@
 import fs from "fs";
-import {OcrWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript";
-import {Metrics, Ocr, OcrInterface, OcrLanguage, OcrOutput, OcrPage} from "../../../../src/main/typescript/generated-sources";
+import {OcrWebService, RestDocument, RestSession, ResultException, SessionContext, SessionFactory, WebServiceProtocol, WebServiceTypes, WsclientError} from "../../../../src/main/typescript/index.js";
+import {Metrics, Ocr, OcrInterface, OcrLanguage, OcrOutput, OcrPage} from "../../../../src/main/typescript/generated-sources/index.js";
 
 /**
  * Here you will find a usage example for the webPDF {@link OcrWebService} demonstrating how you can extract text
@@ -82,7 +82,7 @@ class ApplyOCRToPdf {
 
 			/** Execute the webservice and download your result document: */
 			let resultDocument: RestDocument | undefined = await ocrWebService.process(restDocument);
-			let downloadedFile: Buffer = await resultDocument!.downloadDocument();
+			let downloadedFile: Uint8Array = await resultDocument!.downloadDocument();
 			/** This is the node variant of writing the file. You could also just download the file contents in browser. */
 			fs.writeFileSync(targetDocument, downloadedFile);
 

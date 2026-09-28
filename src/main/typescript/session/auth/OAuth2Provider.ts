@@ -1,6 +1,6 @@
-import {AuthenticationProvider} from "./AuthenticationProvider";
-import {Session} from "../Session";
-import {OAuth2Token} from "./material";
+import {AuthenticationProvider} from "./AuthenticationProvider.js";
+import {Session} from "../Session.js";
+import {OAuth2Token} from "./material/index.js";
 
 /**
  * <p>

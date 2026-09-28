@@ -1,7 +1,7 @@
-import {AuthMaterial} from "./AuthMaterial";
-import {Credentials} from "./token";
+import {AuthMaterial} from "./AuthMaterial.js";
+import {Credentials} from "./token/index.js";
 import {AxiosHeaders, AxiosRequestHeaders} from "axios";
-import {HttpHeaders} from "../../connection";
+import {HttpHeaders} from "../../connection/index.js";
 
 /**
  * An instance of {@link AuthMaterial} provides information for the authentication {@link #getCredentials()} and

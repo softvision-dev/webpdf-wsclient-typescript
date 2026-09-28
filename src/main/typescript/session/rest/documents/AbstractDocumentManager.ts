@@ -1,6 +1,6 @@
-import {RestDocument} from "./RestDocument";
-import {DocumentManager, SharedDocumentDownload} from "./DocumentManager";
-import {RestSession} from "../RestSession";
+import {RestDocument} from "./RestDocument.js";
+import {DocumentManager, SharedDocumentDownload} from "./DocumentManager.js";
+import {RestSession} from "../RestSession.js";
 import {
 	DocumentFile,
 	FileCompress,
@@ -13,13 +13,13 @@ import {
 	Parameter,
 	PdfPassword,
 	ShareRequestOptions
-} from "../../../generated-sources";
-import {HttpMethod, HttpRestRequest, MultipartPart, parseMultipartMixed} from "../../connection";
-import {ClientResultException, WsclientErrors} from "../../../exception";
-import {DataFormats} from "../../DataFormat";
+} from "../../../generated-sources/index.js";
+import {HttpMethod, HttpRestRequest, MultipartPart, parseMultipartMixed} from "../../connection/index.js";
+import {ClientResultException, WsclientErrors} from "../../../exception/index.js";
+import {DataFormats} from "../../DataFormat.js";
 import {AxiosProgressEvent, AxiosResponse} from "axios";
-import {RestDocumentState} from "./RestDocumentState";
-import {wsclientConfiguration} from "../../../configuration";
+import {RestDocumentState} from "./RestDocumentState.js";
+import {wsclientConfiguration} from "../../../configuration/index.js";
 
 /**
  * An instance of {@link AbstractDocumentManager} allows to monitor and interact with the {@link RestDocument}s uploaded

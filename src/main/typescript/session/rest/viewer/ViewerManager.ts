@@ -1,6 +1,6 @@
-import {RestSession} from "../RestSession";
-import {RestDocument} from "../documents";
-import {ViewerExternalDocument, ViewerProfilePublicView} from "../../../generated-sources";
+import {RestSession} from "../RestSession.js";
+import {RestDocument} from "../documents/index.js";
+import {ViewerExternalDocument, ViewerProfilePublicView} from "../../../generated-sources/index.js";
 
 /**
  * <p>
@@ -10,7 +10,7 @@ import {ViewerExternalDocument, ViewerProfilePublicView} from "../../../generate
  * <p>
  * These reads are public (field-allowlisted on the server) and never require administrator rights;
  * the administrative profile CRUD is provided separately by the
- * {@link import("../administration").AdministrationManager}.
+ * {@link import("../administration/index.js").AdministrationManager}.
  * </p>
  *
  * @param <T_REST_DOCUMENT> The {@link RestDocument} used by the currently active {@link RestSession}.

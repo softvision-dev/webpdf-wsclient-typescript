@@ -1,16 +1,16 @@
-import {AbstractSession} from "../AbstractSession";
-import {RestSession} from "./RestSession";
-import {RestWebService, WebServiceProtocol, WebServiceType} from "../../webservice";
-import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources";
+import {AbstractSession} from "../AbstractSession.js";
+import {RestSession} from "./RestSession.js";
+import {RestWebService, WebServiceProtocol, WebServiceType} from "../../webservice/index.js";
+import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources/index.js";
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
-import {HttpMethod, HttpRestRequest, SessionContext} from "../connection";
-import {AuthenticationProvider} from "../auth";
-import {DocumentManager, RestDocument} from "./documents";
-import {AdministrationManager} from "./administration";
-import {UserManager} from "./user";
-import {ViewerManager} from "./viewer";
-import {DataFormats} from "../DataFormat";
-import {wsclientConfiguration} from "../../configuration";
+import {HttpMethod, HttpRestRequest, SessionContext} from "../connection/index.js";
+import {AuthenticationProvider} from "../auth/index.js";
+import {DocumentManager, RestDocument} from "./documents/index.js";
+import {AdministrationManager} from "./administration/index.js";
+import {UserManager} from "./user/index.js";
+import {ViewerManager} from "./viewer/index.js";
+import {DataFormats} from "../DataFormat.js";
+import {wsclientConfiguration} from "../../configuration/index.js";
 
 /**
  * <p>

@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {it, suite} from "mocha";
-import {DataFormats} from "../../../main/typescript";
+import {DataFormats} from "../../../main/typescript/index.js";
 
 suite("DataFormatTest", function (): void {
 	it("matches a JSON content type with and without parameters", function (): void {

@@ -1,5 +1,5 @@
-import {Document} from "../../documents"
-import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources";
+import {Document} from "../../documents/index.js"
+import {DocumentFile, FileExtract, HistoryEntry, Info, InfoType, PdfPassword, ShareRequestOptions} from "../../../generated-sources/index.js";
 import {AxiosProgressEvent} from "axios";
 
 /**

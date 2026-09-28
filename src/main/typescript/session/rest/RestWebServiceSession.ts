@@ -1,12 +1,12 @@
-import {AbstractRestSession} from "./AbstractRestSession";
-import {SessionContext} from "../connection";
-import {AuthenticationProvider} from "../auth";
-import {DocumentManager, RestWebServiceDocument, RestWebServiceDocumentManager} from "./documents";
-import {AdministrationManager, RestAdministrationManager} from "./administration";
-import {RestUserManager, UserManager} from "./user";
-import {RestViewerManager, ViewerManager} from "./viewer";
-import {RestSession} from "./RestSession";
-import {RestWebService, WebServiceFactory, WebServiceType} from "../../webservice";
+import {AbstractRestSession} from "./AbstractRestSession.js";
+import {SessionContext} from "../connection/index.js";
+import {AuthenticationProvider} from "../auth/index.js";
+import {DocumentManager, RestWebServiceDocument, RestWebServiceDocumentManager} from "./documents/index.js";
+import {AdministrationManager, RestAdministrationManager} from "./administration/index.js";
+import {RestUserManager, UserManager} from "./user/index.js";
+import {RestViewerManager, ViewerManager} from "./viewer/index.js";
+import {RestSession} from "./RestSession.js";
+import {RestWebService, WebServiceFactory, WebServiceType} from "../../webservice/index.js";
 
 /**
  * <p>

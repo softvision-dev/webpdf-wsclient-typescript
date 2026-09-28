@@ -1,11 +1,11 @@
-import {AuthenticationProvider} from "./AuthenticationProvider";
-import {AuthMaterial, instanceOfSessionToken, WSClientSessionToken} from "./material";
-import {Session} from "../Session";
-import {instanceOfRestSession, RestSession} from "../rest";
-import {HttpMethod, HttpRestRequest} from "../connection";
-import {LoginOptions, LoginOptionsInterface, SessionToken as WebpdfSessionToken} from "../../generated-sources";
-import {AuthResultException} from "../../exception";
-import {DataFormats} from "../DataFormat";
+import {AuthenticationProvider} from "./AuthenticationProvider.js";
+import {AuthMaterial, instanceOfSessionToken, WSClientSessionToken} from "./material/index.js";
+import {Session} from "../Session.js";
+import {instanceOfRestSession, RestSession} from "../rest/index.js";
+import {HttpMethod, HttpRestRequest} from "../connection/index.js";
+import {LoginOptions, LoginOptionsInterface, SessionToken as WebpdfSessionToken} from "../../generated-sources/index.js";
+import {AuthResultException} from "../../exception/index.js";
+import {DataFormats} from "../DataFormat.js";
 
 /**
  * <p>

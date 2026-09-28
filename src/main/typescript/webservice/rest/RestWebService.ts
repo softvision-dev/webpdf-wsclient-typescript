@@ -1,8 +1,8 @@
-import {AbstractWebService} from "../AbstractWebService";
-import {DataFormats, DocumentManager, HttpMethod, HttpRestRequest, RestDocument, RestSession} from "../../session";
-import {WebServiceType} from "../WebServiceType";
-import {Billing, DocumentFile, Parameter, PdfPassword, Settings} from "../../generated-sources";
-import {ClientResultException, WsclientErrors} from "../../exception";
+import {AbstractWebService} from "../AbstractWebService.js";
+import {DataFormats, DocumentManager, HttpMethod, HttpRestRequest, RestDocument, RestSession} from "../../session/index.js";
+import {WebServiceType} from "../WebServiceType.js";
+import {Billing, DocumentFile, Parameter, PdfPassword, Settings} from "../../generated-sources/index.js";
+import {ClientResultException, WsclientErrors} from "../../exception/index.js";
 
 /**
  * An instance of {@link RestWebService} wraps a wsclient connection to a specific webPDF webservice endpoint

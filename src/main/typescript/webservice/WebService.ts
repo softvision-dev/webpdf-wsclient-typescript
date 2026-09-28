@@ -1,4 +1,4 @@
-import {Document, Session} from "../session";
+import {Document, Session} from "../session/index.js";
 
 /**
  * A class implementing {@link WebService} wraps a wsclient connection to a specific webPDF webservice endpoint

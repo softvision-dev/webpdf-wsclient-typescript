@@ -1,1 +1,1 @@
-export * from "./TestResources";
+export * from "./TestResources.js";

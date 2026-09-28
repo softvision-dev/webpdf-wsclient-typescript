@@ -1,7 +1,7 @@
-import {Session} from "../../../Session";
-import {AbstractAuthMaterial} from "../AbstractAuthMaterial";
-import {AuthMethods} from "../AuthMethod";
-import {Credentials} from "./Credentials";
+import {Session} from "../../../Session.js";
+import {AbstractAuthMaterial} from "../AbstractAuthMaterial.js";
+import {AuthMethods} from "../AuthMethod.js";
+import {Credentials} from "./Credentials.js";
 
 /**
  * An instance of {@link AbstractJWTToken} wraps an access token that can be used to authorize a webPDF server {@link Session}.

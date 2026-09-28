@@ -1,4 +1,4 @@
-import {Session} from "./Session";
+import {Session} from "./Session.js";
 
 /**
  * A {@link DataFormat} for a {@link Session}´s data transfer objects.

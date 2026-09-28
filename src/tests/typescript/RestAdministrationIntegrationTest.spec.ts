@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite";
+import {ServerType, TestConfig, TestResources, TestServer} from "./testsuite/index.js";
 import {
 	AuthMaterial,
 	ClientResultException,
@@ -10,7 +10,7 @@ import {
 	SessionFactory,
 	UserAuthProvider,
 	WebServiceProtocol
-} from "../../main/typescript";
+} from "../../main/typescript/index.js";
 import {
 	Application,
 	ApplicationCheck,
@@ -54,7 +54,7 @@ import {
 	User,
 	Users,
 	WebserviceStatus
-} from "../../main/typescript/generated-sources";
+} from "../../main/typescript/generated-sources/index.js";
 import {it, suite} from "mocha";
 
 const atob: (data: string) => string = function (data: string): string {
@@ -767,7 +767,7 @@ suite("RestAdministrationIntegrationTest", function (): void {
 		expect(sessions!.activeSessions, "There should be at least 1 active session").to.be.greaterThan(0);
 		expect(sessions!.sessionList, "There should be a session list").to.exist;
 
-		expect(sessions!.sessionList!.find((value: import("../../main/typescript/generated-sources").SessionTableEntry): boolean => {
+		expect(sessions!.sessionList!.find((value: import("../../main/typescript/generated-sources/index.js").SessionTableEntry): boolean => {
 			return value.sessionId === sessionId;
 		}), "The admin session should exist").to.exist;
 

@@ -1,7 +1,7 @@
 import {execSync} from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import {adaptOpenApiRawOutput} from "./adapter/openapiRawAdapter";
+import {adaptOpenApiRawOutput} from "./adapter/openapiRawAdapter.js";
 
 /**
  * Builds a `ProcessEnv` that ensures the `java` binary from `JAVA_HOME` (when set) is
@@ -54,7 +54,7 @@ function ensureJavaAvailable(rootDir: string, env: NodeJS.ProcessEnv): void {
  * 2) Adapter transform to generated-sources
  */
 function main(): void {
-	const rootDir: string = path.resolve(__dirname, "../../..");
+	const rootDir: string = path.resolve(import.meta.dirname, "../../..");
 	const env: NodeJS.ProcessEnv = buildJavaEnv(rootDir);
 	ensureJavaAvailable(rootDir, env);
 

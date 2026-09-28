@@ -1,6 +1,6 @@
-import {RestWebService} from "./RestWebService";
-import {RestDocument, RestSession} from "../../session";
-import {WebServiceTypes} from "../WebServiceType";
+import {RestWebService} from "./RestWebService.js";
+import {RestDocument, RestSession} from "../../session/index.js";
+import {WebServiceTypes} from "../WebServiceType.js";
 import {
 	Billing,
 	Converter,
@@ -8,7 +8,7 @@ import {
 	ConverterOperationInterface,
 	PdfPassword,
 	Settings
-} from "../../generated-sources";
+} from "../../generated-sources/index.js";
 
 /**
  * An instance of {@link ConverterWebService} wraps a wsclient connection to the webPDF webservice endpoint

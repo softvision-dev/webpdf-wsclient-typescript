@@ -1,4 +1,4 @@
-import {AuthResultException, ClientResultException, OAuth2Provider, OAuth2Token, Session, WsclientErrors} from "../../../main/typescript";
+import {AuthResultException, ClientResultException, OAuth2Provider, OAuth2Token, Session, WsclientErrors} from "../../../main/typescript/index.js";
 import {ConfidentialClientApplication} from '@azure/msal-node';
 import {AuthenticationResult} from "@azure/msal-common";
 
