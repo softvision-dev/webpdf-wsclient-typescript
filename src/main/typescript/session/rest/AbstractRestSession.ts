@@ -9,6 +9,7 @@ import {DocumentManager, RestDocument} from "./documents/index.js";
 import {AdministrationManager} from "./administration/index.js";
 import {UserManager} from "./user/index.js";
 import {ViewerManager} from "./viewer/index.js";
+import {FontManager} from "./font/index.js";
 import {DataFormats} from "../DataFormat.js";
 import {wsclientConfiguration} from "../../configuration/index.js";
 
@@ -36,6 +37,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	protected administrationManager: AdministrationManager<T_REST_DOCUMENT>;
 	protected readonly userManager: UserManager<T_REST_DOCUMENT>;
 	protected readonly viewerManager: ViewerManager<T_REST_DOCUMENT>;
+	protected readonly fontManager: FontManager<T_REST_DOCUMENT>;
 
 	/**
 	 * <p>
@@ -79,6 +81,7 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 		this.administrationManager = this.createAdministrationManager();
 		this.userManager = this.createUserManager();
 		this.viewerManager = this.createViewerManager();
+		this.fontManager = this.createFontManager();
 	}
 
 	/**
@@ -124,6 +127,15 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 */
 	public getViewerManager(): ViewerManager<T_REST_DOCUMENT> {
 		return this.viewerManager;
+	}
+
+	/**
+	 * Returns the active {@link FontManager} of this {@link RestSession}.
+	 *
+	 * @return The active {@link FontManager} of this {@link RestSession}.
+	 */
+	public getFontManager(): FontManager<T_REST_DOCUMENT> {
+		return this.fontManager;
 	}
 
 	/**
@@ -227,6 +239,13 @@ export abstract class AbstractRestSession<T_REST_DOCUMENT extends RestDocument> 
 	 * @return The created {@link ViewerManager}.
 	 */
 	protected abstract createViewerManager(): ViewerManager<T_REST_DOCUMENT>;
+
+	/**
+	 * Creates a new {@link FontManager} matching this {@link RestSession}.
+	 *
+	 * @return The created {@link FontManager}.
+	 */
+	protected abstract createFontManager(): FontManager<T_REST_DOCUMENT>;
 
 	public abstract createWebServiceInstance<T_WEBSERVICE extends RestWebService<any, any, any>>(
 		webServiceType: WebServiceType

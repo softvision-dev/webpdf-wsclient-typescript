@@ -1,46 +1,7 @@
 import {expect} from "chai";
 import {it, suite} from "mocha";
 import {models, RestViewerManager} from "../../../main/typescript/index.js";
-
-/**
- * Captured shape of the last HTTP request the manager issued through the stub session.
- */
-interface CapturedRequest {
-	method?: string;
-	url?: string;
-}
-
-/**
- * Builds a stub RestSession sufficient for {@link RestViewerManager}: it resolves URLs the same way
- * {@link AbstractSession#getURL} does, supplies a no-op bearer auth provider and routes HTTP requests
- * through the supplied response factory while capturing the request config for assertions.
- */
-function createStubSession(
-	captured: CapturedRequest,
-	responseFactory: (config: any) => any
-): any {
-	return {
-		getURL: (subPath: string, parameters?: URLSearchParams): URL => {
-			let url: URL = new URL("http://localhost/webPDF/rest/" + subPath);
-			if (typeof parameters !== "undefined") {
-				parameters.forEach((value: string, key: string): void => url.searchParams.append(key, value));
-			}
-			return url;
-		},
-		getAuthProvider: (): any => ({
-			provide: async (): Promise<any> => ({
-				getAuthHeader: (): any => ({Authorization: "Bearer TEST"})
-			})
-		}),
-		getHttpClient: (): any => ({
-			request: async (config: any): Promise<any> => {
-				captured.method = config.method;
-				captured.url = config.url;
-				return {status: 200, headers: {"content-type": "application/json"}, data: responseFactory(config)};
-			}
-		})
-	};
-}
+import {CapturedRequest, createStubSession} from "./StubRestSession.js";
 
 suite("RestViewerManagerTest", function (): void {
 	it("fetchProfile GETs the public tenant profile endpoint and hydrates the branding view",

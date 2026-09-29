@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-09-17T07:12:07Z)"
+		"version": "webPDF 11.0.0 (2026-09-29T08:14:35Z)"
 	},
 	"servers": [
 		{
@@ -3001,6 +3001,150 @@
 				]
 			}
 		},
+		"/portal/fonts": {
+			"get": {
+				"description": "Gets the fonts the web services 'toolbox' and 'converter' use, with the status of each web service. **For internal use by the portal only, undocumented, will change without further notice!** The answer carries a strong ETag; revalidate with If-None-Match.",
+				"operationId": "readFontCatalog",
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Portal_FontCatalog"
+								}
+							}
+						},
+						"description": "The font catalog."
+					},
+					"304": {
+						"description": "The catalog is unchanged (matching If-None-Match / ETag)."
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"503": {
+						"description": "The catalog is still being built; repeat after Retry-After."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Gets the font catalog of the web services [Internal use only, will change without further notice]",
+				"tags": [
+					"portal"
+				]
+			}
+		},
+		"/portal/fonts/metrics/{id}": {
+			"get": {
+				"description": "Gets the metrics of a toolbox cut as the watermark operation lays out a text with it, and which of the given characters it rejects. **For internal use by the portal only, undocumented, will change without further notice!** Usable metrics never change for an identifier and may be cached for good.",
+				"operationId": "readFontMetrics",
+				"parameters": [
+					{
+						"description": "The identifier of a toolbox cut: 16 characters of base64url.",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The characters, as decimal code points without leading zeros, separated by commas, strictly ascending, between 0 and 1114111 without surrogates, at most 512. Empty for the values of the font alone.",
+						"in": "query",
+						"name": "codepoints",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Portal_FontMetrics"
+								}
+							}
+						},
+						"description": "The metrics."
+					},
+					"400": {
+						"description": "The identifier or the code points are not of the required form."
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "The toolbox has no cut of this identifier."
+					},
+					"503": {
+						"description": "The request waited too long; repeat after Retry-After."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Gets the watermark metrics of a font cut [Internal use only, will change without further notice]",
+				"tags": [
+					"portal"
+				]
+			}
+		},
+		"/portal/fonts/previews/{key}": {
+			"get": {
+				"description": "Gets the previews of the families of one catalog page. **For internal use by the portal only, undocumented, will change without further notice!** The page never changes under its key and may be cached for good.",
+				"operationId": "readFontPreviewPage",
+				"parameters": [
+					{
+						"description": "The key of the page: 16 characters of base64url.",
+						"in": "path",
+						"name": "key",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Portal_FontPreviewPage"
+								}
+							}
+						},
+						"description": "The preview page."
+					},
+					"400": {
+						"description": "The key is not of the form of a page key."
+					},
+					"401": {
+						"$ref": "#/components/responses/401Unauthorized"
+					},
+					"404": {
+						"description": "No running source has a page of this key."
+					},
+					"503": {
+						"description": "The page is still being drawn; repeat after Retry-After."
+					}
+				},
+				"security": [
+					{
+						"BearerAuth": []
+					}
+				],
+				"summary": "Gets a page of font previews [Internal use only, will change without further notice]",
+				"tags": [
+					"portal"
+				]
+			}
+		},
 		"/portal/info": {
 			"get": {
 				"description": "Gets the portal information. **These information are for internal use only, they are undocumented and will change without further notice!**",
@@ -3833,7 +3977,8 @@
 						"type": "array",
 						"items": {
 							"$ref": "#/components/schemas/Admin_ExecutableName"
-						}
+						},
+						"uniqueItems": true
 					}
 				},
 				"required": [
@@ -5328,7 +5473,7 @@
 			},
 			"ApplicationConfig_InvoiceValidation": {
 				"type": "object",
-				"description": "Server-wide settings for the invoice rule validation engine. The feature is opt-in per request via \"pdfa > convert > zugferd > invoiceRuleValidation/@mode\" and via \"pdfa > analyze > invoiceRuleValidation/@mode\"; there is no separate top-level \"enabled\" attribute here. The two built-in rule packages are available unless explicitly disabled below.",
+				"description": "Server-wide settings for the invoice rule validation engine. The feature is opt-in per request via \"pdfa > convert > zugferd > invoiceRuleValidation/@mode\", via \"pdfa > analyze > invoiceRuleValidation/@mode\" and via the \"pdfa > invoice\" operation, which checks an invoice XML without a PDF carrier; there is no separate top-level \"enabled\" attribute here. The two built-in rule packages are available unless explicitly disabled below.",
 				"properties": {
 					"maxActiveRuleSets": {
 						"type": "integer",
@@ -5363,7 +5508,7 @@
 						"type": "integer",
 						"format": "int64",
 						"default": 8388608,
-						"description": "Upper size limit, in bytes, of an invoice document that is checked against a rule package. A larger document is not evaluated (notEvaluable, reason \"documentTooLarge\"). Also bounds the INFLATION of an invoice attachment extracted from an uploaded PDF/A document (\"pdfa > analyze\"): exceeding it while decompressing the attachment ends the check the same way, before the engine is even reached.",
+						"description": "Upper size limit, in bytes, of an invoice document that is checked against a rule package. A larger document is not evaluated (notEvaluable, reason \"documentTooLarge\"). Also bounds the INFLATION of an invoice attachment extracted from an uploaded PDF/A document (\"pdfa > analyze\"): exceeding it while decompressing the attachment ends the check the same way, before the engine is even reached. For \"pdfa > invoice\" the source document is the invoice itself, and its size is checked before it is read.",
 						"maximum": 9223372036854775807,
 						"minimum": 1
 					},
@@ -13341,7 +13486,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. How the selected font is embedded in the document is controlled by `subsetFont`.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"size": {
 						"type": "integer",
@@ -13350,6 +13495,11 @@
 						"description": "Used to set the text size for the text output.",
 						"maximum": 1296,
 						"minimum": 1
+					},
+					"subsetFont": {
+						"type": "boolean",
+						"default": true,
+						"description": "Used to select how the font is embedded in the document.\n\nIf \"true,\" only a subset of the font is embedded, holding the glyphs that the text of the annotations actually draws. The document stays small and remains self-contained, but a later editor can only re-set the text in characters that have already been drawn.\n\nIf \"false,\" the complete font program is embedded, so the text can later be re-set in every character the font provides. An editor reaches that program through the annotation's rich text (`/RC` and `/DS`) and the font of the same name in the document's default resources (`/DR`). The annotation's default appearance (`/DA`) names the standard font \"Helvetica\", so an editor that regenerates the appearance from that alone does not use the embedded program. For a font with a large character set, embedding it completely can increase the size of the document considerably.\n\n**Note:** A value set here always takes precedence - including over the subsetting that is otherwise applied to the default font of the \"Toolbox\" web service.\n\n**Note:** A font that cannot be embedded in full is embedded as a subset instead, and a warning is written to the server log. The appearance of the annotation is not affected by this."
 					}
 				}
 			},
@@ -13916,9 +14066,61 @@
 					"extends": "Operation_ActionEvent"
 				}
 			},
+			"Operation_Invoice": {
+				"type": "object",
+				"description": "Validates an electronic invoice XML (ZUGFeRD, Factur-X, XRechnung) that is supplied WITHOUT a PDF carrier: the source document of the request is the invoice XML itself. The check is the same check \"analyze > invoiceRuleValidation\" runs on an invoice embedded in a PDF/A document - the same rule packages, the same parameters with the same meaning and the same result - only without the PDF/A validation and without the search for the embedded invoice.\n\nThe response document is always the invoice validation report, with the standalone root element \"report\" of \"report/invoice.xsd\" - also for an invoice that violates the rules and for one that could not be evaluated at all. Exactly as in \"analyze\", the operation never answers with a dedicated error code for the outcome of the check: the verdict is carried by the report's \"state\", and a \"mode=enforce\" decision by its \"enforcement\" attribute. A source document that is not well-formed XML is reported as \"state=notEvaluable\" with \"reason=sourceDocumentUnreadable\", one that exceeds the configured size limit with \"reason=documentTooLarge\".\n\nThe operation needs neither a PDF nor the PDF/A converter at request time, but it is part of the \"Pdfa\" web service: it is available exactly when that web service is available and licensed.",
+				"properties": {
+					"mode": {
+						"type": "string",
+						"default": "report",
+						"description": "\"report\" (default): the invoice is checked against a rule package and the outcome is returned as the invoice validation report.\n\n\"enforce\": the same check, and additionally the enforcement decision is recorded as \"enforcement=passed\" or \"enforcement=rejected\" on the report - exactly as in \"analyze > invoiceRuleValidation\". Whether a document that could not be evaluated at all counts as rejected is governed by \"notEvaluable\". The operation itself still answers with the report and without an error code.\n\nUnlike \"invoiceRuleValidation\", this attribute knows no \"disabled\": the presence of the \"invoice\" element IS the request to check the invoice.",
+						"enum": [
+							"report",
+							"enforce"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceMode"
+						}
+					},
+					"notEvaluable": {
+						"type": "string",
+						"default": "reject",
+						"description": "Only effective under \"mode=enforce\". Governs the enforcement decision for a document that could NOT be evaluated at all - no rule package matched, a size or depth limit was exceeded, the time budget was exceeded, the configured rule package could not be loaded, (in \"analyze\") no invoice attachment could be identified or read at all, or (in \"invoice\") the source document is not well-formed XML. \"reject\" (default, fail-closed): such a document is treated the same as a genuine rule violation - rejected with error code -416 in \"convert\", or reported as \"enforcement=rejected\" in \"analyze\" and \"invoice\". \"accept\": such a document is embedded (\"convert\") or reported as \"enforcement=passed\" (\"analyze\", \"invoice\") instead. Either way, this attribute NEVER rescues a document that WAS evaluated and rejected by the rule package itself - it only covers the \"could not be evaluated\" case.",
+						"enum": [
+							"reject",
+							"accept"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceNotEvaluable"
+						}
+					},
+					"originalReport": {
+						"type": "string",
+						"default": "none",
+						"description": "Whether the rule package's OWN report - the \"Validation Artefact Result List\" the package produces while checking the document, and which webPDF otherwise discards - is delivered alongside webPDF's own invoice validation result, and in which form. \"none\" (default): it is not delivered, and the answer is exactly the answer of a request that does not name this attribute at all. \"embedded\": it is delivered base64-encoded in the \"originalReport\" element of the invoice validation result (see \"report/invoice.xsd\") - complete and unaltered, including its own XML declaration, so that a recipient can hand it to another tool as the standalone document the rule package produced. webPDF neither rewrites nor abridges it, and it is delivered IN ADDITION to webPDF's own result, never instead of it.\n\nThe payload travels wherever the invoice validation result itself travels, and only there - it is part of the report, not a second response. Under \"invoiceRuleValidation/@mode=disabled\" no rule package is loaded at all, so there is neither a result nor a payload. In \"analyze\" and in \"invoice\" the report IS the response, so an evaluated document carries the payload unless one of the reasons named below removes it. In \"convert\" a report is delivered only when one was requested - through \"successReport\" for a document that was embedded, or through \"errorReport\" for a document rejected under \"mode=enforce\" - so with both of those at \"none\" the payload has nowhere to travel and is simply not produced. That is a documented interaction and not an error: asking for the payload never turns a request into a failure, and never makes the operation deliver a report that was not asked for.\n\nThe ABSENCE of the payload therefore carries no verdict information of its own - \"state\", \"assessment\", \"reason\" and the finding counters are unaffected by it. Every reason it can be absent is described at the element itself in \"report/invoice.xsd\". The one worth naming here: it is absent whenever no rule package evaluation produced a report at all, which is every \"state=notEvaluable\" outcome whatever its reason - including the ordinary \"analyze\" case of a document that carries no invoice attachment. Under \"mode=enforce\" with \"notEvaluable=reject\" such a document is still rejected; the rejection and the absent payload are independent statements.\n\n**Size:** the rule package's own report is a multiple of webPDF's own result, it grows with the number of findings the checked document produces, and the base64 encoding adds to that again - a response can grow by orders of magnitude. In \"convert\", use \"errorReport=file\" for large reports, which delivers the report as a response document, rather than \"errorReport=message\"; in \"analyze\" and in \"invoice\" the report is always the response document. A server administrator can additionally cap the payload (see \"invoiceValidation\" in the application configuration schema); above that ceiling the payload is omitted while the verdict and the operation's result stay exactly as they are.\n\n**Important, when combined with \"errorReport=message\" (only in \"convert\"):** the rule package's report carries invoice CONTENT - among other things the supplier, the invoice number, the invoice date and a table of element values taken from the checked document. With \"errorReport=message\" that content is delivered in the ERROR channel (the REST error body, the SOAP fault) instead of as a report document, and error channels are routinely logged and forwarded by callers, middleware and monitoring. The combination is served rather than refused, but choose it deliberately: \"errorReport=file\" delivers the same report, with the same payload, as a response document instead.",
+						"enum": [
+							"none",
+							"embedded"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_InvoiceOriginalReport"
+						}
+					},
+					"originalReportHtml": {
+						"type": "boolean",
+						"default": false,
+						"description": "Whether the human-readable HTML view the rule package embeds in its OWN report is ADDITIONALLY delivered as a payload of its own, in the \"originalReportHtml\" element of the invoice validation result (see \"report/invoice.xsd\") - the same element name as this attribute, deliberately. \"false\" (default): the view is not delivered separately, and the answer is exactly the answer of a request that does not name this attribute at all.\n\nOnly effective when \"originalReport\" is not \"none\": this attribute decides only WHETHER the view travels, never in which form - its delivery form always follows \"originalReport\". With \"originalReport=none\" there is no rule package report to take a view out of, so \"originalReportHtml\" has no effect and asking for it is not an error, exactly like every other documented interaction of this element.\n\nThe view is EXTRACTED from the rule package's own report, never re-rendered: it is the very HTML fragment that report already embeds. It is delivered UTF-8 encoded and, being a fragment of an XML document rather than a standalone HTML file, carries no character-set declaration of its own - a recipient that serves or stores it as HTML has to state UTF-8 itself. Its absence carries no verdict information of its own; every reason it can be absent is described at the element itself in \"report/invoice.xsd\". None of them changes \"state\", \"assessment\", \"reason\" or the finding counters, and asking for the view never turns a request into a failure.\n\nSubject to the same operator size ceiling as \"originalReport\" (see \"invoiceValidation\" in the application configuration schema), measured against the view's own raw, not-yet-encoded size and applied independently of it: a ceiling that suppresses the (larger) report does not by itself suppress the (smaller) view."
+					},
+					"ruleSet": {
+						"type": "string",
+						"default": "",
+						"description": "Forces a specific configured rule package identifier (for example \"xrechnung\" or \"zugferd\") instead of the automatic, ordered selection. Selects a PACKAGE, not a scenario within it: if the forced package has no scenario matching the document, the outcome is \"notEvaluable\" - it does NOT fall back to another package.\n\nBoth built-in packages can declare a matching scenario for the SAME EN 16931-based document (guideline identifier \"urn:cen.eu:en16931:2017\"); without this override, the server-configured selection order decides which one is used (see \"invoiceValidation\" in the application configuration schema). Use this attribute when the caller, not the server's default order, must decide which of the two packages such a document is checked against."
+					}
+				}
+			},
 			"Operation_InvoiceRuleValidation": {
 				"type": "object",
-				"description": "Optionally validates a ZUGFeRD/Factur-X/XRechnung invoice XML against an official e-invoicing rule package (KoSIT XRechnung 3.0.2 or Landrix ZUGFeRD 2.5). Two elements use this type, and the same parameters trigger the same check in both: \"convert > zugferd > invoiceRuleValidation\" checks the invoice supplied with the request, before it is embedded, and \"analyze > invoiceRuleValidation\" checks an invoice that is already embedded in the uploaded PDF/A document. In \"analyze\" the invoice is located in the document itself: an attachment named by the XMP \"DocumentFileName\" pointer, or carrying one of the canonical invoice file names, or marked as an associated file. A document that carries no such attachment, more than one equally qualified one, or one that cannot be read is reported as \"state=notEvaluable\" with the corresponding reason.\n\nThis is independent of and in addition to webPDF's own XSD validation of the ZUGFeRD schema variant (error code -410), which always runs first in the \"convert\" branch and is unaffected by this element: a document can be valid against webPDF's own schema and still be rejected here, because the official rule packages check business rules the schema alone cannot express - and vice versa, a document that fails the rule package's own, stricter schema step is reported through the error code documented below (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR), never through -410 itself.\n\nThe two branches differ in how \"mode=enforce\" surfaces a rejection, because they differ in what the operation returns. In \"convert\", a rejection aborts the operation with the error code documented on the \"zugferd\" web service response (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR) instead of embedding the invoice; that single error code does NOT by itself distinguish a genuine rule violation from a document that could not be evaluated at all, a distinction available only in the invoice validation report (see \"report/invoice.xsd\", attributes \"state\" and \"reason\") and in a single WARN log entry per request. In \"analyze\", the operation always returns its analysis report and never a dedicated error code for this check; the rejection decision is instead recorded as \"enforcement\" on that report's \"invoice\" element (see \"report/pdfa.xsd\").",
+				"description": "Optionally validates a ZUGFeRD/Factur-X/XRechnung invoice XML against an official e-invoicing rule package (KoSIT XRechnung 3.0.2 or Landrix ZUGFeRD 2.5). Two elements use this type, and the same parameters trigger the same check in both: \"convert > zugferd > invoiceRuleValidation\" checks the invoice supplied with the request, before it is embedded, and \"analyze > invoiceRuleValidation\" checks an invoice that is already embedded in the uploaded PDF/A document. In \"analyze\" the invoice is located in the document itself: an attachment named by the XMP \"DocumentFileName\" pointer, or carrying one of the canonical invoice file names, or marked as an associated file. A document that carries no such attachment, more than one equally qualified one, or one that cannot be read is reported as \"state=notEvaluable\" with the corresponding reason. An invoice XML without a PDF carrier is checked by the \"invoice\" operation, which shares all parameters of this type except \"mode\" (see \"InvoiceType\").\n\nThis is independent of and in addition to webPDF's own XSD validation of the ZUGFeRD schema variant (error code -410), which always runs first in the \"convert\" branch and is unaffected by this element: a document can be valid against webPDF's own schema and still be rejected here, because the official rule packages check business rules the schema alone cannot express - and vice versa, a document that fails the rule package's own, stricter schema step is reported through the error code documented below (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR), never through -410 itself.\n\nThe two branches differ in how \"mode=enforce\" surfaces a rejection, because they differ in what the operation returns. In \"convert\", a rejection aborts the operation with the error code documented on the \"zugferd\" web service response (PDFA\\_ZUGFERD\\_RULE\\_VALIDATION\\_ERROR) instead of embedding the invoice; that single error code does NOT by itself distinguish a genuine rule violation from a document that could not be evaluated at all, a distinction available only in the invoice validation report (see \"report/invoice.xsd\", attributes \"state\" and \"reason\") and in a single WARN log entry per request. In \"analyze\", the operation always returns its analysis report and never a dedicated error code for this check; the rejection decision is instead recorded as \"enforcement\" on that report's \"invoice\" element (see \"report/pdfa.xsd\").",
 				"properties": {
 					"mode": {
 						"type": "string",
@@ -13936,7 +14138,7 @@
 					"notEvaluable": {
 						"type": "string",
 						"default": "reject",
-						"description": "Only effective under \"mode=enforce\". Governs the enforcement decision for a document that could NOT be evaluated at all - no rule package matched, a size or depth limit was exceeded, the time budget was exceeded, the configured rule package could not be loaded, or (in \"analyze\") no invoice attachment could be identified or read at all. \"reject\" (default, fail-closed): such a document is treated the same as a genuine rule violation - rejected with error code -416 in \"convert\", or reported as \"enforcement=rejected\" in \"analyze\". \"accept\": such a document is embedded (\"convert\") or reported as \"enforcement=passed\" (\"analyze\") instead. Either way, this attribute NEVER rescues a document that WAS evaluated and rejected by the rule package itself - it only covers the \"could not be evaluated\" case.",
+						"description": "Only effective under \"mode=enforce\". Governs the enforcement decision for a document that could NOT be evaluated at all - no rule package matched, a size or depth limit was exceeded, the time budget was exceeded, the configured rule package could not be loaded, (in \"analyze\") no invoice attachment could be identified or read at all, or (in \"invoice\") the source document is not well-formed XML. \"reject\" (default, fail-closed): such a document is treated the same as a genuine rule violation - rejected with error code -416 in \"convert\", or reported as \"enforcement=rejected\" in \"analyze\" and \"invoice\". \"accept\": such a document is embedded (\"convert\") or reported as \"enforcement=passed\" (\"analyze\", \"invoice\") instead. Either way, this attribute NEVER rescues a document that WAS evaluated and rejected by the rule package itself - it only covers the \"could not be evaluated\" case.",
 						"enum": [
 							"reject",
 							"accept"
@@ -13948,7 +14150,7 @@
 					"originalReport": {
 						"type": "string",
 						"default": "none",
-						"description": "Whether the rule package's OWN report - the \"Validation Artefact Result List\" the package produces while checking the document, and which webPDF otherwise discards - is delivered alongside webPDF's own invoice validation result, and in which form. \"none\" (default): it is not delivered, and the answer is exactly the answer of a request that does not name this attribute at all. \"embedded\": it is delivered base64-encoded in the \"originalReport\" element of the invoice validation result (see \"report/invoice.xsd\") - complete and unaltered, including its own XML declaration, so that a recipient can hand it to another tool as the standalone document the rule package produced. webPDF neither rewrites nor abridges it, and it is delivered IN ADDITION to webPDF's own result, never instead of it.\n\nThe payload travels wherever the invoice validation result itself travels, and only there - it is part of the report, not a second response. Under \"mode=disabled\" no rule package is loaded at all, so there is neither a result nor a payload. In \"analyze\" the report IS the response, so an evaluated document carries the payload unless one of the reasons named below removes it. In \"convert\" a report is delivered only when one was requested - through \"successReport\" for a document that was embedded, or through \"errorReport\" for a document rejected under \"mode=enforce\" - so with both of those at \"none\" the payload has nowhere to travel and is simply not produced. That is a documented interaction and not an error: asking for the payload never turns a request into a failure, and never makes the operation deliver a report that was not asked for.\n\nThe ABSENCE of the payload therefore carries no verdict information of its own - \"state\", \"assessment\", \"reason\" and the finding counters are unaffected by it. Every reason it can be absent is described at the element itself in \"report/invoice.xsd\". The one worth naming here: it is absent whenever no rule package evaluation produced a report at all, which is every \"state=notEvaluable\" outcome whatever its reason - including the ordinary \"analyze\" case of a document that carries no invoice attachment. Under \"mode=enforce\" with \"notEvaluable=reject\" such a document is still rejected; the rejection and the absent payload are independent statements.\n\n**Size:** the rule package's own report is a multiple of webPDF's own result, it grows with the number of findings the checked document produces, and the base64 encoding adds to that again - a response can grow by orders of magnitude. For large reports use \"errorReport=file\", which delivers the report as a response document, rather than \"errorReport=message\". A server administrator can additionally cap the payload (see \"invoiceValidation\" in the application configuration schema); above that ceiling the payload is omitted while the verdict and the operation's result stay exactly as they are.\n\n**Important, when combined with \"errorReport=message\":** the rule package's report carries invoice CONTENT - among other things the supplier, the invoice number, the invoice date and a table of element values taken from the checked document. With \"errorReport=message\" that content is delivered in the ERROR channel (the REST error body, the SOAP fault) instead of as a report document, and error channels are routinely logged and forwarded by callers, middleware and monitoring. The combination is served rather than refused, but choose it deliberately: \"errorReport=file\" delivers the same report, with the same payload, as a response document instead.",
+						"description": "Whether the rule package's OWN report - the \"Validation Artefact Result List\" the package produces while checking the document, and which webPDF otherwise discards - is delivered alongside webPDF's own invoice validation result, and in which form. \"none\" (default): it is not delivered, and the answer is exactly the answer of a request that does not name this attribute at all. \"embedded\": it is delivered base64-encoded in the \"originalReport\" element of the invoice validation result (see \"report/invoice.xsd\") - complete and unaltered, including its own XML declaration, so that a recipient can hand it to another tool as the standalone document the rule package produced. webPDF neither rewrites nor abridges it, and it is delivered IN ADDITION to webPDF's own result, never instead of it.\n\nThe payload travels wherever the invoice validation result itself travels, and only there - it is part of the report, not a second response. Under \"invoiceRuleValidation/@mode=disabled\" no rule package is loaded at all, so there is neither a result nor a payload. In \"analyze\" and in \"invoice\" the report IS the response, so an evaluated document carries the payload unless one of the reasons named below removes it. In \"convert\" a report is delivered only when one was requested - through \"successReport\" for a document that was embedded, or through \"errorReport\" for a document rejected under \"mode=enforce\" - so with both of those at \"none\" the payload has nowhere to travel and is simply not produced. That is a documented interaction and not an error: asking for the payload never turns a request into a failure, and never makes the operation deliver a report that was not asked for.\n\nThe ABSENCE of the payload therefore carries no verdict information of its own - \"state\", \"assessment\", \"reason\" and the finding counters are unaffected by it. Every reason it can be absent is described at the element itself in \"report/invoice.xsd\". The one worth naming here: it is absent whenever no rule package evaluation produced a report at all, which is every \"state=notEvaluable\" outcome whatever its reason - including the ordinary \"analyze\" case of a document that carries no invoice attachment. Under \"mode=enforce\" with \"notEvaluable=reject\" such a document is still rejected; the rejection and the absent payload are independent statements.\n\n**Size:** the rule package's own report is a multiple of webPDF's own result, it grows with the number of findings the checked document produces, and the base64 encoding adds to that again - a response can grow by orders of magnitude. In \"convert\", use \"errorReport=file\" for large reports, which delivers the report as a response document, rather than \"errorReport=message\"; in \"analyze\" and in \"invoice\" the report is always the response document. A server administrator can additionally cap the payload (see \"invoiceValidation\" in the application configuration schema); above that ceiling the payload is omitted while the verdict and the operation's result stay exactly as they are.\n\n**Important, when combined with \"errorReport=message\" (only in \"convert\"):** the rule package's report carries invoice CONTENT - among other things the supplier, the invoice number, the invoice date and a table of element values taken from the checked document. With \"errorReport=message\" that content is delivered in the ERROR channel (the REST error body, the SOAP fault) instead of as a report document, and error channels are routinely logged and forwarded by callers, middleware and monitoring. The combination is served rather than refused, but choose it deliberately: \"errorReport=file\" delivers the same report, with the same payload, as a response document instead.",
 						"enum": [
 							"none",
 							"embedded"
@@ -14801,7 +15003,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output. If a font is not specified, \"Helvetica\" will be used."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"size": {
 						"type": "integer",
@@ -15151,13 +15353,16 @@
 			},
 			"Operation_Pdfa": {
 				"type": "object",
-				"description": "When using the \"Pdfa\" web service, both the `<convert>` and `<analyze>` operations can be used.\n\nThe `convert` operation is used to convert PDF documents to PDF/A, while the `analyze` operation is used to validate existing PDF/A documents.",
+				"description": "When using the \"Pdfa\" web service, the `<convert>`, `<analyze>` and `<invoice>` operations can be used.\n\nThe `convert` operation is used to convert PDF documents to PDF/A, while the `analyze` operation is used to validate existing PDF/A documents. The `invoice` operation validates an electronic invoice (ZUGFeRD, Factur-X, XRechnung) that is supplied as a plain XML document, without a PDF carrying it.\n\nThe three operations cover the e-invoicing subject of this web service together: `convert > zugferd` embeds an invoice, `analyze` checks an invoice that is already embedded, and `invoice` checks an invoice without a PDF carrier. The invoice validation is therefore available whenever the \"Pdfa\" web service is available.",
 				"properties": {
 					"analyze": {
 						"$ref": "#/components/schemas/Operation_AnalyzePdfa"
 					},
 					"convert": {
 						"$ref": "#/components/schemas/Operation_ConvertPdfa"
+					},
+					"invoice": {
+						"$ref": "#/components/schemas/Operation_Invoice"
 					}
 				}
 			},
@@ -19478,7 +19683,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output. If a font is not specified, \"Helvetica\" will be used."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"opacity": {
 						"type": "integer",
@@ -19983,12 +20188,6 @@
 			"Portal_Environment": {
 				"type": "object",
 				"properties": {
-					"fonts": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						}
-					},
 					"printers": {
 						"type": "array",
 						"items": {
@@ -19997,6 +20196,329 @@
 					}
 				},
 				"readOnly": true
+			},
+			"Portal_FontCatalog": {
+				"type": "object",
+				"description": "The fonts of the web services 'toolbox' and 'converter'. Both keys are always present. The frontend portal reads 'toolbox' for the four font fields of the toolbox operations and for the watermark metrics, and for the five Chromium font fields the families of a source with readsSystemFontFolder=true, preferably 'converter'; the admin portal reads 'converter' for the converter's default font.",
+				"properties": {
+					"sources": {
+						"type": "object",
+						"additionalProperties": {
+							"$ref": "#/components/schemas/Portal_FontSource"
+						},
+						"description": "The fonts by web service: 'toolbox' and 'converter', in this order."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"sources"
+				]
+			},
+			"Portal_FontCut": {
+				"type": "object",
+				"description": "A cut of a font: the style it is drawn in and its identifier.",
+				"properties": {
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "The identifier of the cut: 16 characters of base64url, opaque. The server never answers other content under one identifier; a changed font or another server version has another identifier. The same font has the same identifier in every source.",
+						"maxLength": 16,
+						"minLength": 16
+					},
+					"style": {
+						"$ref": "#/components/schemas/Portal_FontStyle"
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"id",
+					"style"
+				]
+			},
+			"Portal_FontDefault": {
+				"type": "object",
+				"description": "The default font effective in the running web service.",
+				"properties": {
+					"cuts": {
+						"type": "array",
+						"description": "Only for the source 'toolbox': per style, the cut the toolbox draws with when a request names no font. Missing for the source 'converter', which passes its default font on by name.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontCut"
+						}
+					},
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The family name of the default font the running web service uses. For the source 'converter' the family its default font selection elected, which can differ from the configured name."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"name"
+				]
+			},
+			"Portal_FontFamily": {
+				"type": "object",
+				"description": "A font family as a web service uses it: the name it is offered under, the cuts the web service draws under that name, and the page it is previewed on.",
+				"properties": {
+					"cuts": {
+						"type": "array",
+						"description": "The cuts in the order plain, bold, italic, boldItalic, at least one. For the source 'toolbox' the cuts the toolbox draws under this name in exactly this style, without falling back to another style. For the source 'converter' the occupied style slots of the family the converter uses as its default font when this name is configured. In both cases: this name leads the consumer of the source to exactly this cut.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontCut"
+						}
+					},
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The name the family is offered under."
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The index of the preview page the family is on, in 'previewPages' of its source."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"cuts",
+					"name",
+					"page"
+				]
+			},
+			"Portal_FontGlyph": {
+				"type": "object",
+				"description": "A character the watermark operation can draw in the cut, in 1/1000 em.",
+				"properties": {
+					"codepoint": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The Unicode code point."
+					},
+					"path": {
+						"type": "string",
+						"default": "",
+						"description": "The outline as SVG path data of the relative commands m, l, q, c and z with integer arguments, y pointing downwards, the origin at the left end of the base line; empty for a character without outline such as the space."
+					},
+					"width": {
+						"type": "number",
+						"format": "float",
+						"default": 0,
+						"description": "The advance width; the widths of the characters of a text add up to its width."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"codepoint",
+					"path",
+					"width"
+				]
+			},
+			"Portal_FontMetrics": {
+				"type": "object",
+				"description": "The metrics of a cut as the watermark operation lays out a text with it, in 1/1000 em. The answer never changes for an identifier.",
+				"properties": {
+					"descent": {
+						"type": "number",
+						"format": "float",
+						"default": 0,
+						"description": "Only when usable: the descent of the embedded font, below the base line."
+					},
+					"glyphs": {
+						"type": "array",
+						"description": "The requested characters the operation can draw, in ascending order.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontGlyph"
+						}
+					},
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "The identifier of the cut."
+					},
+					"lineBoxHeight": {
+						"type": "number",
+						"format": "float",
+						"default": 0,
+						"description": "Only when usable: the height of the line box the operation lays a text out with - ascent minus descent of the embedded font."
+					},
+					"unitsPerEm": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The units per em of every number and path: 1000."
+					},
+					"unsupported": {
+						"type": "array",
+						"description": "The requested characters with which the operation rejects a text (TOOLBOX_WATERMARK_INVALID_CHAR_IN_TEXT), in ascending order - they are not removed from a text.",
+						"items": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					"usable": {
+						"type": "boolean",
+						"default": false,
+						"description": "false when the watermark operation cannot draw with the cut; then no other value is given."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"glyphs",
+					"id",
+					"unitsPerEm",
+					"unsupported",
+					"usable"
+				]
+			},
+			"Portal_FontPreview": {
+				"type": "object",
+				"description": "A family name drawn in its font, as SVG path data in the units of its page, y pointing downwards, the origin at the left end of the base line.",
+				"properties": {
+					"ascent": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The ascender of the font, above the base line."
+					},
+					"complete": {
+						"type": "boolean",
+						"default": false,
+						"description": "false when the font cannot draw its name - a symbol font, for example; 'path' then shows a sample of the font's own glyphs."
+					},
+					"descent": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The descender of the font, below the base line and therefore negative."
+					},
+					"id": {
+						"type": "string",
+						"default": "",
+						"description": "The identifier of the cut the name is drawn in - the first listed cut of the family."
+					},
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the family, as listed in the catalog."
+					},
+					"path": {
+						"type": "string",
+						"default": "",
+						"description": "SVG path data of the relative commands m, l, q, c and z with integer arguments."
+					},
+					"width": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "The advance of the drawn text."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"ascent",
+					"complete",
+					"descent",
+					"id",
+					"name",
+					"path",
+					"width"
+				]
+			},
+			"Portal_FontPreviewPage": {
+				"type": "object",
+				"description": "The previews of the families of one catalog page, each family name drawn in the cut the family is listed with first. The page never changes under its key.",
+				"properties": {
+					"key": {
+						"type": "string",
+						"default": "",
+						"description": "The key of the page."
+					},
+					"previews": {
+						"type": "array",
+						"description": "The previews, in the order of the families; a family whose font cannot be read has none.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontPreview"
+						}
+					},
+					"unitsPerEm": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"description": "The units per em of all numbers and paths of the page: 128."
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"key",
+					"previews",
+					"unitsPerEm"
+				]
+			},
+			"Portal_FontPreviewPageRef": {
+				"type": "object",
+				"description": "A page of family previews, read with GET /portal/fonts/previews/{key}.",
+				"properties": {
+					"key": {
+						"type": "string",
+						"default": "",
+						"description": "The key of the page: 16 characters of base64url, opaque. The page answered under a key never changes; changed fonts or another server version have another key.",
+						"maxLength": 16,
+						"minLength": 16
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"key"
+				]
+			},
+			"Portal_FontSource": {
+				"type": "object",
+				"description": "The fonts of one web service. The status is always present; the font data only while the web service runs (status 'ok'), and it describes the running instance - a changed font path or default font takes effect with the restart of the web service.",
+				"properties": {
+					"defaultFont": {
+						"$ref": "#/components/schemas/Portal_FontDefault"
+					},
+					"families": {
+						"type": "array",
+						"description": "Only with status 'ok': the families, ordered by their name in lower case, then by the name itself. Names are weighed in this order: names from a Windows name entry, other family names, then alternative names. For the source 'toolbox' each readable name - alternative names such as the named instances of a variable font included - under which the toolbox reaches a cut in exactly its style that no name weighed before it reaches in that style; a name whose cuts all belong to names weighed before it is left out, although the toolbox still draws with it. For the source 'converter' family names only, each of which the converter uses as its default font under exactly that name; not every name that takes effect is listed - one whose family has the same cuts as a family already listed under a name weighed before it is left out. Whether a configured default font takes effect shows in defaultFont.name, not in its membership in families.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontFamily"
+						}
+					},
+					"previewPages": {
+						"type": "array",
+						"description": "Only with status 'ok': the preview pages, each for 100 consecutive families; 'page' of a family is an index into this list.",
+						"items": {
+							"$ref": "#/components/schemas/Portal_FontPreviewPageRef"
+						}
+					},
+					"readsSystemFontFolder": {
+						"type": "boolean",
+						"default": false,
+						"description": "Only with status 'ok': whether the web service reads the font folder of the operating system - the folder whose families Chromium also resolves as CSS font families."
+					},
+					"status": {
+						"$ref": "#/components/schemas/Webservice_Status"
+					}
+				},
+				"readOnly": true,
+				"required": [
+					"status"
+				]
+			},
+			"Portal_FontStyle": {
+				"type": "string",
+				"default": "plain",
+				"description": "The style of a cut.\n\n- plain = Regular.\n\n- bold = Bold.\n\n- italic = Italic.\n\n- boldItalic = Bold and italic.",
+				"enum": [
+					"plain",
+					"bold",
+					"italic",
+					"boldItalic"
+				]
 			},
 			"Portal_Functions": {
 				"type": "object",

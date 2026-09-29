@@ -5,6 +5,7 @@ import {AxiosProgressEvent, AxiosInstance} from "axios";
 import {AdministrationManager} from "./administration/index.js";
 import {UserManager} from "./user/index.js";
 import {ViewerManager} from "./viewer/index.js";
+import {FontManager} from "./font/index.js";
 import {KeyStorePassword, UserCertificates, UserCredentials} from "../../generated-sources/index.js";
 
 /**
@@ -71,6 +72,14 @@ export interface RestSession<T_REST_DOCUMENT extends RestDocument> extends Sessi
      * @return The active {@link ViewerManager} of this {@link RestSession}.
      */
     getViewerManager(): ViewerManager<T_REST_DOCUMENT>;
+
+    /**
+     * Returns the active {@link FontManager} of this {@link RestSession}, providing access to the
+     * font endpoints ({@code /portal/fonts/...}).
+     *
+     * @return The active {@link FontManager} of this {@link RestSession}.
+     */
+    getFontManager(): FontManager<T_REST_DOCUMENT>;
 
     /**
      * Returns the {@link UserCredentials} logged in via this {@link RestSession}.

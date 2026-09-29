@@ -5,6 +5,7 @@ import {DocumentManager, RestWebServiceDocument, RestWebServiceDocumentManager} 
 import {AdministrationManager, RestAdministrationManager} from "./administration/index.js";
 import {RestUserManager, UserManager} from "./user/index.js";
 import {RestViewerManager, ViewerManager} from "./viewer/index.js";
+import {FontManager, RestFontManager} from "./font/index.js";
 import {RestSession} from "./RestSession.js";
 import {RestWebService, WebServiceFactory, WebServiceType} from "../../webservice/index.js";
 
@@ -89,6 +90,15 @@ export class RestWebServiceSession extends AbstractRestSession<RestWebServiceDoc
 	 */
 	protected createViewerManager(): ViewerManager<RestWebServiceDocument> {
 		return new RestViewerManager(this);
+	}
+
+	/**
+	 * Creates a new {@link FontManager} matching this {@link RestSession}.
+	 *
+	 * @return The created {@link FontManager}.
+	 */
+	protected createFontManager(): FontManager<RestWebServiceDocument> {
+		return new RestFontManager(this);
 	}
 
 	/**
