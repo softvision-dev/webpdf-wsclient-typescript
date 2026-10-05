@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-09-29T08:14:35Z)"
+		"version": "webPDF 11.0.0 (2026-10-05T11:09:35Z)"
 	},
 	"servers": [
 		{
@@ -3661,11 +3661,12 @@
 		"schemas": {
 			"Admin_ApplicationCheck": {
 				"type": "object",
-				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.",
+				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.\n\n- locale = Select the default locale and time zone of the \"Converter\" web service for validation.",
 				"discriminator": {
 					"mapping": {
 						"executable": "#/components/schemas/Admin_ExecutableApplicationCheck",
 						"license": "#/components/schemas/Admin_LicenseApplicationCheck",
+						"locale": "#/components/schemas/Admin_LocaleApplicationCheck",
 						"signature": "#/components/schemas/Admin_SignatureApplicationCheck",
 						"tsa": "#/components/schemas/Admin_TsaApplicationCheck"
 					},
@@ -3687,7 +3688,8 @@
 					"license",
 					"tsa",
 					"executable",
-					"signature"
+					"signature",
+					"locale"
 				]
 			},
 			"Admin_ApplicationConfiguration": {
@@ -4344,6 +4346,18 @@
 					}
 				],
 				"description": "Validates the configured webPDF server license and whether it matches the given server.",
+				"required": [
+					"checkType"
+				]
+			},
+			"Admin_LocaleApplicationCheck": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Admin_ApplicationCheck"
+					}
+				],
+				"description": "Validates the default locale and time zone settings of the configuration against the Java runtime of the server. Checked are the attributes \"locale\" and \"timeZone\" of \"webservices/converter\".",
 				"required": [
 					"checkType"
 				]
@@ -5401,7 +5415,7 @@
 					"defaultFont": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the default font to be used if the original font was not found and no matching character (for representation) was found in any other font with a similar font family or characteristic. Therefore, a font should be used that has the widest possible coverage of characters, especially in the Unicode range.\n\n**Note:** If no font is specified, then the server tries to find a suitable font (such as \"Arial Unicode MS\" or \"Go Noto Current\"). If these fonts are not available, then the respective default font of the operating system (under Windows \"Arial\" and under Linux \"DejaVu Sans\") is used. If these are not available either, then a corresponding message appears on the server console (or in the logs).\n\n**Important:** This setting is supported only by the built-in document converter OutsideIn."
+						"description": "Sets the default font to be used if the original font was not found and no matching character (for representation) was found in any other font with a similar font family or characteristic. Therefore, a font should be used that has the widest possible coverage of characters, especially in the Unicode range.\n\n**Note:** If no font is specified, then the server tries to find a suitable font (such as \"Arial Unicode MS\" or \"Go Noto Current\"). If these fonts are not available, then the respective default font of the operating system (under Windows \"Arial\" and under Linux \"DejaVu Sans\") is used. If these are not available either, then a corresponding message appears on the server console (or in the logs).\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word, Excel, PowerPoint and Markdown converters."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -5411,7 +5425,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting is supported only by the built-in document converter OutsideIn. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\" or \"Toolbox\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word, Excel, PowerPoint and Markdown converters. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\" or \"Toolbox\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -5419,6 +5433,12 @@
 						"default": 2,
 						"description": "Number of parallel instances (threads) for the web service. Defines the number of requests that can be executed in parallel before requests are queued.",
 						"minimum": 1
+					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default locale of the integrated Word, Excel, PowerPoint and Markdown converters as a language tag, for example \"de-DE\" or \"en-US\". It applies to every conversion whose request sets no locale (\"locale\" of the \"converter\" operation). If no value is specified, the locale of the Java runtime of the server is used, which by default follows the operating system or the container.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed language tag prevents the configuration from being loaded, and the server does not start. A well-formed value for which the Java runtime of the server has no formatting data prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
 					},
 					"maxLatency": {
 						"type": "integer",
@@ -5444,6 +5464,13 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the integrated Word and Excel converters, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every conversion whose request sets no time zone (\"timeZone\" of the \"converter\" operation). If no value is specified, the time zone of the Java runtime of the server is used, which by default follows the operating system or the container.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -7978,7 +8005,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The main color of visible annotations. The color will be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -8355,7 +8382,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The interior (fill) color for the shape.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"style": {
 						"type": "string",
@@ -8846,7 +8873,7 @@
 						"type": "string",
 						"default": "",
 						"description": "The text of headers and footers color.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"font": {
 						"$ref": "#/components/schemas/Metadata_Font"
@@ -9433,7 +9460,7 @@
 						"type": "string",
 						"default": "#FFFFFF",
 						"description": "The color of a unicolor background.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"horizOffset": {
 						"type": "number",
@@ -11302,7 +11329,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -11341,7 +11368,7 @@
 						"type": "string",
 						"default": "#000000",
 						"description": "Used to set the font color. The hereby defined color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"invisible": {
 						"type": "boolean",
@@ -11570,7 +11597,7 @@
 						"type": "string",
 						"default": "#FFFFFF",
 						"description": "Used to set the colour for the background layer. The colour needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"settings": {
 						"$ref": "#/components/schemas/Operation_BackgroundBaseSettings"
@@ -11739,6 +11766,12 @@
 						"maximum": 100,
 						"minimum": 0
 					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the locale of the conversion as a language tag, for example \"de-DE\" or \"en-US\". It applies wherever the document itself states no language: to the formatting of numbers and dates (for example in Excel cells, the TEXT function, charts and Excel headers and footers), to the language of text without a language of its own, and to the document language of a document that states none. A language stated in the document always takes precedence and is not overridden.\n\nIf no value is set, the default locale configured for the \"Converter\" web service is used; if none is configured there either, the locale of the Java runtime of the server is used.\n\n**Important:** This option is currently only evaluated by the integrated converters for Word (docx), Excel (xlsx), PowerPoint (pptx) and Markdown documents. It does not affect the templates for e-mails, calendars and contacts; their language is selected by \"language\" of the \"template\" element.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"mail": {
 						"$ref": "#/components/schemas/Operation_ConverterMail"
 					},
@@ -11783,11 +11816,23 @@
 					"signature": {
 						"$ref": "#/components/schemas/Operation_Signature"
 					},
+					"subsetFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" only the characters used in the document are embedded for each font (font subset). If \"false,\" the complete font program is embedded; this can enlarge the document considerably.\n\nThis option only takes effect if \"embedFonts\" is \"true\". A font whose license does not permit subsetting is always embedded completely. A face of a font collection that cannot be embedded completely is embedded as a subset instead, and a warning is written to the server log.\n\n**Important:** This option is currently only evaluated by the integrated converters for Word (docx), Excel (xlsx), PowerPoint (pptx) and Markdown documents."
+					},
 					"template": {
 						"$ref": "#/components/schemas/Operation_ConverterTemplate"
 					},
 					"text": {
 						"$ref": "#/components/schemas/Operation_ConverterText"
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the time zone in which the conversion reads the current date and time, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\": Word's DATE and TIME fields, Excel's TODAY and NOW functions (also in conditional formats) and the date and time codes of Excel headers and footers. Dates stored in the document are not changed, and neither are the time stamps written to the PDF (creation and modification date, metadata, signature time).\n\nIf no value is set, the default time zone configured for the \"Converter\" web service is used; if none is configured there either, the time zone of the Java runtime of the server is used.\n\n**Important:** This option is currently only evaluated by the integrated converters for Word (docx) and Excel (xlsx) documents.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					},
 					"transform": {
 						"$ref": "#/components/schemas/Operation_ConverterTransform"
@@ -12007,7 +12052,7 @@
 					"bodyFont": {
 						"type": "string",
 						"default": "",
-						"description": "Font family used for the main body text (and headings). If empty, the converter's configured default font is used."
+						"description": "Font family used for the main body text (and headings). If empty, the font family 'Go Noto Current' is used; if it is not available, the converter's default font is used instead, or a built-in font if there is none."
 					},
 					"bodyFontSize": {
 						"type": "number",
@@ -12047,6 +12092,11 @@
 				"type": "object",
 				"description": "Defines the settings to be used when converting Excel (xlsx) workbooks with the integrated Excel converter. All attributes are optional and override the built-in defaults; unset attributes keep the default behavior. This is intentionally a basic set; further options are planned as additive extensions.",
 				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" Excel workbooks (xlsx) are converted with the integrated Excel converter. If \"false,\" the integrated converter is skipped and the workbook is converted as without it, which by default means with Outside In. The other settings of this element only apply to the integrated converter.\n\n**Important:** A requested Office bridge or SharePoint bridge takes precedence over this option."
+					},
 					"plotterMode": {
 						"type": "string",
 						"default": "fitContent",
@@ -12056,7 +12106,8 @@
 							"fitRows",
 							"fitColumns",
 							"expandPage",
-							"plotTable"
+							"plotTable",
+							"faithful"
 						],
 						"x-webpdf-codegen": {
 							"enumName": "Operation_ConverterOfficeExcelPlotterMode"
@@ -12079,6 +12130,11 @@
 				"type": "object",
 				"description": "Defines the settings to be used when converting PowerPoint (pptx) presentations with the integrated PowerPoint converter. All attributes are optional and override the built-in defaults; unset attributes keep the default behavior.",
 				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" PowerPoint presentations (pptx) are converted with the integrated PowerPoint converter. If \"false,\" the integrated converter is skipped and the presentation is converted as without it, which by default means with Outside In. The other settings of this element only apply to the integrated converter.\n\n**Important:** A requested Office bridge or SharePoint bridge takes precedence over this option."
+					},
 					"renderNotes": {
 						"type": "boolean",
 						"default": false,
@@ -12090,6 +12146,11 @@
 				"type": "object",
 				"description": "Defines the settings to be used when converting Word (docx) documents.",
 				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" Word documents (docx) are converted with the integrated Word converter. If \"false,\" the integrated converter is skipped and the document is converted as without it, which by default means with Outside In. The other settings of this element only apply to the integrated converter.\n\n**Important:** A requested Office bridge or SharePoint bridge takes precedence over this option."
+					},
 					"form": {
 						"$ref": "#/components/schemas/Operation_ConverterOfficeForm"
 					}
@@ -12180,22 +12241,22 @@
 			},
 			"Operation_ConverterReport": {
 				"type": "object",
-				"description": "Can be used to enable expanded error reporting for text-based documents (e.g., Word).",
+				"description": "Can be used to enable expanded error reporting. As of this version, it applies to the conversion of Word (docx), Excel (xlsx), PowerPoint (pptx) and Markdown documents with the integrated converters, and to conversions with Outside In. Other conversion paths (e.g., the Office Bridge, the SharePoint Bridge, or the conversion of HTML, e-mail, EPUB, text and image files) ignore these options.\n\nIf the integrated converters report several kinds of problems, ERR\\_CONVERTER\\_CONTENT\\_PROBLEMS takes precedence over ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING, which in turn takes precedence over ERR\\_CONVERTER\\_FONT\\_ALIAS\\_USED. The error message lists all problems reported during the conversion.",
 				"properties": {
 					"contentProblems": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_CONTENT\\_PROBLEMS) is triggered if a problem occurs with a content item during the conversion. The following are among the problems:\n\n*   Unicode resolution of characters is not possible\n*   Vertical text elements\n*   Unsupported text effects\n*   Unsupported graphics compression\n*   Unsupported colour space\n*   Non-integrated sub-document that was not converted\n*   Tables with a \"right-to-left\" alignment in the content\n*   The document contains mathematical formulas"
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_CONTENT\\_PROBLEMS) is triggered if a problem occurs with a content item during the conversion. In conversions with Outside In, the following are among the problems:\n\n*   Unicode resolution of characters is not possible\n*   Vertical text elements\n*   Unsupported text effects\n*   Unsupported graphics compression\n*   Unsupported colour space\n*   Non-integrated sub-document that was not converted\n*   Tables with a \"right-to-left\" alignment in the content\n*   The document contains mathematical formulas\n\nThe integrated converters report content they do not support or cannot reproduce faithfully instead. The following are among the problems:\n\n*   Shapes, drawing elements, chart types, form controls and other objects that are not supported and were skipped or replaced\n*   Pattern, gradient and table cell fills that are not supported and were skipped or approximated\n*   Formulas, cell values and conditional formatting rules that could not be evaluated, rendered or applied\n*   Notes of the spreadsheet engine about formulas and volatile cells it could only evaluate through a fallback; the value shown may still be correct\n*   Images that could not be rendered"
 					},
 					"fontAliasUsage": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_ALIAS\\_USED) is triggered if a font was not found during conversion and in its place a substitute (alias) font was used."
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_ALIAS\\_USED) is triggered if a font was not found during conversion and in its place a substitute (alias) font was used. With the integrated converters, this is the usual case for a font that is not found: it is replaced by a font that covers the character set of the text, preferably the default font. They do not count an alias that cannot be used, for example because its font file is damaged, as a substitute: the font counts as missing then (see \"fontIsMissing\")."
 					},
 					"fontIsMissing": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion."
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion. With the integrated converters, this applies to a font for which no substitute that covers the character set of the text is available either (see \"fontAliasUsage\"). They also count a font that was found but cannot be used, because its font file is damaged or its license does not permit embedding, and that was replaced by the default font, and, in spreadsheets, a symbol that no installed font can draw; its characters are not rendered."
 					}
 				}
 			},
@@ -12213,7 +12274,7 @@
 						"type": "string",
 						"default": "",
 						"description": "An ISO 639-1-compliant language code consisting of 2 letters. If there is one, a localized template will be selected using the language selected here. If not defined, the language in which webPDF is run will be used.",
-						"pattern": "system|[a-z]{2}"
+						"pattern": "^[ \\t\\n\\r]*(?:system|[a-z]{2})[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -12697,7 +12758,7 @@
 					"folderNameTemplate": {
 						"type": "string",
 						"default": "page[%d]",
-						"description": "Used to set the template for the page folders in the returned ZIP file. \"page\\[%d\\]\", for example, would result in a folder called \"page1\" for page 1, etc."
+						"description": "Used to set the template for the page folders in the returned ZIP file. \"page\\[%d\\]\", for example, would result in a folder called \"page\\[1\\]\" for page 1, etc.\n\nNumbers are written with ASCII digits. A template that is longer than 1024 characters, contains a width or precision greater than 64 or cannot be formatted with a number is not used; the default template applies instead."
 					},
 					"selection": {
 						"type": "array",
@@ -12745,12 +12806,12 @@
 					"fileNameTemplate": {
 						"type": "string",
 						"default": "file[%d]",
-						"description": "Used to set the template for the image files in the returned ZIP file. \"file\\[%d\\]\", for example, would result in a \"file\\[1\\].png\" entry for a PNG image."
+						"description": "Used to set the template for the image files in the returned ZIP file. \"file\\[%d\\]\", for example, would result in a \"file\\[1\\].png\" entry for a PNG image.\n\nNumbers are written with ASCII digits. A template that is longer than 1024 characters, contains a width or precision greater than 64 or cannot be formatted with a number is not used; the default template applies instead."
 					},
 					"folderNameTemplate": {
 						"type": "string",
 						"default": "page[%d]",
-						"description": "Used to set the template for the page folders in the returned ZIP file. \"page\\[%d\\]\", for example, would result in a folder called \"page\\[1\\]\" for page 1, etc."
+						"description": "Used to set the template for the page folders in the returned ZIP file. \"page\\[%d\\]\", for example, would result in a folder called \"page\\[1\\]\" for page 1, etc.\n\nNumbers are written with ASCII digits. A template that is longer than 1024 characters, contains a width or precision greater than 64 or cannot be formatted with a number is not used; the default template applies instead."
 					},
 					"pages": {
 						"type": "string",
@@ -12910,7 +12971,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation colour will change the main colour of the attachment's icon. The colour needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"height": {
 						"type": "number",
@@ -13360,7 +13421,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -13476,7 +13537,7 @@
 						"type": "string",
 						"default": "#A0A0A0",
 						"description": "Used to set the font color. The hereby defined color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"italic": {
 						"type": "boolean",
@@ -14190,7 +14251,7 @@
 						"type": "string",
 						"default": "#000000",
 						"description": "Used to set the colour that will be used to display the element's name. The hereby defined color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"isOpen": {
 						"type": "boolean",
@@ -14445,7 +14506,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -14585,7 +14646,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -14998,7 +15059,7 @@
 						"type": "string",
 						"default": "#000000",
 						"description": "Used to set the colour for the text output. The colour needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"name": {
 						"type": "string",
@@ -16201,7 +16262,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -16227,7 +16288,7 @@
 						"type": "string",
 						"default": "#000000",
 						"description": "The annotation color will change the interior color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"invisible": {
 						"type": "boolean",
@@ -16548,7 +16609,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -17371,7 +17432,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -17410,7 +17471,7 @@
 						"type": "string",
 						"default": "#000000",
 						"description": "Used to set the font color. The hereby defined color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"invisible": {
 						"type": "boolean",
@@ -17828,7 +17889,7 @@
 						"type": "string",
 						"default": "#4800FF",
 						"description": "The annotation color will change the main color of visible annotations. The color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"contents": {
 						"type": "string",
@@ -18375,7 +18436,7 @@
 							"fileNameTemplate": {
 								"type": "string",
 								"default": "page[%d]",
-								"description": "When exporting multiple pages, this parameter is used to define the file name that will be used for the generated image files in the ZIP file. The file name must include the string \"%d\". This string will be replaced with a consecutive number in the file name."
+								"description": "When exporting multiple pages, this parameter is used to define the file name that will be used for the generated image files in the ZIP file. The file name must include the string \"%d\". This string will be replaced with a consecutive number in the file name.\n\nNumbers are written with ASCII digits. A template that is longer than 1024 characters, contains a width or precision greater than 64 or cannot be formatted with a number is not used; the default template applies instead."
 							},
 							"gif": {
 								"$ref": "#/components/schemas/Operation_Gif"
@@ -18892,7 +18953,7 @@
 							"fileNameTemplate": {
 								"type": "string",
 								"default": "page[%d]",
-								"description": "If the \"split\" operation generates a ZIP document (please refer to \"mode\"), this template can be used to define the file name of the PDF document in the ZIP document. The \"%d\" placeholder must be used in the template in order to define the PDF document page."
+								"description": "If the \"split\" operation generates a ZIP document (please refer to \"mode\"), this template can be used to define the file name of the PDF document in the ZIP document. The \"%d\" placeholder must be used in the template in order to define the PDF document page.\n\nNumbers are written with ASCII digits. A template that is longer than 1024 characters, contains a width or precision greater than 64 or cannot be formatted with a number is not used; the default template applies instead."
 							},
 							"mode": {
 								"type": "string",
@@ -19673,7 +19734,7 @@
 						"type": "string",
 						"default": "#A0A0A0",
 						"description": "Used to set the colour for the watermark. The hereby defined color needs to be specified as a hexadecimal RGB value with a number sign before it.",
-						"pattern": "#[0-9a-fA-F]{6}"
+						"pattern": "^[ \\t\\n\\r]*(?:#[0-9a-fA-F]{6})[ \\t\\n\\r]*$"
 					},
 					"italic": {
 						"type": "boolean",
@@ -19800,15 +19861,13 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to define the X-axis position (as per metrics), starting from the top left corner of the PDF document, if position is set to \"custom.\". If \"position is set to a different value, these arguments will be interpreted as \"offsets\" from the selected position. This specification applies for both the text and image output.",
-						"minimum": 0
+						"description": "Horizontal position in the unit given by `metrics`. With position `custom`: distance of the watermark's left edge from the left edge of the visible page. With a preset position: signed distance from that position - positive values move the watermark inward, away from the page edge (to the right for `*_left`, to the left for `*_right`); for the middle column (`*_center`) positive values move it to the right. Negative values move it in the opposite direction and may place the watermark partly or completely outside the page (`custom` included); values are not limited. Directions refer to the page as displayed (page rotation and crop box are taken into account). The distance applies to the unrotated watermark; `angle` then rotates it around its centre. Applies to text and image watermarks."
 					},
 					"y": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to define the Y-axis position (as per metrics), starting from the top left corner of the PDF document, if position is set to \"custom.\". If \"position is set to a different value, these arguments will be interpreted as \"offsets\" from the selected position. This specification applies for both the text and image output.",
-						"minimum": 0
+						"description": "Vertical position in the unit given by `metrics`. With position `custom`: distance of the watermark's top edge from the top edge of the visible page. With a preset position: signed distance from that position - positive values move the watermark inward, away from the page edge (down for `top_*`, up for `bottom_*`); for the middle row (`center_*`) positive values move it down. Negative values move it in the opposite direction and may place the watermark partly or completely outside the page (`custom` included); values are not limited. Directions refer to the page as displayed (page rotation and crop box are taken into account). The distance applies to the unrotated watermark; `angle` then rotates it around its centre. Applies to text and image watermarks."
 					}
 				}
 			},

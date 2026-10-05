@@ -1,6 +1,6 @@
 {
 	"name": "@softvision/webpdf-wsclient-typescript",
-	"version": "11.0.0-beta.66",
+	"version": "11.0.0-beta.67",
 	"description": "A simplified and optimized API client library for the webPDF server",
 	"type": "module",
 	"main": "./lib/index.js",
