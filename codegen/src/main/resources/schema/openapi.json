@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-05T11:32:59Z)"
+		"version": "webPDF 10.0.7 (2026-10-08T08:19:21Z)"
 	},
 	"servers": [
 		{
@@ -2683,11 +2683,12 @@
 			},
 			"Admin_ApplicationCheck": {
 				"type": "object",
-				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.",
+				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.\n\n- locale = Select the default locale and time zone of the server (\"webservices\") and of the \"Converter\" and \"URL Converter\" web services for validation.",
 				"discriminator": {
 					"mapping": {
 						"executable": "#/components/schemas/Admin_ExecutableApplicationCheck",
 						"license": "#/components/schemas/Admin_LicenseApplicationCheck",
+						"locale": "#/components/schemas/Admin_LocaleApplicationCheck",
 						"signature": "#/components/schemas/Admin_SignatureApplicationCheck",
 						"tsa": "#/components/schemas/Admin_TsaApplicationCheck"
 					},
@@ -2709,7 +2710,8 @@
 					"license",
 					"tsa",
 					"executable",
-					"signature"
+					"signature",
+					"locale"
 				]
 			},
 			"Admin_ApplicationConfiguration": {
@@ -3311,6 +3313,18 @@
 					}
 				],
 				"description": "Validates the configured webPDF server license and whether it matches the given server.",
+				"required": [
+					"checkType"
+				]
+			},
+			"Admin_LocaleApplicationCheck": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Admin_ApplicationCheck"
+					}
+				],
+				"description": "Validates the default locale and time zone settings of the configuration against the Java runtime of the server. Checked are the attributes \"locale\" and \"timeZone\" of \"webservices\" (the default of the server), of \"webservices/converter\", of \"webservices/urlconverter\" and of \"webservices/signature\", and the attribute \"timeZone\" of \"webservices/toolbox\".",
 				"required": [
 					"checkType"
 				]
@@ -4338,7 +4352,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word converter. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\" or \"Toolbox\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word converter. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\", \"Signature\" or \"Toolbox\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -4346,6 +4360,12 @@
 						"default": 2,
 						"description": "Number of parallel instances (threads) for the web service. Defines the number of requests that can be executed in parallel before requests are queued.",
 						"minimum": 1
+					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default locale of the \"Converter\" web service as a language tag, for example \"de-DE\" or \"en-US\". It applies to every conversion whose request sets no locale (\"locale\" of the \"converter\" operation, which describes where the locale takes effect). If no value is specified, the default locale of the server (\"locale\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"locale\" of the \"converter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed language tag prevents the configuration from being loaded, and the server does not start. A well-formed value for which the Java runtime of the server has no formatting data prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
 					},
 					"maxLatency": {
 						"type": "integer",
@@ -4371,6 +4391,13 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the \"Converter\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every conversion whose request sets no time zone (\"timeZone\" of the \"converter\" operation, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"timeZone\" of the \"converter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -4932,7 +4959,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Pdfa\" web service only and does not change the fonts used by the \"Converter\" or \"Toolbox\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Pdfa\" web service only and does not change the fonts used by the \"Converter\", \"Signature\" or \"Toolbox\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -5431,10 +5458,20 @@
 				"type": "object",
 				"description": "Defines a set of options specific for the \"Signature\" web service.",
 				"properties": {
+					"defaultFont": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the first font of the text in visual signatures whose request names no font (`name` of the element `font` of the signature appearance): unless it is `Helvetica` (see below), a character that it cannot display is drawn with the next font of the font chain below that provides it. The fonts are embedded in the document as subsets that hold only the characters drawn.\n\nThe font chain of the server follows from the font directories of the \"Signature\" web service: \"Arial Unicode MS\", then \"Go Noto Current\", then \"DejaVu Sans\", then \"Go Noto CJKCore\"; under Windows \"Arial\" is used as a last resort. If the value is empty, the font chain alone is used.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions of webPDF. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories or cannot be used (it cannot be embedded or has no line metrics) is reported in the server log when the web service starts and is skipped. A character that no font of the chain can display ends the signature with an error; only a font that the request names (`name` of the element `font`) is binding."
+					},
 					"enabled": {
 						"type": "boolean",
 						"default": true,
 						"description": "If enabled, then the web service is activated."
+					},
+					"fontPath": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts for the text of visual signatures.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Signature\" web service only, also when a conversion signs its result, and does not change the fonts used by the \"Converter\", \"Pdfa\" or \"Toolbox\" web service. If no fonts can be read from the font directories, the \"Signature\" web service starts nevertheless, writes a warning to the server log and draws the text of visual signatures with the PDF standard font \"Helvetica\"; a character outside the Windows Latin character set then ends a visual signature with an error."
 					},
 					"instances": {
 						"type": "integer",
@@ -5442,6 +5479,12 @@
 						"default": 2,
 						"description": "Number of parallel instances (threads) for the web service. Defines the number of requests that can be executed in parallel before requests are queued.",
 						"minimum": 1
+					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default locale of the \"Signature\" web service as a language tag, for example \"de-DE\" or \"en-US\". It applies to every signature whose request sets no locale (\"locale\" of the element `identifierElements` of the signature appearance, which describes where the locale takes effect). If no value is specified, the default locale of the server (\"locale\" of \"webservices\") is used. A signature that is part of a conversion uses the locale of the conversion instead (see \"locale\" of the \"converter\" operation).\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed language tag prevents the configuration from being loaded, and the server does not start. A well-formed value for which the Java runtime of the server has no formatting data prevents the \"Signature\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
 					},
 					"maxLatency": {
 						"type": "integer",
@@ -5467,6 +5510,13 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the \"Signature\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every signature whose request sets no time zone (\"timeZone\" of the element `identifierElements` of the signature appearance, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used. A signature that is part of a conversion uses the time zone of the conversion instead (see \"timeZone\" of the \"converter\" operation).\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Signature\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -5482,7 +5532,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Toolbox\" web service only and does not change the fonts used by the \"Converter\" or \"Pdfa\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Toolbox\" web service only and does not change the fonts used by the \"Converter\", \"Pdfa\" or \"Signature\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -5515,6 +5565,13 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the \"Toolbox\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to the current date of a date format in a header or footer whose request sets no time zone (\"timeZone\" of the element `headerFooterContent` of the \"options\" operation). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Toolbox\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -5571,6 +5628,12 @@
 						"description": "Number of parallel instances (threads) for the web service. Defines the number of requests that can be executed in parallel before requests are queued.",
 						"minimum": 1
 					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default locale of the \"URL Converter\" web service as a language tag, for example \"de-DE\" or \"en-US\". It applies to every conversion whose request sets no locale (\"locale\" of the \"urlconverter\" operation, which describes where the locale takes effect). If no value is specified, the default locale of the server (\"locale\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"locale\" of the \"urlconverter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed language tag prevents the configuration from being loaded, and the server does not start. A well-formed value for which the Java runtime of the server has no formatting data prevents the \"URL Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"maxLatency": {
 						"type": "integer",
 						"format": "int32",
@@ -5596,6 +5659,13 @@
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
 					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the \"URL Converter\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every conversion whose request sets no time zone (\"timeZone\" of the \"urlconverter\" operation, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"timeZone\" of the \"urlconverter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"URL Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
+					},
 					"timeout": {
 						"type": "integer",
 						"format": "int32",
@@ -5619,6 +5689,12 @@
 					"converter": {
 						"$ref": "#/components/schemas/ApplicationConfig_ConverterWebservice"
 					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default locale of the server as a language tag, for example \"de-DE\" or \"en-US\". It applies to every request of a web service that evaluates a locale (currently \"Converter\", \"URL Converter\" and \"Signature\") for which neither the request nor the default of the web service (\"locale\" of \"converter\", \"urlconverter\" or \"signature\") sets a value. If no value is specified here either, each web service falls back as described for its request attribute, usually to the locale of the Java runtime of the server, which by default follows the operating system or the container.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed language tag prevents the configuration from being loaded, and the server does not start. A well-formed value for which the Java runtime of the server has no formatting data prevents the \"Converter\", \"URL Converter\" and \"Signature\" web services from starting; the other web services start. In both cases the reason is written to the server log.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"ocr": {
 						"$ref": "#/components/schemas/ApplicationConfig_OcrWebservice"
 					},
@@ -5627,6 +5703,13 @@
 					},
 					"signature": {
 						"$ref": "#/components/schemas/ApplicationConfig_SignatureWebservice"
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default time zone of the server, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every request of a web service that evaluates a time zone (currently \"Converter\", \"URL Converter\", \"Signature\" and \"Toolbox\") for which neither the request nor the default of the web service (\"timeZone\" of \"converter\", \"urlconverter\", \"signature\" or \"toolbox\") sets a value. If no value is specified here either, each web service falls back as described for its request attribute, usually to the time zone of the Java runtime of the server, which by default follows the operating system or the container.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Converter\", \"URL Converter\", \"Signature\" and \"Toolbox\" web services from starting; the other web services start. In both cases the reason is written to the server log.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					},
 					"toolbox": {
 						"$ref": "#/components/schemas/ApplicationConfig_ToolboxWebservice"
@@ -9401,6 +9484,9 @@
 				"type": "object",
 				"description": "Used to define the signature's visual appearance.",
 				"properties": {
+					"font": {
+						"$ref": "#/components/schemas/Operation_SignatureFont"
+					},
 					"identifier": {
 						"type": "string",
 						"default": "",
@@ -10567,6 +10653,12 @@
 						"maximum": 100,
 						"minimum": 0
 					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the locale of the conversion as a language tag, for example \"de-DE\" or \"en-US\". A language or format stated in the document itself always takes precedence; the locale applies to what the document leaves open:\n\n*   Integrated converter for Word (docx): the formatting of dates (Word's DATE and TIME fields), the language of text without a language of its own, and the document language of a document that states none.\n*   Templates for e-mails (eml, msg, winmail.dat), calendars (ics), contacts (vcf), text and SVG documents, and the templates of headers and footers: the language and format of dates and numbers and, if \"language\" of the \"template\" element is not set, the selection of the localized template.\n*   Conversions with Chromium (HTML, e-mail bodies, text, SVG and the XRechnung visualization): the locale of JavaScript in the page (for example \"Intl\" and \"toLocaleString\") and the \"Accept-Language\" header of the requests of the page; \"navigator.language\" keeps the language of Chromium's process environment.\n*   XRechnung visualization: English if the language of the locale is English, otherwise German.\n*   Visual signature of the conversion (\"signature\"): the signature time when it is displayed in the \"localized\" form (\"dateFormat\" of \"identifierElements\"), unless \"identifierElements\" sets a locale of its own.\n\nIf no value is set, the default locale of the \"Converter\" web service is used, then the default locale of the server (\"locale\" of \"webservices\"). If neither is configured, the integrated converter and the templates use the locale of the Java runtime of the server, Chromium uses the settings of its process environment, and the XRechnung visualization is German.\n\n**Important:** The locale has no effect on conversions with Outside In Technology (which converts, among others, Excel and PowerPoint documents unless a bridge is requested), with the \"Office Bridge\" or with the \"SharePoint Bridge\". JavaScript in frames that are loaded from another website does not see the locale, and the date of a header or footer that uses the class \"date\" is formatted in the language of Chromium's process environment.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"mail": {
 						"$ref": "#/components/schemas/Operation_ConverterMail"
 					},
@@ -10613,6 +10705,13 @@
 					},
 					"text": {
 						"$ref": "#/components/schemas/Operation_ConverterText"
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the time zone of the conversion, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\":\n\n*   Integrated converter for Word (docx): the current date and time read by Word's DATE and TIME fields.\n*   Templates for e-mails, calendars and contacts and the templates of headers and footers: the time zone in which times are shown, for example the sent date of an e-mail or the start of an event. An event with a time zone of its own is shown in that time zone as well; all-day events and times without a time zone are shown as stated in the document.\n*   Conversions with Chromium: the time zone seen by JavaScript in the page and the date of a header or footer that uses the class \"date\".\n*   Outside In Technology: the time zone in which dates, such as the sent date of an e-mail, are shown. Outside In applies no daylight saving time: all dates are shown with the standard offset of the time zone, rounded to a quarter of an hour.\n*   Visual signature of the conversion (\"signature\"): the time zone in which the signature time is displayed, unless \"identifierElements\" sets a time zone of its own.\n\nIf no value is set, the default time zone of the \"Converter\" web service is used, then the default time zone of the server (\"timeZone\" of \"webservices\"). If neither is configured, the integrated converter and the templates use the time zone of the Java runtime of the server, and Chromium and Outside In use the time zone of the operating system (or the environment variable TZ of the server process).\n\n**Important:** Dates stored in the document are not changed, and neither are the time stamps written to the PDF (creation and modification date, metadata, signature time). The \"Office Bridge\" and the \"SharePoint Bridge\" do not evaluate the time zone. JavaScript in frames that are loaded from another website does not see the time zone.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					},
 					"transform": {
 						"$ref": "#/components/schemas/Operation_ConverterTransform"
@@ -10971,7 +11070,7 @@
 					"language": {
 						"type": "string",
 						"default": "",
-						"description": "An ISO 639-1-compliant language code consisting of 2 letters. If there is one, a localized template will be selected using the language selected here. If not defined, the language in which webPDF is run will be used.",
+						"description": "An ISO 639-1-compliant language code consisting of 2 letters, or \"system\". It selects the localized template and the language in which the template formats dates and numbers. If not defined, or set to \"system\", the locale of the conversion is used, region included (\"locale\" of the operation, otherwise the default of the web service or of the server); without any of these, the locale in which webPDF is run is used.",
 						"pattern": "^[ \\t\\n\\r]*(?:system|[a-z]{2})[ \\t\\n\\r]*$"
 					}
 				}
@@ -12402,12 +12501,19 @@
 						"type": "boolean",
 						"default": false,
 						"description": "If true, preexisting header and footer definition will be automatically deleted from all pages of the document and replaced with the new one. If false, preexisting header and footer definitions on any page of the document will cause the operation to be aborted."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the time zone in which the current date of a date format in the header or footer is determined, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". A date set with `<date>` is used as given.\n\nIf no value is set, the default time zone of the \"Toolbox\" web service is used (\"timeZone\" of \"webservices/toolbox\"), then the default time zone of the server (\"timeZone\" of \"webservices\"). If neither is configured, the time zone of the Java runtime of the server is used.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
 			"Operation_HeaderFooterDate": {
 				"type": "object",
-				"description": "Sets a date for inclusion in the added header/footer element.",
+				"description": "Sets a date for inclusion in the added header/footer element.\n\n**Important:** If a text of the header or footer contains a format instruction (`<<...>>`), `day`, `month` and `year` have to be set together; a date with a missing part then ends the operation with an error. Without a format instruction the date is not used. If the element is not set, the current date is used (see `timeZone` of the header/footer).",
 				"properties": {
 					"day": {
 						"type": "integer",
@@ -15772,10 +15878,39 @@
 					}
 				}
 			},
+			"Operation_SignatureFont": {
+				"type": "object",
+				"description": "Selects the font of the text in the visual signature.",
+				"properties": {
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "Name of the font that is used for the text of the visual signature. The font is searched in the font directories of the \"Signature\" web service (`webservices/signature/@fontPath`), embedded in the document as a subset that holds only the characters drawn, and the text is fitted into the signature field.\n\nIf no value is specified, the default font of the \"Signature\" web service applies (`webservices/signature/@defaultFont`): if it is empty, the font chain of the server is used; a font name configured there is tried first, and a character that it cannot display is drawn with the next font of the font chain that provides it. The value `Helvetica` there selects the standard font as described below.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions. A PDF/A document whose conformance is kept when signing (`pdfaEditProfile` \"noEditRestrictions\") then no longer conforms to PDF/A. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** Unless the PDF standard font \"Helvetica\" is selected (here or as the default font), the following applies. A font named here is binding: if it is not found or cannot be embedded, or if it cannot display a character, the signature ends with an error. Without a font named here, a character that no font of the server can display ends the signature with an error. A text that does not fit into the signature field even at the smallest font size ends it with an error as well. Characters of scripts that are written right to left or need contextual shaping (for example Arabic, Hebrew, Hindi or Thai) are drawn one by one, without shaping and in the order in which they are given."
+					}
+				}
+			},
 			"Operation_SignatureIdentifier": {
 				"type": "object",
 				"description": "Used to define the elements that are part of the visual signature.",
 				"properties": {
+					"dateFormat": {
+						"type": "string",
+						"default": "iso",
+						"description": "Form of the signature time in the visual signature:\n\n*   iso = Date and time in the form `yyyy-MM-dd HH:mm:ss`, followed by the offset from UTC\n*   localized = Date and time in the medium format of the locale, followed by the offset from UTC - only with an embedded font; with the PDF standard font \"Helvetica\", for scripts that need shaping or are written right to left, and where the fonts cannot display it, the iso form is written (see `dateFormat`)",
+						"enum": [
+							"iso",
+							"localized"
+						],
+						"x-webpdf-codegen": {
+							"enumName": "Operation_SignatureDateFormat"
+						}
+					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the locale of the signature time as a language tag, for example \"de-DE\" or \"en-US\". It takes effect only with the `dateFormat` \"localized\".\n\nIf no value is set, the locale of the request is used: for a signature that is part of a conversion \"locale\" of the \"converter\" operation, then the default locale of the \"Converter\" web service; otherwise the default locale of the \"Signature\" web service (\"locale\" of \"webservices/signature\"). After that the default locale of the server (\"locale\" of \"webservices\") is used, and if none is configured, the locale of the Java runtime of the server.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"showCommonName": {
 						"type": "boolean",
 						"default": true,
@@ -15826,10 +15961,22 @@
 						"default": true,
 						"description": "Displays or hides the state (S) in which the certificate holder is located."
 					},
+					"textDate": {
+						"type": "string",
+						"default": "",
+						"description": "Label that is displayed in front of the signature time when the `showDate` option is enabled. If not set, then the label `Date:` is used as default. A label set here is always used as given, independently of `locale`."
+					},
 					"textSignedBy": {
 						"type": "string",
 						"default": "",
 						"description": "Text that is displayed when the `showSignedBy` option is enabled. If not set, then the text `Digitally signed by` is used as default."
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the time zone in which the signature time is displayed when the `showDate` option is enabled, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\".\n\nIf no value is set, the time zone of the request is used: for a signature that is part of a conversion \"timeZone\" of the \"converter\" operation, then the default time zone of the \"Converter\" web service; otherwise the default time zone of the \"Signature\" web service (\"timeZone\" of \"webservices/signature\"). After that the default time zone of the server (\"timeZone\" of \"webservices\") is used, and if none is configured, the time zone of the Java runtime of the server.\n\n**Important:** The signing time stored in the signature is not changed; PDF viewers show it in their own local time.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					}
 				}
 			},
@@ -17299,7 +17446,8 @@
 							"language": {
 								"type": "string",
 								"default": "",
-								"description": "Specifies the language (and optionally the country) for the content of the document. The value is encoded as RFC 3066 (Tags for the Identification of Languages) and includes either the language only (e.g. \"de\") or the language and a country identifier (e.g. \"de-DE\")."
+								"description": "Specifies the language of the content of the document (the document language) as a language tag (BCP 47): a language of two or three letters, optionally followed by a script of four letters and a region of two letters or three digits, for example \"de\", \"de-DE\", \"sr-Latn-RS\" or \"es-419\". A language of two letters must be an ISO 639-1 code and a region of two letters an ISO 3166-1 code; any other value is rejected with an error. The value is stored normalized (language in lower case, script with an initial capital, region in upper case). An empty value removes the document language.\n\nThe value only states the language; it does not have to be a locale for which the Java runtime of the server provides formatting data.",
+								"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
 							},
 							"magnification": {
 								"type": "string",
@@ -18017,11 +18165,24 @@
 					"basicAuth": {
 						"$ref": "#/components/schemas/Operation_HttpBasicAuth"
 					},
+					"locale": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the locale of the conversion as a language tag, for example \"de-DE\" or \"en-US\": the \"Accept-Language\" header with which the page and its resources are requested (the website may answer in that language), the locale of JavaScript in the page (for example \"Intl\" and \"toLocaleString\"), and the language and format of dates and numbers in the templates of the header and footer.\n\nAn \"Accept-Language\" header that the request sets itself in \"settings/http\" takes precedence for the request of the page itself; the resources of the page are requested with this locale.\n\nIf no value is set, the default locale of the \"URL Converter\" web service is used, then the default locale of the server (\"locale\" of \"webservices\"). If neither is configured, the page itself is requested without an \"Accept-Language\" header, Chromium uses the settings of its process environment for the resources and for JavaScript, and the templates use the locale of the Java runtime of the server.\n\n**Important:** JavaScript in frames that are loaded from another website does not see the locale, \"navigator.language\" keeps the language of Chromium's process environment, and the date of a header or footer that uses the class \"date\" is formatted in that language.",
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z]{2,3}(-[A-Za-z]{4})?(-([A-Za-z]{2}|[0-9]{3}))?)?)[ \\t\\n\\r]*$"
+					},
 					"page": {
 						"$ref": "#/components/schemas/Operation_UrlConverterPage"
 					},
 					"proxy": {
 						"$ref": "#/components/schemas/Operation_HttpProxy"
+					},
+					"timeZone": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the time zone of the conversion, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\": the time zone seen by JavaScript in the page, the date of a header or footer that uses the class \"date\", and the time zone in which the templates of the header and footer show times.\n\nIf no value is set, the default time zone of the \"URL Converter\" web service is used, then the default time zone of the server (\"timeZone\" of \"webservices\"). If neither is configured, Chromium uses the time zone of the operating system and the templates use the time zone of the Java runtime of the server.\n\n**Important:** JavaScript in frames that are loaded from another website does not see the time zone.",
+						"maxLength": 64,
+						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
 					},
 					"url": {
 						"type": "string",
