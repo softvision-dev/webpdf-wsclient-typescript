@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-08T08:19:21Z)"
+		"version": "webPDF 10.0.7 (2026-10-09T13:33:13Z)"
 	},
 	"servers": [
 		{
@@ -3146,6 +3146,60 @@
 					"checkType"
 				]
 			},
+			"Admin_FontSubstitutionEntry": {
+				"type": "object",
+				"description": "Provides one effective pair of a font and the metric-compatible replacement font it is substituted by when it is not installed.",
+				"properties": {
+					"available": {
+						"type": "boolean",
+						"default": false,
+						"description": "When set to true, the replacement font is installed in the font folders of the web service on this server, so that the pair takes effect."
+					},
+					"font": {
+						"type": "string",
+						"default": "",
+						"description": "The family name of the font that is substituted when it is not installed."
+					},
+					"origin": {
+						"$ref": "#/components/schemas/Admin_FontSubstitutionOrigin"
+					},
+					"replacement": {
+						"type": "string",
+						"default": "",
+						"description": "The family name of the replacement font."
+					}
+				},
+				"readOnly": true
+			},
+			"Admin_FontSubstitutionOrigin": {
+				"type": "string",
+				"default": "DEFAULT",
+				"description": "Indicates where a pair of the font substitution comes from.\n\n- DEFAULT = A built-in pair of the server version.\n\n- CONFIGURED = An own entry of the configuration (webservices/fontSubstitution/substitute).",
+				"enum": [
+					"DEFAULT",
+					"CONFIGURED"
+				],
+				"readOnly": true
+			},
+			"Admin_FontSubstitutionStatus": {
+				"type": "object",
+				"description": "Provides the effective substitution of a font that is not installed by a metric-compatible replacement font (webservices/fontSubstitution of application.xml), as the web service applies it on this server.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "When set to true, a font that is not installed is substituted."
+					},
+					"entries": {
+						"type": "array",
+						"description": "The effective pairs of a font and its replacement font: the own entries of the configuration, then the built-in pairs no own entry replaces. Empty when the substitution is disabled.",
+						"items": {
+							"$ref": "#/components/schemas/Admin_FontSubstitutionEntry"
+						}
+					}
+				},
+				"readOnly": true
+			},
 			"Admin_GenericFileDataStore": {
 				"type": "object",
 				"allOf": [
@@ -4079,6 +4133,9 @@
 							"$ref": "#/components/schemas/Admin_ExecutableStatus"
 						}
 					},
+					"fontSubstitution": {
+						"$ref": "#/components/schemas/Admin_FontSubstitutionStatus"
+					},
 					"state": {
 						"$ref": "#/components/schemas/Admin_ServerState"
 					},
@@ -4398,6 +4455,45 @@
 						"description": "Sets the default time zone of the \"Converter\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every conversion whose request sets no time zone (\"timeZone\" of the \"converter\" operation, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"timeZone\" of the \"converter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
 						"maxLength": 64,
 						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
+					}
+				}
+			},
+			"ApplicationConfig_FontSubstitute": {
+				"type": "object",
+				"description": "Assigns a replacement font to a font that is not installed.",
+				"properties": {
+					"font": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the family name of the font that is replaced if it is not installed, for example \"Cambria\". The native Word converter compares the name the way it compares the font names of the document, by default without regard to upper and lower case; the \"Toolbox\" and \"Signature\" web services compare it exactly."
+					},
+					"replacement": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the family name of the replacement font, for example \"Caladea\". The entry only takes effect if this font is installed in the font folders of the web service. A replacement font is not replaced in turn: the entries are not followed one after the other."
+					}
+				}
+			},
+			"ApplicationConfig_FontSubstitution": {
+				"type": "object",
+				"description": "Defines the substitution of a font that is not installed in the font folders of a web service by a metric-compatible replacement font. A replacement font has the same character widths as the original font, so that lines, paragraphs and pages break as with the original.\n\nThe server knows the following built-in pairs: \"Arial\" and \"Helvetica\" are replaced by \"Liberation Sans\", \"Times New Roman\" by \"Liberation Serif\", \"Courier New\" by \"Liberation Mono\" and \"Calibri\" by \"Carlito\". The built-in pairs belong to the server version; a fixed table is obtained by setting \"useDefaults\" to \"false\" and defining own entries. Own entries (\"substitute\") are added to the built-in pairs; an own entry for the same font replaces the built-in pair.\n\n**Note:** The substitution only takes place if the font is not installed: an installed original font always wins. A replacement font is only used if it is installed in the font folders of the web service itself; the server does not ship any of them. The substitution applies to the native Word converter of the \"Converter\" web service and to the \"Toolbox\" and \"Signature\" web services. It does not apply to the built-in document converter OutsideIn, which converts all other Office formats (for example Excel and PowerPoint documents), to the \"Pdfa\" web service and to HTML content and the text of e-mails, which the integrated browser renders, and it does not apply to the default fonts (\"defaultFont\" of the web services), which are always chosen among the installed fonts.\n\n**Note:** In the native Word converter, a font that is not installed is replaced by the first font that draws all characters of the text: first the replacement the document names itself for the font (\"w:altName\" of its font table) - the first of the names that is installed, whose own replacement font is not used -, then the replacement font of the font that is not installed, then the font that replaced it in earlier versions (usually the default font), then the fonts of the server's fallback chain (\"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"Arial Unicode MS\", \"DejaVu Sans\"). If none of them draws all characters, the one that draws the most is used; characters of the text which the delivered substitute cannot draw are not rendered and are named in the report of the conversion. Such a replacement counts as alias usage (\"fontAliasUsage\" of the \"converter\" operation).\n\n**Important:** The settings are read when the server starts; a change takes effect after a restart. Entries with an empty font or replacement, entries that replace a font by itself and further entries for the same font are ignored and written to the server log.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true\", a font that is not installed is substituted as described for this element.\n\nIf \"false\", no font is substituted: no replacement font is used, the replacement a Word document names for a font is not used, the replacement of a font that is not installed is not chosen by the characters of the text, and characters that cannot be drawn are not named in the report. The fonts are then chosen exactly as in earlier versions of the server."
+					},
+					"substitute": {
+						"type": "array",
+						"description": "Assigns a replacement font to a font that is not installed.",
+						"items": {
+							"$ref": "#/components/schemas/ApplicationConfig_FontSubstitute"
+						}
+					},
+					"useDefaults": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true\", the built-in pairs are used in addition to the own entries (\"substitute\").\n\nIf \"false\", only the own entries are used. This switches off the built-in pairs only: the replacement a Word document names for a font, the choice of a replacement by the characters of the text and the report of characters that cannot be drawn remain active. To restore the font selection of earlier versions, set \"enabled\" to \"false\"."
 					}
 				}
 			},
@@ -5688,6 +5784,9 @@
 					},
 					"converter": {
 						"$ref": "#/components/schemas/ApplicationConfig_ConverterWebservice"
+					},
+					"fontSubstitution": {
+						"$ref": "#/components/schemas/ApplicationConfig_FontSubstitution"
 					},
 					"locale": {
 						"type": "string",
@@ -11048,12 +11147,12 @@
 					"fontAliasUsage": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_ALIAS\\_USED) is triggered if a font was not found during conversion and in its place a substitute (alias) font was used."
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_ALIAS\\_USED) is triggered if a font was not found during conversion and in its place a substitute (alias) font was used. With the integrated Word converter, the substitute can also be the metric-compatible replacement font configured for the missing font (`webservices/fontSubstitution` in `application.xml`) or a font that draws the characters of the text; both count as alias usage."
 					},
 					"fontIsMissing": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion."
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion. With the integrated Word converter, this also counts characters of a text in a font that is not found which the delivered substitute cannot draw; these characters are not rendered and are named in the report."
 					}
 				}
 			},
@@ -15885,7 +15984,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Name of the font that is used for the text of the visual signature. The font is searched in the font directories of the \"Signature\" web service (`webservices/signature/@fontPath`), embedded in the document as a subset that holds only the characters drawn, and the text is fitted into the signature field.\n\nIf no value is specified, the default font of the \"Signature\" web service applies (`webservices/signature/@defaultFont`): if it is empty, the font chain of the server is used; a font name configured there is tried first, and a character that it cannot display is drawn with the next font of the font chain that provides it. The value `Helvetica` there selects the standard font as described below.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions. A PDF/A document whose conformance is kept when signing (`pdfaEditProfile` \"noEditRestrictions\") then no longer conforms to PDF/A. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** Unless the PDF standard font \"Helvetica\" is selected (here or as the default font), the following applies. A font named here is binding: if it is not found or cannot be embedded, or if it cannot display a character, the signature ends with an error. Without a font named here, a character that no font of the server can display ends the signature with an error. A text that does not fit into the signature field even at the smallest font size ends it with an error as well. Characters of scripts that are written right to left or need contextual shaping (for example Arabic, Hebrew, Hindi or Thai) are drawn one by one, without shaping and in the order in which they are given."
+						"description": "Name of the font that is used for the text of the visual signature. The font is searched in the font directories of the \"Signature\" web service (`webservices/signature/@fontPath`), embedded in the document as a subset that holds only the characters drawn, and the text is fitted into the signature field.\n\nIf no value is specified, the default font of the \"Signature\" web service applies (`webservices/signature/@defaultFont`): if it is empty, the font chain of the server is used; a font name configured there is tried first, and a character that it cannot display is drawn with the next font of the font chain that provides it. The value `Helvetica` there selects the standard font as described below.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions. A PDF/A document whose conformance is kept when signing (`pdfaEditProfile` \"noEditRestrictions\") then no longer conforms to PDF/A. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** Unless the PDF standard font \"Helvetica\" is selected (here or as the default font), the following applies. A font named here is binding: if it is not found or cannot be embedded, or if it cannot display a character, the signature ends with an error. If the font named here is not installed, the replacement font configured for it (`webservices/fontSubstitution` in `application.xml`) is used instead, if it is installed; it is binding in the same way. Without a font named here, a character that no font of the server can display ends the signature with an error. A text that does not fit into the signature field even at the smallest font size ends it with an error as well. Characters of scripts that are written right to left or need contextual shaping (for example Arabic, Hebrew, Hindi or Thai) are drawn one by one, without shaping and in the order in which they are given."
 					}
 				}
 			},
