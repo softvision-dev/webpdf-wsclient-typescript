@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-09T13:33:13Z)"
+		"version": "webPDF 10.0.7 (2026-10-12T11:49:56Z)"
 	},
 	"servers": [
 		{
@@ -4399,7 +4399,7 @@
 					"defaultFont": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the default font to be used if the original font was not found and no matching character (for representation) was found in any other font with a similar font family or characteristic. Therefore, a font should be used that has the widest possible coverage of characters, especially in the Unicode range.\n\n**Note:** If no font is specified, then the server tries to find a suitable font (such as \"Arial Unicode MS\" or \"Go Noto Current\"). If these fonts are not available, then the respective default font of the operating system (under Windows \"Arial\" and under Linux \"DejaVu Sans\") is used. If these are not available either, then a corresponding message appears on the server console (or in the logs).\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word converter."
+						"description": "Sets the default font to be used if the original font was not found and no matching character (for representation) was found in any other font with a similar font family or characteristic. Therefore, a font should be used that has the widest possible coverage of characters, especially in the Unicode range.\n\n**Note:** If no font is specified, then the server takes the first of the fonts \"Go Noto Current\", \"DejaVu Sans\" and \"Arial Unicode MS\" that is installed; under Windows \"Arial\" is used as a last resort. \"Arial Unicode MS\" is not delivered with webPDF; it is an optional font whose license the operator clarifies. If none of these fonts is available, then a corresponding message appears on the server console (or in the logs).\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word converter."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -4476,7 +4476,7 @@
 			},
 			"ApplicationConfig_FontSubstitution": {
 				"type": "object",
-				"description": "Defines the substitution of a font that is not installed in the font folders of a web service by a metric-compatible replacement font. A replacement font has the same character widths as the original font, so that lines, paragraphs and pages break as with the original.\n\nThe server knows the following built-in pairs: \"Arial\" and \"Helvetica\" are replaced by \"Liberation Sans\", \"Times New Roman\" by \"Liberation Serif\", \"Courier New\" by \"Liberation Mono\" and \"Calibri\" by \"Carlito\". The built-in pairs belong to the server version; a fixed table is obtained by setting \"useDefaults\" to \"false\" and defining own entries. Own entries (\"substitute\") are added to the built-in pairs; an own entry for the same font replaces the built-in pair.\n\n**Note:** The substitution only takes place if the font is not installed: an installed original font always wins. A replacement font is only used if it is installed in the font folders of the web service itself; the server does not ship any of them. The substitution applies to the native Word converter of the \"Converter\" web service and to the \"Toolbox\" and \"Signature\" web services. It does not apply to the built-in document converter OutsideIn, which converts all other Office formats (for example Excel and PowerPoint documents), to the \"Pdfa\" web service and to HTML content and the text of e-mails, which the integrated browser renders, and it does not apply to the default fonts (\"defaultFont\" of the web services), which are always chosen among the installed fonts.\n\n**Note:** In the native Word converter, a font that is not installed is replaced by the first font that draws all characters of the text: first the replacement the document names itself for the font (\"w:altName\" of its font table) - the first of the names that is installed, whose own replacement font is not used -, then the replacement font of the font that is not installed, then the font that replaced it in earlier versions (usually the default font), then the fonts of the server's fallback chain (\"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"Arial Unicode MS\", \"DejaVu Sans\"). If none of them draws all characters, the one that draws the most is used; characters of the text which the delivered substitute cannot draw are not rendered and are named in the report of the conversion. Such a replacement counts as alias usage (\"fontAliasUsage\" of the \"converter\" operation).\n\n**Important:** The settings are read when the server starts; a change takes effect after a restart. Entries with an empty font or replacement, entries that replace a font by itself and further entries for the same font are ignored and written to the server log.",
+				"description": "Defines the substitution of a font that is not installed in the font folders of a web service by a metric-compatible replacement font. A replacement font has the same character widths as the original font, so that lines, paragraphs and pages break as with the original.\n\nThe server knows the following built-in pairs: \"Arial\" and \"Helvetica\" are replaced by \"Liberation Sans\", \"Times New Roman\" by \"Liberation Serif\", \"Courier New\" by \"Liberation Mono\" and \"Calibri\" by \"Carlito\". The built-in pairs belong to the server version; a fixed table is obtained by setting \"useDefaults\" to \"false\" and defining own entries. Own entries (\"substitute\") are added to the built-in pairs; an own entry for the same font replaces the built-in pair.\n\n**Note:** The substitution only takes place if the font is not installed: an installed original font always wins. A replacement font is only used if it is installed in the font folders of the web service itself; the server does not ship any of them. The substitution applies to the native Word converter of the \"Converter\" web service and to the \"Toolbox\" and \"Signature\" web services. It does not apply to the built-in document converter OutsideIn, which converts all other Office formats (for example Excel and PowerPoint documents), to the \"Pdfa\" web service and to HTML content and the text of e-mails, which the integrated browser renders, and it does not apply to the default fonts (\"defaultFont\" of the web services), which are always chosen among the installed fonts.\n\n**Note:** In the native Word converter, a font that is not installed is replaced by the first font that draws all characters of the text: first the replacement the document names itself for the font (\"w:altName\" of its font table) - the first of the names that is installed, whose own replacement font is not used -, then the replacement font of the font that is not installed, then the font that replaced it in earlier versions (usually the default font), then the fonts of the server's fallback chain (\"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\", \"Arial Unicode MS\"). If none of them draws all characters, the one that draws the most is used; characters of the text which the delivered substitute cannot draw are not rendered and are named in the report of the conversion. Such a replacement counts as alias usage (\"fontAliasUsage\" of the \"converter\" operation).\n\n**Important:** The settings are read when the server starts; a change takes effect after a restart. Entries with an empty font or replacement, entries that replace a font by itself and further entries for the same font are ignored and written to the server log.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -5557,7 +5557,7 @@
 					"defaultFont": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the first font of the text in visual signatures whose request names no font (`name` of the element `font` of the signature appearance): unless it is `Helvetica` (see below), a character that it cannot display is drawn with the next font of the font chain below that provides it. The fonts are embedded in the document as subsets that hold only the characters drawn.\n\nThe font chain of the server follows from the font directories of the \"Signature\" web service: \"Arial Unicode MS\", then \"Go Noto Current\", then \"DejaVu Sans\", then \"Go Noto CJKCore\"; under Windows \"Arial\" is used as a last resort. If the value is empty, the font chain alone is used.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions of webPDF. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories or cannot be used (it cannot be embedded or has no line metrics) is reported in the server log when the web service starts and is skipped. A character that no font of the chain can display ends the signature with an error; only a font that the request names (`name` of the element `font`) is binding."
+						"description": "Sets the first font of the text in visual signatures whose request names no font (`name` of the element `font` of the signature appearance): unless it is `Helvetica` (see below), a character that it cannot display is drawn with the next font of the font chain below that provides it. The fonts are embedded in the document as subsets that hold only the characters drawn.\n\nThe font chain of the server follows from the font directories of the \"Signature\" web service: first the first installed of \"Go Noto Current\", \"DejaVu Sans\" and \"Arial Unicode MS\", then \"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\" and \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. If the value is empty, the font chain alone is used.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions of webPDF. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories or cannot be used (it cannot be embedded or has no line metrics) is reported in the server log when the web service starts and is skipped. A character that no font of the chain can display ends the signature with an error; only a font that the request names (`name` of the element `font`) is binding."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -5620,6 +5620,11 @@
 				"type": "object",
 				"description": "Defines a set of options specific for the \"Toolbox\" web service.",
 				"properties": {
+					"defaultFont": {
+						"type": "string",
+						"default": "",
+						"description": "Sets the default font of the \"Toolbox\" web service: the font that the text of a watermark, a header or footer and a free text annotation is drawn with if the request names no font. The font is drawn in the requested style or, if it has no such style, in its regular style, and it is embedded in the document as a subset that holds only the characters drawn.\n\nThe value is the family name or an alternative name of a font installed in the font directories of the \"Toolbox\" web service (see \"fontPath\"); the case of the name counts, and a PostScript name is not accepted. The replacement of a font that is not installed (\"fontSubstitution\") does not apply to the default font.\n\nIf no value is specified, then the server takes the first of the fonts \"Go Noto Current\", \"DejaVu Sans\" and \"Arial Unicode MS\" that is installed; under Windows \"Arial\" is used as a last resort. \"Arial Unicode MS\" is not delivered with webPDF; it is an optional font whose license the operator clarifies.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories is reported as a warning in the server log when the web service starts; the fonts named above are used instead, and the web service starts. A character that the default font cannot draw ends the request with an error, as before (-688 for a watermark, -678 for a header or footer, -1213 for a free text annotation); the default font is not replaced by another font for it. There is no special value `Helvetica`. The font must allow embedding as a subset (OS/2 \"fsType\"); otherwise requests without a font name end with an error when the document is written."
+					},
 					"enabled": {
 						"type": "boolean",
 						"default": true,
@@ -7648,6 +7653,13 @@
 						"items": {
 							"$ref": "#/components/schemas/Metadata_FormValueStyle"
 						}
+					},
+					"widget": {
+						"type": "array",
+						"description": "Check boxes and radio button groups only: one entry per widget annotation of the field, in the order of the \"annotation\" elements, with the widget's export value, its \"on\" state, whether it is selected and the value that selects it in a form data import. Duplicate export values are kept.\n\nThe entries describe the document as it was extracted. An import can change them, also for widgets other than the selected ones; read them again after an import.",
+						"items": {
+							"$ref": "#/components/schemas/Metadata_FieldWidget"
+						}
 					}
 				}
 			},
@@ -7677,6 +7689,37 @@
 						"type": "string",
 						"default": "",
 						"description": "Indicates the type of the annotation´s field.\n\n*   Btn = Button\n*   Tx = Textfield\n*   Ch = Choicefield\n*   Sig = Signaturefield"
+					}
+				}
+			},
+			"Metadata_FieldWidget": {
+				"type": "object",
+				"description": "Describes one widget annotation of a check box or radio button group.",
+				"properties": {
+					"export": {
+						"type": "string",
+						"default": "",
+						"description": "The export value of the widget: the entry of the field's option list (Opt) at the widget's position, otherwise the name of its on state; for a check box without option list none of whose widgets has an appearance or names its on state, the on value of the field (its value unless that is Off, else Yes). Empty if unknown or if the option text is empty."
+					},
+					"objectKey": {
+						"type": "string",
+						"default": "",
+						"description": "The object ID of the widget annotation, the same as the objectKey of the \"annotation\" element at the same position. Empty for a widget that is no indirect object; the position identifies it then. **Info:** A PDF object ID consists of two numbers, where the first number selects the object's number and the second the \"generation\" of the object. The object ID shall always be unique within the context of the document and can be used to select a specific object."
+					},
+					"selectValue": {
+						"type": "string",
+						"default": "",
+						"description": "The value to import as the field's value with the xml or XFDF form data import so that this widget - together with every other widget of the same selectValue - is selected. Valid for the document as extracted.\n\nWithout an option list (Opt), a widget with more than one on state besides Off reports only one of them, here and in \"state\"; the import selects every widget that has the imported name as one of its on states.\n\nEmpty: the widget cannot be selected through this attribute; an empty selectValue is never sent. To keep the current state of a field, leave the field out of the imported data: a partial import leaves fields without data unchanged, whereas an empty value or Off may deselect the field or select another widget."
+					},
+					"selected": {
+						"type": "boolean",
+						"default": false,
+						"description": "True if the widget is shown in its on state (its appearance state is present and not Off)."
+					},
+					"state": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the widget's on appearance state, as found in the document - or, for a form whose missing appearances the server builds when it reads the document (NeedAppearances), the name the server gives them. For a widget without appearance it is known only while the widget is on. Empty if unknown."
 					}
 				}
 			},
@@ -7834,6 +7877,11 @@
 						"type": "boolean",
 						"default": false,
 						"description": "True, if the given value is the default of the connected form field."
+					},
+					"selected": {
+						"type": "boolean",
+						"default": false,
+						"description": "Choice fields (list and combo boxes) only: true if this option is selected, that is, its export value is one of the field's values. Use this attribute rather than splitting \"content\" at commas, since an option may itself contain a comma. A combo box value that is no option selects none; it is found in \"content\" only. Not set for other field types."
 					}
 				}
 			},
@@ -10878,7 +10926,7 @@
 					"adjustFonts": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then the font specifications \"Arial\", \"Helvetica\" and \"Sans-Serif\" in HTML documents and e-mails (which are based on HTML) are automatically replaced by the \"Arial Unicode MS\" font. The improves the appearance of the typeface in the PDF result."
+						"description": "**Deprecated.** This option has no effect: the server ignores its value, and the fonts named in HTML documents and e-mails are passed to the integrated browser unchanged. The integrated browser resolves fonts itself; replacing fonts such as \"Arial\" or \"Helvetica\" before rendering changed line breaks and font weights without displaying any additional character. If a font of a document is not installed, install it or a metric-compatible substitute as a system font of the server, or end the font list with a generic family such as `sans-serif`. The attribute is still accepted so that existing requests remain valid, and it may be removed in a future main version."
 					},
 					"baseURL": {
 						"type": "string",
@@ -10973,7 +11021,7 @@
 					"adjustFonts": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then the font specifications \"Arial\", \"Helvetica\" and \"Sans-Serif\" in HTML documents and e-mails (which are based on HTML) are automatically replaced by the \"Arial Unicode MS\" font. The improves the appearance of the typeface in the PDF result."
+						"description": "**Deprecated.** This option has no effect: the server ignores its value, and the fonts named in HTML documents and e-mails are passed to the integrated browser unchanged. The integrated browser resolves fonts itself; replacing fonts such as \"Arial\" or \"Helvetica\" before rendering changed line breaks and font weights without displaying any additional character. If a font of a document is not installed, install it or a metric-compatible substitute as a system font of the server, or end the font list with a generic family such as `sans-serif`. The attribute is still accepted so that existing requests remain valid, and it may be removed in a future main version."
 					},
 					"attachmentMode": {
 						"type": "string",
@@ -12443,7 +12491,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. How the selected font is embedded in the document is controlled by `subsetFont`.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. It is the font configured as `webservices/toolbox/@defaultFont` if that font is installed; otherwise the server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Go Noto Current\", then \"DejaVu Sans\" and then \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. How the selected font is embedded in the document is controlled by `subsetFont`.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"size": {
 						"type": "integer",
@@ -13930,7 +13978,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. It is the font configured as `webservices/toolbox/@defaultFont` if that font is installed; otherwise the server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Go Noto Current\", then \"DejaVu Sans\" and then \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"size": {
 						"type": "integer",
@@ -17927,7 +17975,7 @@
 							"failureLevel": {
 								"type": "string",
 								"default": "error",
-								"description": "This parameter determines at which error level the conversion should fail, you can use this parameter to automatically reject also results with lower precision as failure\n\n*   warning = Documents for which warnings occur will also cause the conversion to fail.\n*   missingContent = Documents for which not all content could be converted correctly will also be considered as failures.\n*   error = Only if a conversion of the document did not lead to any meaningful result document, this is evaluated as failure, even if contents should be missing.",
+								"description": "This parameter determines at which error level the conversion should fail, you can use this parameter to automatically reject also results with lower precision as failure\n\n*   warning = Documents for which warnings occur will also cause the conversion to fail.\n*   missingContent = Documents for which not all content could be converted correctly will also be considered as failures.\n*   error = Only if a conversion of the document did not lead to any meaningful result document, this is evaluated as failure, even if contents should be missing.\n\nIndependently of this level, the conversion fails if content was refused or could not be drawn completely: a content stream exceeding a limit of the PDF engine, or - with the appearance profile acrobat - an annotation without appearance that cannot be drawn completely.",
 								"enum": [
 									"warning",
 									"missingContent",
@@ -18665,7 +18713,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. The server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Arial Unicode MS\", then \"Go Noto Current\" and then \"DejaVu Sans\"; under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
+						"description": "Used to specify the name of the font that should be used for the text output.\n\nIf no font is specified, then the default font of the \"Toolbox\" web service is used. It is the font configured as `webservices/toolbox/@defaultFont` if that font is installed; otherwise the server determines it from the font directories configured for that web service (`webservices/toolbox/@fontPath`, by default the font directories of the operating system) by looking for \"Go Noto Current\", then \"DejaVu Sans\" and then \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. A subset of the selected font is embedded in the document.\n\n**Note:** The requested style is only applied if the determined font family provides it. A family without an italic or a bold cut is used in its regular cut instead - exactly as it is when the font is specified by name. No style is simulated.\n\n**Note:** Only if no default font can be determined at all, the standard font \"Helvetica\" is used, which is not embedded in the document."
 					},
 					"opacity": {
 						"type": "integer",
