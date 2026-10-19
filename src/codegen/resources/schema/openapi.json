@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-10-14T09:49:25Z)"
+		"version": "webPDF 11.0.0 (2026-10-19T07:58:01Z)"
 	},
 	"servers": [
 		{
@@ -5302,8 +5302,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -5511,8 +5517,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -6052,8 +6064,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -6180,8 +6198,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -6768,8 +6792,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -6828,8 +6858,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -6921,8 +6957,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for the execution of a web service request (job), counted from the start of its execution. If the time has expired, the execution is aborted and error code -10 is returned. A value of 0 uses the default of 180 seconds. The time a request waits in the queue for a free instance is limited separately by `maxQueueTime`.",
 						"minimum": 0
+					},
+					"maxQueueTime": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Maximum time in seconds a request (job) may wait in the queue for a free instance. If it has not started by then, it is removed from the queue and rejected with error code -9. If not set, the effective value of `maxLatency` applies. The longest time until a response for each job, counted from its acceptance into the queue, is therefore `maxQueueTime` plus `maxLatency` (twice `maxLatency` if `maxQueueTime` is not set).",
+						"minimum": 1
 					},
 					"queueMode": {
 						"type": "string",
@@ -8406,7 +8448,6 @@
 					"number": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "The position number of the attachment in the embedded files of the document.",
 						"minimum": 1
 					},
@@ -10353,13 +10394,12 @@
 					"version": {
 						"type": "string",
 						"default": "v11.0",
-						"description": "Key schema version",
-						"example": "v10.0"
+						"description": "Key schema version, fixed to the main and minor version of the server ('v11.0'). Leave it out; any other value prevents the start of a cluster node.",
+						"example": "v11.0"
 					}
 				},
 				"required": [
-					"app",
-					"version"
+					"app"
 				]
 			},
 			"OAuth_OIDCMetadata": {
@@ -13947,7 +13987,6 @@
 					"day": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "The day of the month.",
 						"maximum": 31,
 						"minimum": 1
@@ -13955,7 +13994,6 @@
 					"month": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "The selected month.",
 						"maximum": 12,
 						"minimum": 1
@@ -15548,14 +15586,12 @@
 					"dataCodewordsMax": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "Used to specify the maximum number of codewords allowed in a single PDF417 barcode row.",
 						"minimum": 1
 					},
 					"dataCodewordsMin": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "Used to specify the minimum number of codewords allowed in a single PDF417 barcode row.",
 						"minimum": 1
 					},
@@ -15605,14 +15641,12 @@
 					"symbolsPerCodewordMax": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "Used to specify the maximum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
 						"minimum": 1
 					},
 					"symbolsPerCodewordMin": {
 						"type": "integer",
 						"format": "int32",
-						"default": 0,
 						"description": "Used to specify the minimum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
 						"minimum": 1
 					},
@@ -22273,42 +22307,42 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the overall global disk space (in bytes) the server may use (set to 0 to disable this limitation).",
+						"description": "Sets the maximum total size in MiB (1 MiB = 1,048,576 bytes) of all documents in a REST session of an anonymous user (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"diskSpaceLimitUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum disk space (in bytes) a single user may use (set to 0 to disable this limitation).",
+						"description": "Sets the maximum total size in MiB (1 MiB = 1,048,576 bytes) of all documents in a REST session of a logged-in user (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"maxFiles": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum number of files that may be uploaded to the server (set to 0 to disable this limitation).",
+						"description": "Sets the maximum number of documents a REST session of an anonymous user may hold (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"maxFilesUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum number of files a single user may upload to the server (set to 0 to disable this limitation).",
+						"description": "Sets the maximum number of documents a REST session of a logged-in user may hold (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"uploadLimit": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum size (in bytes) a file uploaded to the server may have (set to 0 to disable this limitation).",
+						"description": "Sets the maximum size in MiB (1 MiB = 1,048,576 bytes) of a single document that an anonymous user may upload into a REST session (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"uploadLimitUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum size (in bytes) a file uploaded by a single user may have (set to 0 to disable this limitation).",
+						"description": "Sets the maximum size in MiB (1 MiB = 1,048,576 bytes) of a single document that a logged-in user may upload into a REST session (set to 0 to disable this limitation).",
 						"minimum": 0
 					}
 				}
@@ -22364,7 +22398,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 100000,
-						"description": "Hard upper bound for the number of revocation (denylist) entries kept by the in-memory registry. When reached, the soonest-expiring entry is evicted.",
+						"description": "Hard upper bound for the number of revocation (denylist) entries kept by the in-memory registry. When reached, the soonest-expiring entry is evicted. The same bound applies separately to the per-session cutoffs that a logout records; a revocation of all tokens of a session by an administrator is never evicted.",
 						"minimum": 1
 					},
 					"enabled": {
