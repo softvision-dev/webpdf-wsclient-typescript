@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-10-19T07:58:01Z)"
+		"version": "webPDF 11.0.0 (2026-10-22T07:51:52Z)"
 	},
 	"servers": [
 		{
@@ -7315,6 +7315,65 @@
 				},
 				"readOnly": true
 			},
+			"Cluster_CacheServerNodeStatus": {
+				"type": "object",
+				"description": "Memory status of one master of the cache server (Redis or Valkey), read from its INFO command. maxMemoryPolicy, maxMemory and evictedKeys are present only if 'readable' is 'true'.",
+				"properties": {
+					"address": {
+						"type": "string",
+						"default": "",
+						"description": "Address of the master (host:port)."
+					},
+					"evictedKeys": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Present only if 'readable' is 'true'. Number of keys the master evicted since its start or the last CONFIG RESETSTAT (evicted_keys). Must stay 0: every evicted key may be data of webPDF."
+					},
+					"maxMemory": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Present only if 'readable' is 'true'. The memory limit of the master in bytes (maxmemory); 0 means no limit."
+					},
+					"maxMemoryPolicy": {
+						"type": "string",
+						"default": "",
+						"description": "Present only if 'readable' is 'true'. The maxmemory-policy the master reports. webPDF requires 'noeviction': with every other policy the server deletes keys without notice when its memory is full, and webPDF keeps sessions, documents and locks there - under a 'volatile-*' policy every key with an expiry is deleted first, among them all locks."
+					},
+					"readable": {
+						"type": "boolean",
+						"default": false,
+						"description": "'true' if the master answered both INFO requests of the check (memory and stats) and reported maxmemory_policy, maxmemory and evicted_keys. 'false' otherwise - the command is renamed or not permitted, the master failed, did not answer in time or did not report one of the values; maxMemoryPolicy, maxMemory and evictedKeys are absent then. Evaluate them only if this is 'true'."
+					}
+				},
+				"readOnly": true
+			},
+			"Cluster_CacheServerStatus": {
+				"type": "object",
+				"description": "Memory status of the cache server (Redis or Valkey) used by the storage providers, as read by the server node that answers the request. Only present if a provider uses Redis or Valkey and the first check has finished.",
+				"properties": {
+					"checkedAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Time of the last finished check in milliseconds since 1970-01-01T00:00:00Z. The values are a snapshot of that time."
+					},
+					"nodes": {
+						"type": "array",
+						"description": "One entry per master of the cache server: one for a single server and for a Sentinel or replicated setup, one per master in a Redis Cluster.",
+						"items": {
+							"$ref": "#/components/schemas/Cluster_CacheServerNodeStatus"
+						}
+					},
+					"provider": {
+						"type": "string",
+						"default": "",
+						"description": "The storage provider of the cache server: 'REDIS' or 'VALKEY'."
+					}
+				},
+				"readOnly": true
+			},
 			"Cluster_Configuration": {
 				"type": "object",
 				"description": "Defines settings for configuring the nodes in the cluster",
@@ -7438,6 +7497,9 @@
 				"type": "object",
 				"description": "General information about the cluster status and detailed information about each node.",
 				"properties": {
+					"cacheServer": {
+						"$ref": "#/components/schemas/Cluster_CacheServerStatus"
+					},
 					"error": {
 						"$ref": "#/components/schemas/Webservice_Result"
 					},
@@ -10918,7 +10980,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -11030,7 +11092,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -11162,7 +11224,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -11561,7 +11623,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -12124,7 +12186,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -12151,7 +12213,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -13319,7 +13381,7 @@
 					"fileName": {
 						"type": "string",
 						"default": "",
-						"description": "Used to define the name under which the attachment in the document will be created."
+						"description": "Used to define the name under which the attachment in the document will be created.\n\nThe name must not be empty or consist only of whitespace. Otherwise the operation fails with error code -22 and none of the attachments of this operation is added."
 					},
 					"mimeType": {
 						"type": "string",
@@ -13636,7 +13698,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -15055,7 +15117,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -15586,13 +15648,13 @@
 					"dataCodewordsMax": {
 						"type": "integer",
 						"format": "int32",
-						"description": "Used to specify the maximum number of codewords allowed in a single PDF417 barcode row.",
+						"description": "Used to specify the maximum number of codewords allowed in a single PDF417 barcode row.\n\nTakes effect only together with \"dataCodewordsMin\", \"symbolsPerCodewordMin\" and \"symbolsPerCodewordMax\": set all four or none of them. If only some of them are set, the barcode is not created and the request fails with error code -22, naming the missing attributes.",
 						"minimum": 1
 					},
 					"dataCodewordsMin": {
 						"type": "integer",
 						"format": "int32",
-						"description": "Used to specify the minimum number of codewords allowed in a single PDF417 barcode row.",
+						"description": "Used to specify the minimum number of codewords allowed in a single PDF417 barcode row.\n\nTakes effect only together with \"dataCodewordsMax\", \"symbolsPerCodewordMin\" and \"symbolsPerCodewordMax\": set all four or none of them. If only some of them are set, the barcode is not created and the request fails with error code -22, naming the missing attributes.",
 						"minimum": 1
 					},
 					"errorCorrection": {
@@ -15641,13 +15703,13 @@
 					"symbolsPerCodewordMax": {
 						"type": "integer",
 						"format": "int32",
-						"description": "Used to specify the maximum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
+						"description": "Used to specify the maximum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.\n\nTakes effect only together with \"dataCodewordsMin\", \"dataCodewordsMax\" and \"symbolsPerCodewordMin\": set all four or none of them. If only some of them are set, the barcode is not created and the request fails with error code -22, naming the missing attributes.",
 						"minimum": 1
 					},
 					"symbolsPerCodewordMin": {
 						"type": "integer",
 						"format": "int32",
-						"description": "Used to specify the minimum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
+						"description": "Used to specify the minimum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.\n\nTakes effect only together with \"dataCodewordsMin\", \"dataCodewordsMax\" and \"symbolsPerCodewordMax\": set all four or none of them. If only some of them are set, the barcode is not created and the request fails with error code -22, naming the missing attributes.",
 						"minimum": 1
 					},
 					"value": {
@@ -15930,7 +15992,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -16174,7 +16236,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -16363,7 +16425,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -17370,7 +17432,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18136,7 +18198,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18168,7 +18230,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -19710,7 +19772,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -19737,7 +19799,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -20035,7 +20097,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -20282,7 +20344,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -20356,7 +20418,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -20466,7 +20528,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an absolute \"http\" or \"https\" address with a host is loaded. Any other address - without a scheme or a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. An answer with an HTTP status of 400 or above also fails with error code -12. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
