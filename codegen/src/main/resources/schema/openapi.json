@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-13T07:50:46Z)"
+		"version": "webPDF 10.0.7 (2026-10-23T07:23:26Z)"
 	},
 	"servers": [
 		{
@@ -1139,6 +1139,9 @@
 							}
 						},
 						"description": "The session was updated and new tokens (access and update) were issued."
+					},
+					"400": {
+						"$ref": "#/components/responses/400BadRequest"
 					},
 					"401": {
 						"$ref": "#/components/responses/401Unauthorized"
@@ -4229,7 +4232,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -4438,7 +4441,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -4960,7 +4963,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -5088,7 +5091,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -5606,7 +5609,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -5666,7 +5669,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -5759,7 +5762,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 180,
-						"description": "Maximum allowed time in seconds for the execution of a web service request (job) before the request is canceled. If the time has expired, the execution is aborted and an error code is returned.",
+						"description": "Maximum allowed time in seconds for a web service request (job) before the request is canceled. The time is counted from the moment the server accepts the request, so it includes the time the request waits in the queue for a free instance. If the time has expired, the request is aborted (a request that is still waiting is removed from the queue) and error code -10 is returned. A value of 0 uses the default of 180 seconds.",
 						"minimum": 0
 					},
 					"queueMode": {
@@ -6104,6 +6107,65 @@
 				},
 				"readOnly": true
 			},
+			"Cluster_CacheServerNodeStatus": {
+				"type": "object",
+				"description": "Memory status of one master of the cache server (Redis or Valkey), read from its INFO command. maxMemoryPolicy, maxMemory and evictedKeys are present only if 'readable' is 'true'.",
+				"properties": {
+					"address": {
+						"type": "string",
+						"default": "",
+						"description": "Address of the master (host:port)."
+					},
+					"evictedKeys": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Present only if 'readable' is 'true'. Number of keys the master evicted since its start or the last CONFIG RESETSTAT (evicted_keys). Must stay 0: every evicted key may be data of webPDF."
+					},
+					"maxMemory": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Present only if 'readable' is 'true'. The memory limit of the master in bytes (maxmemory); 0 means no limit."
+					},
+					"maxMemoryPolicy": {
+						"type": "string",
+						"default": "",
+						"description": "Present only if 'readable' is 'true'. The maxmemory-policy the master reports. webPDF requires 'noeviction': with every other policy the server deletes keys without notice when its memory is full, and webPDF keeps sessions, documents and locks there - under a 'volatile-*' policy every key with an expiry is deleted first, among them all locks."
+					},
+					"readable": {
+						"type": "boolean",
+						"default": false,
+						"description": "'true' if the master answered both INFO requests of the check (memory and stats) and reported maxmemory_policy, maxmemory and evicted_keys. 'false' otherwise - the command is renamed or not permitted, the master failed, did not answer in time or did not report one of the values; maxMemoryPolicy, maxMemory and evictedKeys are absent then. Evaluate them only if this is 'true'."
+					}
+				},
+				"readOnly": true
+			},
+			"Cluster_CacheServerStatus": {
+				"type": "object",
+				"description": "Memory status of the cache server (Redis or Valkey) used by the storage providers, as read by the server node that answers the request. Only present if a provider uses Redis or Valkey and the first check has finished.",
+				"properties": {
+					"checkedAt": {
+						"type": "integer",
+						"format": "int64",
+						"default": 0,
+						"description": "Time of the last finished check in milliseconds since 1970-01-01T00:00:00Z. The values are a snapshot of that time."
+					},
+					"nodes": {
+						"type": "array",
+						"description": "One entry per master of the cache server: one for a single server and for a Sentinel or replicated setup, one per master in a Redis Cluster.",
+						"items": {
+							"$ref": "#/components/schemas/Cluster_CacheServerNodeStatus"
+						}
+					},
+					"provider": {
+						"type": "string",
+						"default": "",
+						"description": "The storage provider of the cache server: 'REDIS' or 'VALKEY'."
+					}
+				},
+				"readOnly": true
+			},
 			"Cluster_Configuration": {
 				"type": "object",
 				"description": "Defines settings for configuring the nodes in the cluster",
@@ -6227,6 +6289,9 @@
 				"type": "object",
 				"description": "General information about the cluster status and detailed information about each node.",
 				"properties": {
+					"cacheServer": {
+						"$ref": "#/components/schemas/Cluster_CacheServerStatus"
+					},
 					"error": {
 						"$ref": "#/components/schemas/Webservice_Result"
 					},
@@ -9706,7 +9771,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -9818,7 +9883,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -9950,7 +10015,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -10349,7 +10414,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -10904,7 +10969,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -10931,7 +10996,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -12017,7 +12082,7 @@
 					"fileName": {
 						"type": "string",
 						"default": "",
-						"description": "Used to define the name under which the attachment in the document will be created."
+						"description": "Used to define the name under which the attachment in the document will be created.\n\nThe name must not be empty or consist only of whitespace. Otherwise the operation fails with error code -22 and none of the attachments of this operation is added."
 					},
 					"mimeType": {
 						"type": "string",
@@ -12334,7 +12399,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -13755,7 +13820,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -14250,14 +14315,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to specify the maximum number of codewords allowed in a single PDF417 barcode row.",
+						"description": "Used to specify the maximum number of codewords allowed in a single PDF417 barcode row.\n\nTakes effect only together with \"dataCodewordsMin\", \"symbolsPerCodewordMin\" and \"symbolsPerCodewordMax\": set all four or none of them. If \"dataCodewordsMax\" is missing while \"dataCodewordsMin\" and \"symbolsPerCodewordMax\" are set, the request fails with error code -22; other incomplete combinations are ignored and the dimensions are chosen automatically.",
 						"minimum": 1
 					},
 					"dataCodewordsMin": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to specify the minimum number of codewords allowed in a single PDF417 barcode row.",
+						"description": "Used to specify the minimum number of codewords allowed in a single PDF417 barcode row.\n\nTakes effect only together with \"dataCodewordsMax\", \"symbolsPerCodewordMin\" and \"symbolsPerCodewordMax\": set all four or none of them. If \"dataCodewordsMax\" is missing while \"dataCodewordsMin\" and \"symbolsPerCodewordMax\" are set, the request fails with error code -22; other incomplete combinations are ignored and the dimensions are chosen automatically.",
 						"minimum": 1
 					},
 					"errorCorrection": {
@@ -14307,14 +14372,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to specify the maximum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
+						"description": "Used to specify the maximum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.\n\nTakes effect only together with \"dataCodewordsMin\", \"dataCodewordsMax\" and \"symbolsPerCodewordMin\": set all four or none of them. If \"dataCodewordsMax\" is missing while \"dataCodewordsMin\" and \"symbolsPerCodewordMax\" are set, the request fails with error code -22; other incomplete combinations are ignored and the dimensions are chosen automatically.",
 						"minimum": 1
 					},
 					"symbolsPerCodewordMin": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Used to specify the minimum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.",
+						"description": "Used to specify the minimum number of code symbols that are allowed to be in a single codeword in the PDF417 barcode.\n\nTakes effect only together with \"dataCodewordsMin\", \"dataCodewordsMax\" and \"symbolsPerCodewordMax\": set all four or none of them. If \"dataCodewordsMax\" is missing while \"dataCodewordsMin\" and \"symbolsPerCodewordMax\" are set, the request fails with error code -22; other incomplete combinations are ignored and the dimensions are chosen automatically.",
 						"minimum": 1
 					},
 					"value": {
@@ -14597,7 +14662,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -14841,7 +14906,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -15030,7 +15095,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -16037,7 +16102,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -16803,7 +16868,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -16835,7 +16900,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18377,7 +18442,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18404,7 +18469,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18702,7 +18767,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -18951,7 +19016,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -19025,7 +19090,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -19135,7 +19200,7 @@
 					"uri": {
 						"type": "string",
 						"default": "",
-						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)"
+						"description": "The uri the data shall be located at. (This shall only have effect, if the \"source\" is \"uri\".)\n\nOnly an \"http\" or \"https\" address with a host is loaded; an address that starts with \"//\" and names a host is loaded via \"http\". Any other address - without a host, or with another scheme such as \"ftp\" - fails with error code -12 before a connection is made. A \"file\" address is only read if the server allows the file protocol, otherwise it fails with error code -29.\n\nCredentials in the address (\"https://user:password@host/file.pdf\") are used for this request only and are not repeated in error messages."
 					},
 					"value": {
 						"type": "string",
@@ -20315,42 +20380,42 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the overall global disk space (in bytes) the server may use (set to 0 to disable this limitation).",
+						"description": "Sets the maximum total size in MiB (1 MiB = 1,048,576 bytes) of all documents in a REST session of an anonymous user (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"diskSpaceLimitUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum disk space (in bytes) a single user may use (set to 0 to disable this limitation).",
+						"description": "Sets the maximum total size in MiB (1 MiB = 1,048,576 bytes) of all documents in a REST session of a logged-in user (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"maxFiles": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum number of files that may be uploaded to the server (set to 0 to disable this limitation).",
+						"description": "Sets the maximum number of documents a REST session of an anonymous user may hold (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"maxFilesUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum number of files a single user may upload to the server (set to 0 to disable this limitation).",
+						"description": "Sets the maximum number of documents a REST session of a logged-in user may hold (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"uploadLimit": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum size (in bytes) a file uploaded to the server may have (set to 0 to disable this limitation).",
+						"description": "Sets the maximum size in MiB (1 MiB = 1,048,576 bytes) of a single document that an anonymous user may upload into a REST session (set to 0 to disable this limitation).",
 						"minimum": 0
 					},
 					"uploadLimitUser": {
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "Sets the maximum size (in bytes) a file uploaded by a single user may have (set to 0 to disable this limitation).",
+						"description": "Sets the maximum size in MiB (1 MiB = 1,048,576 bytes) of a single document that a logged-in user may upload into a REST session (set to 0 to disable this limitation).",
 						"minimum": 0
 					}
 				}
