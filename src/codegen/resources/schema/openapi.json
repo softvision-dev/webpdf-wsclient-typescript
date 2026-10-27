@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-10-27T08:16:36Z)"
+		"version": "webPDF 11.0.0 (2026-10-27T15:28:07Z)"
 	},
 	"servers": [
 		{
@@ -7392,6 +7392,31 @@
 					"node"
 				]
 			},
+			"Cluster_FileStorageLocation": {
+				"type": "object",
+				"description": "Where the file storage of the cluster keeps its data: the provider, the bucket or container (object storages only) and the namespace path in it.",
+				"properties": {
+					"name": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the bucket or container. Only the object storages (MinIO, Azure Blob) have one.",
+						"example": "webpdf"
+					},
+					"path": {
+						"type": "string",
+						"default": "",
+						"description": "The namespace path below which the data is kept, relative to the bucket, the container, the share or the shared folder.",
+						"example": "webpdf/v11.0-r1/"
+					},
+					"provider": {
+						"type": "string",
+						"default": "",
+						"description": "The name of the file storage provider.",
+						"example": "MINIO"
+					}
+				},
+				"readOnly": true
+			},
 			"Cluster_Mode": {
 				"type": "string",
 				"default": "single",
@@ -7502,6 +7527,9 @@
 					},
 					"error": {
 						"$ref": "#/components/schemas/Webservice_Result"
+					},
+					"fileStorage": {
+						"$ref": "#/components/schemas/Cluster_FileStorageLocation"
 					},
 					"id": {
 						"type": "string",
@@ -10421,48 +10449,18 @@
 			},
 			"Namespace_Settings": {
 				"type": "object",
-				"description": "Namespace parts used to build prefixes",
+				"description": "The namespace of the installation: the prefix that keeps its data apart from the data of other installations",
 				"properties": {
-					"app": {
+					"prefix": {
 						"type": "string",
 						"default": "webpdf",
-						"description": "Application identifier",
-						"example": "webpdf"
-					},
-					"cluster": {
-						"type": "string",
-						"default": "",
-						"description": "Optional cluster discriminator for blue/green or canary",
-						"example": "blue"
-					},
-					"env": {
-						"type": "string",
-						"default": "",
-						"description": "Optional environment name",
-						"example": "prod"
-					},
-					"org": {
-						"type": "string",
-						"default": "",
-						"description": "Optional organization/vendor identifier",
-						"example": "acme"
-					},
-					"region": {
-						"type": "string",
-						"default": "",
-						"description": "Optional region identifier",
-						"example": "eu1"
-					},
-					"version": {
-						"type": "string",
-						"default": "v11.0",
-						"description": "Key schema version, fixed to the main and minor version of the server ('v11.0'). Leave it out; any other value prevents the start of a cluster node.",
-						"example": "v11.0"
+						"description": "The prefix of the namespace. It must have 3 to 32 characters: lower-case letters a-z and digits 0-9, with single hyphens between them. It is checked, never changed. Not allowed are the reserved names con, prn, aux, nul, com1 to com9 and lpt1 to lpt9, and prefixes that begin with 'sthree-' or 'amzn-s3-demo-' or end with '-s3alias' or '-an'. Without a prefix, 'webpdf' is used.",
+						"example": "webpdf-prod",
+						"maxLength": 32,
+						"minLength": 3,
+						"pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
 					}
-				},
-				"required": [
-					"app"
-				]
+				}
 			},
 			"OAuth_OIDCMetadata": {
 				"type": "object",
