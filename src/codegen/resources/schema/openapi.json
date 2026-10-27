@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-10-22T07:51:52Z)"
+		"version": "webPDF 11.0.0 (2026-10-27T08:16:36Z)"
 	},
 	"servers": [
 		{
@@ -863,7 +863,7 @@
 		},
 		"/admin/session/{sessionId}/revoke": {
 			"post": {
-				"description": "Revokes every currently valid access and refresh token of the specified session. Any subsequent request that presents one of these tokens is rejected, even if the token has not yet expired.",
+				"description": "Revokes the tokens of the specified session and ends the session. For a session of the local login, every access and refresh token of the session issued so far is rejected. For a session of an external identity provider, every token of the user at that provider issued before the revocation is rejected - in all applications of the user, permanently; the maximum clock skew of the provider ('maxTimeSkew') moves the cutoff forward. Only the selected session ends; the sessions of the other applications go on, but their tokens are rejected. For the working session of a personal access token, the token is revoked permanently. A share session only ends. With the token registry disabled, the call only ends the session of a local login or of an external identity provider; a personal access token is still taken from the allowlist. A session ID that does not exist is rejected with an error.",
 				"operationId": "revokeSessionTokens",
 				"parameters": [
 					{
@@ -879,7 +879,7 @@
 				],
 				"responses": {
 					"200": {
-						"description": "Session tokens successfully revoked"
+						"description": "Session tokens revoked and session ended"
 					},
 					"400": {
 						"$ref": "#/components/responses/400BadRequest"
@@ -22047,7 +22047,7 @@
 					"claimClientId": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the name of the claim (in most cases \"azp\") that contains the client ID in the token."
+						"description": "Sets the name of the claim (in most cases \"azp\") that contains the client ID in the token. The same user gets a separate session for every client ID, so that the documents of two applications stay apart."
 					},
 					"claimRoles": {
 						"type": "string",
@@ -22057,7 +22057,7 @@
 					"claimSessionId": {
 						"type": "string",
 						"default": "",
-						"description": "Specifies the name of the claim (in most cases \"sub\") that contains the session ID in the token. This must be a unique identifier that uniquely identifies the authenticated client (or user)."
+						"description": "Specifies the name of the claim (in most cases \"sub\") that identifies the authenticated user (or client) in the token. Its value must identify the user uniquely and stay the same over token rotations - use \"sub\", not a per-token value such as \"jti\". Together with the issuer of the token and the value of the claim set with \"claimClientId\", it determines the session of the user in an application; the ID of that session is assigned by the server."
 					},
 					"clientId": {
 						"type": "string",
@@ -22801,6 +22801,17 @@
 				"type": "object",
 				"description": "Defines the local XML file \"conf/users.xml\" as the user source. The users are managed locally via the portal administration area."
 			},
+			"Session_Kind": {
+				"type": "string",
+				"default": "local",
+				"description": "The kind of access a session was opened with. Further values may be added in later versions.",
+				"enum": [
+					"local",
+					"external",
+					"pat",
+					"share"
+				]
+			},
 			"Session_State": {
 				"type": "string",
 				"default": "unknown",
@@ -22874,6 +22885,11 @@
 						"type": "boolean",
 						"default": false
 					},
+					"clientId": {
+						"type": "string",
+						"default": "",
+						"description": "The value of the client claim of the token of an external identity provider the session belongs to (the application of the user, for example the 'azp' or 'appid' claim). Empty for the other kinds of session."
+					},
 					"fileCount": {
 						"type": "integer",
 						"format": "int64",
@@ -22897,6 +22913,11 @@
 						"default": false,
 						"description": "Set if the user has administrator rights."
 					},
+					"issuer": {
+						"type": "string",
+						"default": "",
+						"description": "The issuer ('iss') of the token of an external identity provider the session belongs to. Empty for the other kinds of session."
+					},
 					"lastAccess": {
 						"type": "integer",
 						"format": "int64",
@@ -22919,8 +22940,21 @@
 						"default": "",
 						"description": "Unique id of the session."
 					},
+					"sessionKind": {
+						"$ref": "#/components/schemas/Session_Kind"
+					},
 					"sessionState": {
 						"$ref": "#/components/schemas/Session_State"
+					},
+					"tokenId": {
+						"type": "string",
+						"default": "",
+						"description": "The ID ('jti') of the personal or service access token the session belongs to. Empty for the other kinds of session."
+					},
+					"tokenLabel": {
+						"type": "string",
+						"default": "",
+						"description": "The label of the personal or service access token the session belongs to. Empty for the other kinds of session."
 					},
 					"userName": {
 						"type": "string",
