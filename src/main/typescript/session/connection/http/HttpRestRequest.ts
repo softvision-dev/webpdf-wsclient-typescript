@@ -259,7 +259,8 @@ export class HttpRestRequest {
 		// throw the extracted error message
 		throw new ClientResultException(WsclientErrors.HTTP_CUSTOM_ERROR)
 			.appendMessage(exceptionMessage)
-			.setHttpErrorCode(code);
+			.setHttpErrorCode(code)
+			.setHttpResponseBody(data);
 	}
 
 	/**

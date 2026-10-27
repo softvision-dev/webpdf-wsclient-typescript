@@ -1,6 +1,5 @@
 /**
- * Captured shape of the last HTTP request a manager issued through a stub session created by
- * {@link createStubSession}.
+ * Captured shape of the last HTTP request issued through a stub session created by {@link createStubSession}.
  */
 export interface CapturedRequest {
 	method?: string;
@@ -35,17 +34,18 @@ export class StubHttpFailure {
 }
 
 /**
- * Builds a stub RestSession sufficient for the REST managers that only need URL resolution, an auth
- * provider and an HTTP client: it resolves URLs the same way {@link AbstractSession#getURL} does, supplies
- * a bearer auth provider ({@code Authorization: Bearer TEST}) and routes HTTP requests through the supplied
- * response factory while capturing the request config for assertions.
+ * Builds a stub RestSession sufficient for code that only needs URL resolution, an auth provider and an HTTP
+ * client (such as {@code HttpRestRequest} and the REST managers built on it): it resolves URLs the same way
+ * {@link AbstractSession#getURL} does, supplies a bearer auth provider ({@code Authorization: Bearer TEST})
+ * and routes HTTP requests through the supplied response factory while capturing the request config for
+ * assertions.
  *
  * The response factory returns the JSON body of a 200 answer, or a {@link StubHttpFailure} to make the
  * request fail like axios does for a non-2xx status.
  *
  * @param captured        Receives the method, URL, headers and abort signal of the last request.
  * @param responseFactory Produces the answer for the captured request config.
- * @return The stub session, to be passed to a manager constructor.
+ * @return The stub session, to be passed where a RestSession is expected.
  */
 export function createStubSession(
 	captured: CapturedRequest,

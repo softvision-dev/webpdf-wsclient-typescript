@@ -17,6 +17,7 @@ import {ResultException} from "./ResultException.js";
 export class ClientResultException extends ResultException {
 	private messages: Array<string> = [];
 	private _httpErrorCode?: number;
+	private _httpResponseBody?: unknown;
 
 	/**
 	 * <p>
@@ -52,6 +53,33 @@ export class ClientResultException extends ResultException {
 	 */
 	public setHttpErrorCode(value: number): ClientResultException {
 		this._httpErrorCode = value;
+
+		return this;
+	}
+
+	/**
+	 * Returns the body of the http error response this {@link ResultException} was created for. A JSON body is
+	 * provided as the parsed object, any other body as it was received: usually a {@link string}, but an
+	 * {@link ArrayBuffer} for a request that expected binary data.<br>
+	 * Setting the body does not change the message describing this {@link ResultException}; {@link HttpRestRequest}
+	 * does, however, use a text body as the detail of that message.
+	 *
+	 * @return The http response body of this {@link ResultException}, or {@code undefined} if none has been set.
+	 */
+	public getHttpResponseBody(): unknown {
+		return this._httpResponseBody;
+	}
+
+	/**
+	 * Sets the body of the http error response this {@link ResultException} was created for. The body is kept for
+	 * callers that need to evaluate it; this method does not add it to the message describing this
+	 * {@link ResultException}.
+	 *
+	 * @param value The http response body to keep.
+	 * @return {@link ResultException} itself.
+	 */
+	public setHttpResponseBody(value: unknown): ClientResultException {
+		this._httpResponseBody = value;
 
 		return this;
 	}
