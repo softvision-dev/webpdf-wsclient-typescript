@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-23T07:23:26Z)"
+		"version": "webPDF 10.0.7 (2026-10-27T08:17:27Z)"
 	},
 	"servers": [
 		{
@@ -20104,7 +20104,7 @@
 					"claimClientId": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the name of the claim (in most cases \"azp\") that contains the client ID in the token."
+						"description": "Sets the name of the claim (in most cases \"azp\") that contains the client ID in the token. The same user gets a separate session for every client ID, so that the documents of two applications stay apart."
 					},
 					"claimRoles": {
 						"type": "string",
@@ -20114,7 +20114,7 @@
 					"claimSessionId": {
 						"type": "string",
 						"default": "",
-						"description": "Specifies the name of the claim (in most cases \"sub\") that contains the session ID in the token. This must be a unique identifier that uniquely identifies the authenticated client (or user)."
+						"description": "Specifies the name of the claim (in most cases \"sub\") that identifies the authenticated user (or client) in the token. Its value must identify the user uniquely and stay the same over token rotations - use \"sub\", not a per-token value such as \"jti\". Together with the issuer of the token and the value of the claim set with \"claimClientId\", it determines the session of the user in an application; the ID of that session is assigned by the server."
 					},
 					"clientId": {
 						"type": "string",
@@ -20737,6 +20737,17 @@
 				"type": "object",
 				"description": "Defines the local XML file \"conf/users.xml\" as the user source. The users are managed locally via the portal administration area."
 			},
+			"Session_Kind": {
+				"type": "string",
+				"default": "local",
+				"description": "The kind of access a session was opened with. Further values may be added in later versions.",
+				"enum": [
+					"local",
+					"external",
+					"pat",
+					"share"
+				]
+			},
 			"Session_State": {
 				"type": "string",
 				"default": "unknown",
@@ -20810,6 +20821,11 @@
 						"type": "boolean",
 						"default": false
 					},
+					"clientId": {
+						"type": "string",
+						"default": "",
+						"description": "The value of the client claim of the token of an external identity provider the session belongs to (the application of the user, for example the 'azp' or 'appid' claim). Empty for the other kinds of session."
+					},
 					"fileCount": {
 						"type": "integer",
 						"format": "int64",
@@ -20833,6 +20849,11 @@
 						"default": false,
 						"description": "Set if the user has administrator rights."
 					},
+					"issuer": {
+						"type": "string",
+						"default": "",
+						"description": "The issuer ('iss') of the token of an external identity provider the session belongs to. Empty for the other kinds of session."
+					},
 					"lastAccess": {
 						"type": "integer",
 						"format": "int64",
@@ -20855,8 +20876,21 @@
 						"default": "",
 						"description": "Unique id of the session."
 					},
+					"sessionKind": {
+						"$ref": "#/components/schemas/Session_Kind"
+					},
 					"sessionState": {
 						"$ref": "#/components/schemas/Session_State"
+					},
+					"tokenId": {
+						"type": "string",
+						"default": "",
+						"description": "The ID ('jti') of the personal or service access token the session belongs to. Empty for the other kinds of session."
+					},
+					"tokenLabel": {
+						"type": "string",
+						"default": "",
+						"description": "The label of the personal or service access token the session belongs to. Empty for the other kinds of session."
 					},
 					"userName": {
 						"type": "string",
