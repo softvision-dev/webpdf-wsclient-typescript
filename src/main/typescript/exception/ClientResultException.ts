@@ -59,10 +59,11 @@ export class ClientResultException extends ResultException {
 
 	/**
 	 * Returns the body of the http error response this {@link ResultException} was created for. A JSON body is
-	 * provided as the parsed object, any other body as it was received: usually a {@link string}, but an
-	 * {@link ArrayBuffer} for a request that expected binary data.<br>
+	 * provided as the parsed object, or as its text should it not parse; any other body as it was received: usually a
+	 * {@link string}, but the raw bytes for a request that expected binary data (an {@link ArrayBuffer} in the
+	 * browser, a Buffer under Node.js).<br>
 	 * Setting the body does not change the message describing this {@link ResultException}; {@link HttpRestRequest}
-	 * does, however, use a text body as the detail of that message.
+	 * does, however, use a non-empty text body as the detail of that message.
 	 *
 	 * @return The http response body of this {@link ResultException}, or {@code undefined} if none has been set.
 	 */

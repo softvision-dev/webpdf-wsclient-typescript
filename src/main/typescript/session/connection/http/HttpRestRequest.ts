@@ -199,6 +199,15 @@ export class HttpRestRequest {
 	 * <p>
 	 * Should the failure state represent a server side failure is shall throw a {@link ServerResultException}.<br>
 	 * </p>
+	 * <p>
+	 * A JSON body read as raw bytes (an {@link ArrayBuffer} or a byte view such as a Node.js Buffer) is decoded as
+	 * UTF-8 and parsed; should it not parse, the decoded text is used as a text body instead. Only a JSON object is
+	 * evaluated as a webPDF error. A failure state without any response data (undefined) is thrown as a
+	 * {@link ClientResultException} for {@link WsclientErrors#HTTP_EMPTY_ENTITY}, which carries no status code; an
+	 * empty body arrives as empty text or bytes and is not such a case. Any other failure state is thrown as a
+	 * {@link ClientResultException} carrying the status code and the body; a non-empty text body becomes the detail
+	 * of its message, otherwise the status text does.
+	 * </p>
 	 *
 	 * @param httpResponse The {@link AxiosResponse} to check for a failure state.
 	 * @throws ResultException Shall be thrown, if the {@link AxiosResponse} represents a failure state.
@@ -222,14 +231,22 @@ export class HttpRestRequest {
 		// is this a webPDF server response or a general server error?
 		let contentType = httpResponse.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
 
-		// If data is an ArrayBuffer and content type is JSON, parse it
-		if (data instanceof ArrayBuffer && DataFormats.JSON.matches(contentType)) {
+		// If data are bytes and content type is JSON, parse it. Bytes arrive as an ArrayBuffer in the browser, but as a
+		// Buffer under Node.js: a view on a larger, shared ArrayBuffer, so the view itself is decoded, never the
+		// buffer behind it.
+		if ((data instanceof ArrayBuffer || ArrayBuffer.isView(data)) && DataFormats.JSON.matches(contentType)) {
 			const decoder = new TextDecoder('utf-8');
 			const jsonString: string = decoder.decode(data);
-			data = JSON.parse(jsonString);
+			try {
+				data = JSON.parse(jsonString);
+			} catch {
+				// not valid JSON: keep the decoded text, as axios does for a JSON body it cannot parse
+				data = jsonString;
+			}
 		}
 
-		if (DataFormats.JSON.matches(contentType)) {
+		// only an object can carry the fields of a webPDF error
+		if (DataFormats.JSON.matches(contentType) && typeof data === "object" && data !== null) {
 			let wsException: ServerResultException = ServerResultException.createWebserviceException(
 				data.errorMessage,
 				data.errorCode,
@@ -241,7 +258,8 @@ export class HttpRestRequest {
 			}
 		}
 
-		if (typeof data === "string") {
+		// an empty text carries no detail, so the status text remains the message
+		if (typeof data === "string" && data.length > 0) {
 			exceptionMessage = data;
 		}
 

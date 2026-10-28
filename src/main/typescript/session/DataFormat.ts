@@ -31,6 +31,13 @@ export class DataFormat {
      * @return true should the given MIME-type match the selected {@link DataFormat}.
      */
     public matches(mimeType: string): boolean {
+        // Guard against a missing/non-string MIME type (e.g. an error response without a
+        // Content-Type header). Returning false here avoids masking the real server error
+        // with a TypeError from String.prototype.split.
+        if (typeof mimeType !== "string") {
+            return false;
+        }
+
         // Remove parameters like charset=utf-8
         const cleanMimeType: string = mimeType.split(';')[0].trim();
 
