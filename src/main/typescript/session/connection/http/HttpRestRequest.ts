@@ -206,7 +206,9 @@ export class HttpRestRequest {
 	 * {@link ClientResultException} for {@link WsclientErrors#HTTP_EMPTY_ENTITY}, which carries no status code; an
 	 * empty body arrives as empty text or bytes and is not such a case. Any other failure state is thrown as a
 	 * {@link ClientResultException} carrying the status code and the body; a non-empty text body becomes the detail
-	 * of its message, otherwise the status text does.
+	 * of its message, otherwise the status text does. Should a non-empty JSON body read as bytes not parse, the
+	 * reason becomes the cause of that {@link ClientResultException}. A body delivered as text never carries such a
+	 * cause, as it cannot tell a JSON body that did not parse from a valid JSON string axios has already parsed.
 	 * </p>
 	 *
 	 * @param httpResponse The {@link AxiosResponse} to check for a failure state.
@@ -230,6 +232,9 @@ export class HttpRestRequest {
 
 		// is this a webPDF server response or a general server error?
 		let contentType = httpResponse.headers[HttpHeaders.CONTENT_TYPE.toLowerCase()];
+		// the reason a non-empty JSON body read as bytes does not parse, reported as the cause; a text body gets none,
+		// as axios hands over a JSON body it cannot parse and a valid JSON string it parsed alike as text
+		let parseFailure: Error | undefined;
 
 		// If data are bytes and content type is JSON, parse it. Bytes arrive as an ArrayBuffer in the browser, but as a
 		// Buffer under Node.js: a view on a larger, shared ArrayBuffer, so the view itself is decoded, never the
@@ -239,9 +244,12 @@ export class HttpRestRequest {
 			const jsonString: string = decoder.decode(data);
 			try {
 				data = JSON.parse(jsonString);
-			} catch {
+			} catch (ex: unknown) {
 				// not valid JSON: keep the decoded text, as axios does for a JSON body it cannot parse
 				data = jsonString;
+				if (jsonString.length > 0 && ex instanceof Error) {
+					parseFailure = ex;
+				}
 			}
 		}
 
@@ -264,7 +272,7 @@ export class HttpRestRequest {
 		}
 
 		// throw the extracted error message
-		throw new ClientResultException(WsclientErrors.HTTP_CUSTOM_ERROR)
+		throw new ClientResultException(WsclientErrors.HTTP_CUSTOM_ERROR, parseFailure)
 			.appendMessage(exceptionMessage)
 			.setHttpErrorCode(code)
 			.setHttpResponseBody(data);

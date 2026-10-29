@@ -63,7 +63,8 @@ export class ClientResultException extends ResultException {
 	 * {@link string}, but the raw bytes for a request that expected binary data (an {@link ArrayBuffer} in the
 	 * browser, a Buffer under Node.js).<br>
 	 * Setting the body does not change the message describing this {@link ResultException}; {@link HttpRestRequest}
-	 * does, however, use a non-empty text body as the detail of that message.
+	 * does, however, use a non-empty text body as the detail of that message; should a non-empty JSON body read as
+	 * bytes not parse, it sets the reason as the cause of this {@link ResultException}.
 	 *
 	 * @return The http response body of this {@link ResultException}, or {@code undefined} if none has been set.
 	 */
