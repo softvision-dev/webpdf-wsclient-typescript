@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-27T15:30:21Z)"
+		"version": "webPDF 10.0.7 (2026-10-29T08:51:41Z)"
 	},
 	"servers": [
 		{
@@ -10929,6 +10929,11 @@
 					"signature": {
 						"$ref": "#/components/schemas/Operation_Signature"
 					},
+					"subsetFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" only the characters used in the document are embedded for each font (font subset). If \"false,\" the complete font program is embedded; this can enlarge the document considerably.\n\nThis option only takes effect if \"embedFonts\" is \"true\". A font whose license does not permit subsetting is always embedded completely. A face of a font collection that cannot be embedded completely is embedded as a subset instead, and a warning is written to the server log.\n\n**Important:** This option is currently only evaluated by the integrated converter for Word (docx) documents."
+					},
 					"template": {
 						"$ref": "#/components/schemas/Operation_ConverterTemplate"
 					},
@@ -11177,6 +11182,11 @@
 				"type": "object",
 				"description": "Defines the settings to be used when converting Word (docx) documents.",
 				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If \"true,\" Word documents (docx) are converted with the integrated Word converter. If \"false,\" the integrated converter is skipped and the document is converted as without it, which by default means with Outside In. The other settings of this element only apply to the integrated converter.\n\n**Important:** A requested Office bridge or SharePoint bridge takes precedence over this option."
+					},
 					"form": {
 						"$ref": "#/components/schemas/Operation_ConverterOfficeForm"
 					}
