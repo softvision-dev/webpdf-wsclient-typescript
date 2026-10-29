@@ -107,6 +107,33 @@ function webpdfErrorBody(): Record<string, unknown> {
 const TRUNCATED_JSON: string = "{\"errorCode\":-5009,\"errorMessage\":\"Größenlimit überschr";
 
 /**
+ * Returns the error {@code JSON.parse} throws for the given text in the engine running the tests. Its message is
+ * engine- and version-dependent, so a test compares against this value instead of a fixed text.
+ */
+function jsonParseErrorOf(text: string): SyntaxError {
+	try {
+		JSON.parse(text);
+	} catch (error: unknown) {
+		expect(error, "JSON.parse must reject the text with a SyntaxError").to.be.instanceOf(SyntaxError);
+		return error as SyntaxError;
+	}
+	expect.fail("the text was expected not to parse as JSON: " + text);
+}
+
+/**
+ * Asserts that the given error is the custom HTTP error for a JSON body that does not parse, and that it names the
+ * reason as its cause: the SyntaxError {@code JSON.parse} reports for exactly the given body text.
+ */
+function expectParseErrorAsCause(error: unknown, text: string): void {
+	expect(error).to.be.instanceOf(ClientResultException);
+	let clientError: ClientResultException = error as ClientResultException;
+	expect(clientError.equalsError(WsclientErrors.HTTP_CUSTOM_ERROR)).to.equal(true);
+	let cause: Error | undefined = clientError.getCause();
+	expect(cause, "the reason the body does not parse must be the cause").to.be.instanceOf(SyntaxError);
+	expect((cause as SyntaxError).message).to.equal(jsonParseErrorOf(text).message);
+}
+
+/**
  * Awaits the given promise and returns what it rejected with; fails the test when it resolves.
  */
 async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
@@ -154,6 +181,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.equalsError(WsclientErrors.HTTP_CUSTOM_ERROR)).to.equal(true);
 		expect(clientError.getHttpErrorCode()).to.equal(400);
 		expect(clientError.getHttpResponseBody()).to.deep.equal(oauthErrorBody());
+		expect(clientError.getCause(), "valid JSON leaves nothing to report as a cause").to.equal(undefined);
 	});
 
 	it("does not copy the error body into the exception message", async function (): Promise<void> {
@@ -186,6 +214,42 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpResponseBody()).to.equal(page);
 		// Unchanged behaviour: a text body has always been the message detail.
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\n" + page);
+		expect(clientError.getCause(), "a body not declared as JSON is never parsed").to.equal(undefined);
+	});
+
+	it("keeps a JSON body delivered as text that does not parse as the text", async function (): Promise<void> {
+		// axios delivers a body read as JSON that does not parse as the unparsed text, without an error.
+		let error: unknown = await failedRequest(
+			new StubHttpFailure(502, "Bad Gateway", {"content-type": "application/json; charset=utf-8"}, TRUNCATED_JSON),
+			{}
+		);
+
+		expect(error).to.be.instanceOf(ClientResultException);
+		let clientError: ClientResultException = error as ClientResultException;
+		expect(clientError.equalsError(WsclientErrors.HTTP_CUSTOM_ERROR)).to.equal(true);
+		expect(clientError.getHttpErrorCode()).to.equal(502);
+		expect(clientError.getHttpResponseBody()).to.equal(TRUNCATED_JSON);
+		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\n" + TRUNCATED_JSON);
+		// A text body cannot tell a body that did not parse from a valid JSON string body axios already parsed, so
+		// parsing it again names no reliable reason; only a body read as bytes reports the parse error as its cause.
+		expect(clientError.getCause(), "a body delivered as text has no reliable parse error").to.equal(undefined);
+	});
+
+	it("reports a valid JSON string body delivered as text without a cause", async function (): Promise<void> {
+		// axios parses the valid JSON body "\"Bad Gateway\"" to the string Bad Gateway, which does not parse again.
+		let text: string = "Bad Gateway";
+		let error: unknown = await failedRequest(
+			new StubHttpFailure(502, "Bad Gateway", {"content-type": "application/json"}, text),
+			{}
+		);
+
+		expect(error).to.be.instanceOf(ClientResultException);
+		let clientError: ClientResultException = error as ClientResultException;
+		expect(clientError.equalsError(WsclientErrors.HTTP_CUSTOM_ERROR)).to.equal(true);
+		expect(clientError.getHttpErrorCode()).to.equal(502);
+		expect(clientError.getHttpResponseBody()).to.equal(text);
+		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\n" + text);
+		expect(clientError.getCause(), "a valid JSON string body has no parse error").to.equal(undefined);
 	});
 
 	it("keeps a JSON body read as bytes as the parsed object", async function (): Promise<void> {
@@ -200,6 +264,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(400);
 		expect(clientError.getHttpResponseBody()).to.not.be.instanceOf(ArrayBuffer);
 		expect(clientError.getHttpResponseBody()).to.deep.equal(oauthErrorBody());
+		expect(clientError.getCause(), "valid JSON leaves nothing to report as a cause").to.equal(undefined);
 	});
 
 	it("leaves the body undefined when the error answer has no body", async function (): Promise<void> {
@@ -228,6 +293,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(error).to.not.be.instanceOf(ClientResultException);
 		expect((error as ServerResultException).getErrorCode()).to.equal(-9009);
 		expect((error as ServerResultException).message).to.equal("The session token has expired.");
+		expect((error as ServerResultException).getCause()).to.equal(undefined);
 	});
 
 	for (let form of BYTE_FORMS) {
@@ -243,6 +309,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 			expect(error).to.not.be.instanceOf(ClientResultException);
 			expect((error as ServerResultException).getErrorCode()).to.equal(-5009);
 			expect((error as ServerResultException).message).to.equal(webpdfErrorBody().errorMessage);
+			expect((error as ServerResultException).getCause()).to.equal(undefined);
 		});
 
 		it("keeps a JSON body read as " + form.name + " that does not parse as the decoded text", async function (): Promise<void> {
@@ -262,6 +329,17 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 			expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\n" + TRUNCATED_JSON);
 		});
 
+		it("reports why a JSON body read as " + form.name + " does not parse as the cause", async function (): Promise<void> {
+			let error: unknown = await failedRequest(
+				new StubHttpFailure(502, "Bad Gateway", {"content-type": "application/json; charset=utf-8"},
+					form.encode(TRUNCATED_JSON)),
+				{},
+				DataFormats.OCTET_STREAM.getMimeType()
+			);
+
+			expectParseErrorAsCause(error, TRUNCATED_JSON);
+		});
+
 		it("reports a JSON null body read as " + form.name + " with the status text", async function (): Promise<void> {
 			let error: unknown = await failedRequest(
 				new StubHttpFailure(500, "Internal Server Error", {"content-type": "application/json"},
@@ -276,6 +354,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 			expect(clientError.getHttpErrorCode()).to.equal(500);
 			expect(clientError.getHttpResponseBody()).to.equal(null);
 			expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nInternal Server Error");
+			expect(clientError.getCause(), "valid JSON leaves nothing to report as a cause").to.equal(undefined);
 		});
 	}
 
@@ -295,6 +374,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpResponseBody()).to.not.be.instanceOf(ArrayBuffer);
 		expect(clientError.getHttpResponseBody()).to.deep.equal(oauthErrorBody());
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nBad Request");
+		expect(clientError.getCause(), "valid JSON leaves nothing to report as a cause").to.equal(undefined);
 	});
 
 	it("reports a JSON null body with the status text", async function (): Promise<void> {
@@ -310,6 +390,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(500);
 		expect(clientError.getHttpResponseBody()).to.equal(null);
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nInternal Server Error");
+		expect(clientError.getCause(), "valid JSON leaves nothing to report as a cause").to.equal(undefined);
 	});
 
 	it("keeps a non-JSON body read as an ArrayBuffer as the bytes the server sent", async function (): Promise<void> {
@@ -326,6 +407,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(502);
 		expect(clientError.getHttpResponseBody()).to.equal(page);
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nBad Gateway");
+		expect(clientError.getCause(), "a body not declared as JSON is never parsed").to.equal(undefined);
 	});
 
 	it("reports an empty JSON body with the status text", async function (): Promise<void> {
@@ -341,6 +423,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(502);
 		expect(clientError.getHttpResponseBody()).to.equal("");
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nBad Gateway");
+		expect(clientError.getCause(), "an empty body is reported by its status text alone").to.equal(undefined);
 	});
 
 	for (let form of BYTE_FORMS) {
@@ -357,6 +440,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 			expect(clientError.getHttpErrorCode()).to.equal(502);
 			expect(clientError.getHttpResponseBody()).to.equal("");
 			expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nBad Gateway");
+			expect(clientError.getCause(), "an empty body is reported by its status text alone").to.equal(undefined);
 		});
 	}
 
@@ -373,6 +457,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(503);
 		expect(clientError.getHttpResponseBody()).to.equal(text);
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\n" + text);
+		expect(clientError.getCause(), "a body without a content type is never parsed").to.equal(undefined);
 	});
 
 	it("reports an empty body of an error answer without a content type with the status text", async function (): Promise<void> {
@@ -387,6 +472,7 @@ suite("HttpRestRequestErrorBodyTest", function (): void {
 		expect(clientError.getHttpErrorCode()).to.equal(503);
 		expect(clientError.getHttpResponseBody()).to.equal("");
 		expect(clientError.getMessage()).to.equal(WsclientErrors.HTTP_CUSTOM_ERROR.getMessage() + "\nService Unavailable");
+		expect(clientError.getCause(), "an empty body is reported by its status text alone").to.equal(undefined);
 	});
 
 	it("has no body until one is set, and sets it fluently", function (): void {
