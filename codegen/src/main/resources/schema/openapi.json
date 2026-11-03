@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.7 (2026-10-29T08:51:41Z)"
+		"version": "webPDF 10.0.7 (2026-11-03T11:40:51Z)"
 	},
 	"servers": [
 		{
@@ -2845,7 +2845,6 @@
 			},
 			"Admin_ConfigurationFlag": {
 				"type": "string",
-				"default": "",
 				"description": "Signals different configuration states with these flags",
 				"enum": [
 					"readOnly",
@@ -4219,7 +4218,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"Barcode\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Barcode\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. If no fonts can be read from the font directories, the \"Barcode\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"Barcode\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Barcode\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"Barcode\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Barcode\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
 					},
 					"instances": {
 						"type": "integer",
@@ -4285,7 +4284,7 @@
 					"headlessMode": {
 						"type": "string",
 						"default": "new",
-						"description": "Defines the different headless modes of the Chromium instance.\n\n*   NEW = Uses the same code base for the Chromium headless instance as the normal non-headless browser.\n*   OLD = Uses the old code base for the Chromium headless instance, which is different from the non-headless browser",
+						"description": "Defines the different headless modes of the Chromium instance.\n\n*   NEW = Uses the same code base for the Chromium headless instance as the normal non-headless browser.\n*   OLD = Deprecated, has no effect: Chromium removed the old headless mode with version 132 and is always started in the new headless mode.",
 						"enum": [
 							"old",
 							"new"
@@ -4710,7 +4709,7 @@
 					},
 					"preset": {
 						"type": "string",
-						"default": "",
+						"default": "custom",
 						"description": "Predefined metric configuration presets optimized for different deployment environments.\n\nPresets provide sensible defaults that can be overridden by explicit element configurations.",
 						"enum": [
 							"production",
@@ -4950,7 +4949,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"OCR\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"OCR\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. If no fonts can be read from the font directories, the \"OCR\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"OCR\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"OCR\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"OCR\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"OCR\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
 					},
 					"instances": {
 						"type": "integer",
@@ -5590,7 +5589,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts for the text of visual signatures.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Signature\" web service only, also when a conversion signs its result, and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Toolbox\", \"OCR\" or \"Barcode\" web service. If no fonts can be read from the font directories, the \"Signature\" web service starts nevertheless, writes a warning to the server log and draws the text of visual signatures with the PDF standard font \"Helvetica\"; a character outside the Windows Latin character set then ends a visual signature with an error."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts for the text of visual signatures.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Signature\" web service only, also when a conversion signs its result, and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Toolbox\", \"OCR\" or \"Barcode\" web service. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"Signature\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Signature\" web service starts nevertheless, writes a warning to the server log and draws the text of visual signatures with the PDF standard font \"Helvetica\"; a character outside the Windows Latin character set then ends a visual signature with an error."
 					},
 					"instances": {
 						"type": "integer",
