@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-10-29T07:38:32Z)"
+		"version": "webPDF 11.0.0 (2026-11-03T11:40:50Z)"
 	},
 	"servers": [
 		{
@@ -3820,7 +3820,6 @@
 			},
 			"Admin_ConfigurationFlag": {
 				"type": "string",
-				"default": "",
 				"description": "Signals different configuration states with these flags",
 				"enum": [
 					"readOnly",
@@ -5357,18 +5356,6 @@
 						"type": "boolean",
 						"default": true,
 						"description": "If enabled, then the Chromium bridge is activated."
-					},
-					"headlessMode": {
-						"type": "string",
-						"default": "new",
-						"description": "Defines the different headless modes of the Chromium instance.\n\n*   NEW = Uses the same code base for the Chromium headless instance as the normal non-headless browser.\n*   OLD = Uses the old code base for the Chromium headless instance, which is different from the non-headless browser",
-						"enum": [
-							"old",
-							"new"
-						],
-						"x-webpdf-codegen": {
-							"enumName": "ApplicationConfig_ChromiumBridgeHeadlessMode"
-						}
 					},
 					"hostAddress": {
 						"type": "string",
@@ -23026,7 +23013,6 @@
 					},
 					"status": {
 						"type": "string",
-						"default": "",
 						"description": "Registry status of the token.",
 						"enum": [
 							"ACTIVE",
@@ -23035,7 +23021,6 @@
 					},
 					"tokenKind": {
 						"type": "string",
-						"default": "",
 						"description": "Kind of token.",
 						"enum": [
 							"ACCESS",
