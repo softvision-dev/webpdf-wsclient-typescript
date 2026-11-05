@@ -708,7 +708,15 @@ suite("RestAdministrationIntegrationTest", function () {
 			expect(ex, "The server request did not work").to.be.undefined;
 		}
 
-		await session.close();
+		// the session has been closed by the administration call, a logout must be rejected
+		let logoutError: any;
+		try {
+			await session.close();
+		} catch (ex: any) {
+			logoutError = ex;
+		}
+		expect(logoutError, "The closed session should not be usable anymore").to.exist;
+		expect(logoutError.getErrorCode(), "The session token should be unknown").to.equal(-60);
 	});
 
 	it('testClusterConfig', async function () {

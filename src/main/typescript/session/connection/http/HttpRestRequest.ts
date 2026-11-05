@@ -113,11 +113,11 @@ export class HttpRestRequest {
 		}
 
 		if (typeof this.requestConfig.maxContentLength === "undefined") {
-			this.requestConfig.maxContentLength = Infinity;
+			this.requestConfig.maxContentLength = -1;
 		}
 
 		if (typeof this.requestConfig.maxBodyLength === "undefined") {
-			this.requestConfig.maxBodyLength = Infinity;
+			this.requestConfig.maxBodyLength = -1;
 		}
 
 		if (typeof this.requestConfig.headers === "undefined") {

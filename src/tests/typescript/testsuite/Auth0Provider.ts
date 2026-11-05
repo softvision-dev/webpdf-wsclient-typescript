@@ -1,5 +1,5 @@
 import {AuthResultException, OAuth2Provider, OAuth2Token, Session} from "../../../main/typescript";
-import {AuthenticationClient} from "auth0";
+import {AuthClient, TokenResponse} from "@auth0/auth0-auth-js";
 
 export class Auth0Provider implements OAuth2Provider {
 	private token?: OAuth2Token;
@@ -23,16 +23,16 @@ export class Auth0Provider implements OAuth2Provider {
 		}
 
 		try {
-			let auth: AuthenticationClient = new AuthenticationClient({
+			let auth: AuthClient = new AuthClient({
 				domain: this.authority,
 				clientId: this.clientId,
 				clientSecret: this.clientSecret
 			});
-			let token = await auth.oauth.clientCredentialsGrant({
+			let token: TokenResponse = await auth.getTokenByClientCredentials({
 				audience: this.audience
 			});
 
-			this.token = new OAuth2Token(token.data.access_token);
+			this.token = new OAuth2Token(token.accessToken);
 		} catch (e: any) {
 			throw new AuthResultException(e);
 		}
