@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 11.0.0 (2026-11-03T11:40:50Z)"
+		"version": "webPDF 11.0.0 (2026-11-09T09:52:08Z)"
 	},
 	"servers": [
 		{
@@ -3661,10 +3661,11 @@
 		"schemas": {
 			"Admin_ApplicationCheck": {
 				"type": "object",
-				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.\n\n- locale = Select the default locale and time zone of the server (\"webservices\") and of the \"Converter\" and \"URL Converter\" web services for validation.",
+				"description": "Selects the \"application.xml\" contents and server resources, that shall be validated.\n\n- executable = Select the defined external executables for validation.\n\n- tsa = Select the defined TSA (Timestamp Authority) for validation.\n\n- license = Select the server´s license for validation.\n\n- signature = Select the server´s global certificate keystore for validation.\n\n- locale = Select the default locale and time zone of the server (\"webservices\") and of the \"Converter\" and \"URL Converter\" web services for validation.\n\n- font = Select the font folders (\"fontPath\") of the Toolbox, Converter, PDF/A, Signature, OCR and Barcode web services for validation.",
 				"discriminator": {
 					"mapping": {
 						"executable": "#/components/schemas/Admin_ExecutableApplicationCheck",
+						"font": "#/components/schemas/Admin_FontApplicationCheck",
 						"license": "#/components/schemas/Admin_LicenseApplicationCheck",
 						"locale": "#/components/schemas/Admin_LocaleApplicationCheck",
 						"signature": "#/components/schemas/Admin_SignatureApplicationCheck",
@@ -3689,7 +3690,8 @@
 					"tsa",
 					"executable",
 					"signature",
-					"locale"
+					"locale",
+					"font"
 				]
 			},
 			"Admin_ApplicationConfiguration": {
@@ -4111,6 +4113,18 @@
 					}
 				],
 				"description": "Validates the configured configuration of the file storage provider.",
+				"required": [
+					"checkType"
+				]
+			},
+			"Admin_FontApplicationCheck": {
+				"type": "object",
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Admin_ApplicationCheck"
+					}
+				],
+				"description": "Validates the font folders of the web services in the submitted configuration by the rule the web services apply when they start: the attribute \"fontPath\" - together with \"useUserFonts\" - of \"webservices/toolbox\", \"webservices/converter\", \"webservices/pdfa\", \"webservices/signature\", \"webservices/ocr\" and \"webservices/barcode\". A web service is checked only if it is enabled (\"enabled\") in the submitted configuration. The font folder must exist and be readable, and it must contain a font file, either itself or in a folder read with it: a sub folder, the font folder of the user account that runs the server, or a sub folder of it. With a \"fontPath\" the font folder of the user account is read only if \"useUserFonts\" is set; without a \"fontPath\" it is always read, whatever \"useUserFonts\" says. Only the names of the files are looked at; no font is read. Without \"fontPath\" the font folder of the operating system, together with the font folder of the user account, is checked for the \"toolbox\", \"converter\" and \"pdfa\" web services; the \"signature\", \"ocr\" and \"barcode\" web services start without fonts and are not checked then. The first problem found is reported, in the order given above. The folders are checked on the server that handles the request; in a cluster, another node may have other folders, and a value set by an environment variable or system property takes precedence over the configuration when the web service starts.",
 				"required": [
 					"checkType"
 				]
@@ -5288,7 +5302,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"Barcode\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Barcode\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"Barcode\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Barcode\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"Barcode\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Barcode\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read, or no fonts are found in it, in its subfolders or, as long as \"useUserFonts\" is not set to `false`, in the font directory of the user account - keeps the \"Barcode\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Barcode\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
 					},
 					"instances": {
 						"type": "integer",
@@ -5327,6 +5341,11 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -5485,7 +5504,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word, Excel, PowerPoint and Markdown converters. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\", \"Signature\", \"Toolbox\", \"OCR\" or \"Barcode\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** This setting applies to the built-in document converter OutsideIn and to the native Word, Excel, PowerPoint and Markdown converters. Each web service that uses fonts is configured separately: this setting applies to the \"Converter\" web service only and does not change the fonts used by the \"Pdfa\", \"Signature\", \"Toolbox\", \"OCR\" or \"Barcode\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -5537,6 +5556,11 @@
 						"description": "Sets the default time zone of the \"Converter\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every conversion whose request sets no time zone (\"timeZone\" of the \"converter\" operation, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used; if none is configured there either, the conversion falls back as described for \"timeZone\" of the \"converter\" operation.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Converter\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
 						"maxLength": 64,
 						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -5558,12 +5582,12 @@
 			},
 			"ApplicationConfig_FontSubstitution": {
 				"type": "object",
-				"description": "Defines the substitution of a font that is not installed in the font folders of a web service by a metric-compatible replacement font. A replacement font has the same character widths as the original font, so that lines, paragraphs and pages break as with the original.\n\nThe server knows the following built-in pairs: \"Arial\" and \"Helvetica\" are replaced by \"Liberation Sans\", \"Times New Roman\" by \"Liberation Serif\", \"Courier New\" by \"Liberation Mono\" and \"Calibri\" by \"Carlito\". The built-in pairs belong to the server version; a fixed table is obtained by setting \"useDefaults\" to \"false\" and defining own entries. Own entries (\"substitute\") are added to the built-in pairs; an own entry for the same font replaces the built-in pair.\n\n**Note:** The substitution only takes place if the font is not installed: an installed original font always wins. A replacement font is only used if it is installed in the font folders of the web service itself; the server does not ship any of them. The substitution applies to the native Word, Excel, PowerPoint and Markdown converters of the \"Converter\" web service and to the \"Toolbox\", \"Signature\", \"OCR\" and \"Barcode\" web services. It does not apply to the built-in document converter OutsideIn, to the \"Pdfa\" web service and to HTML content and the text of e-mails, which the integrated browser renders - Office documents attached to an e-mail are converted by the native converters and are substituted like any other document -, and it does not apply to the default fonts (\"defaultFont\" of the web services), which are always chosen among the installed fonts.\n\n**Note:** In the native converters, a font that is not installed is replaced by the first font that draws all characters of the text: for a Word document first the replacement the document names itself for the font (\"w:altName\" of its font table) - the first of the names that is installed, whose own replacement font is not used -, then the replacement font of the font that is not installed, then the font that replaced it in earlier versions (usually the default font), then the fonts of the server's fallback chain (\"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\", \"Arial Unicode MS\"). If none of them draws all characters, the one that draws the most is used; characters of the text which the delivered substitute cannot draw are not rendered and are named in the report of the conversion. Such a replacement counts as alias usage (\"fontAliasUsage\" of the \"converter\" operation).\n\n**Important:** The settings are read when the server starts; a change takes effect after a restart. Entries with an empty font or replacement, entries that replace a font by itself and further entries for the same font are ignored and written to the server log.",
+				"description": "Defines the substitution of a font that is not installed in the font folders of a web service by a metric-compatible replacement font. A replacement font has the same character widths as the original font, so that lines, paragraphs and pages break as with the original.\n\nThe server knows the following built-in pairs: \"Arial\" and \"Helvetica\" are replaced by \"Liberation Sans\", \"Times New Roman\" by \"Liberation Serif\", \"Courier New\" by \"Liberation Mono\" and \"Calibri\" by \"Carlito\". The built-in pairs belong to the server version; a fixed table is obtained by setting \"useDefaults\" to \"false\" and defining own entries. Own entries (\"substitute\") are added to the built-in pairs; an own entry for the same font replaces the built-in pair.\n\n**Note:** The substitution only takes place if the font is not installed: an installed original font always wins. A replacement font is only used if it is installed in the font folders of the web service itself; the server does not ship any of them. The substitution applies to the native Word, Excel, PowerPoint and Markdown converters of the \"Converter\" web service and to the \"Toolbox\", \"Signature\", \"OCR\" and \"Barcode\" web services. It does not apply to the built-in document converter OutsideIn, to the \"Pdfa\" web service and to HTML content and the text of e-mails, which the integrated browser renders - Office documents attached to an e-mail are converted by the native converters and are substituted like any other document -, and it does not apply to the default fonts (\"defaultFont\" of the web services), which are always chosen among the installed fonts.\n\n**Note:** In the native converters, a font that is not installed is replaced by the first font that draws all characters of the text: for a Word document first the replacement the document names itself for the font (\"w:altName\" of its font table) - the first of the names that is installed, whose own replacement font is not used -, then the replacement font of the font that is not installed, then the font that replaced it in earlier versions (usually the default font), then the fonts of the server's fallback chain (\"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\", \"Arial Unicode MS\"). If none of them draws all characters, the one that draws the most is used; characters of the text which the delivered substitute cannot draw are drawn as its .notdef glyph (usually an empty box) where it has one, otherwise left out, and are named in the report of the conversion. Such a replacement counts as alias usage (\"fontAliasUsage\" of the \"converter\" operation).\n\n**Important:** The settings are read when the server starts; a change takes effect after a restart. Entries with an empty font or replacement, entries that replace a font by itself and further entries for the same font are ignored and written to the server log.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
 						"default": true,
-						"description": "If \"true\", a font that is not installed is substituted as described for this element.\n\nIf \"false\", no font is substituted: no replacement font is used, the replacement a Word document names for a font is not used, the replacement of a font that is not installed is not chosen by the characters of the text, and characters that cannot be drawn are not named in the report. The fonts are then chosen exactly as in earlier versions of the server."
+						"description": "If \"true\", a font that is not installed is substituted as described for this element.\n\nIf \"false\", no font is substituted: no replacement font is used, the replacement a Word document names for a font is not used, the replacement of a font that is not installed is not chosen by the characters of the text. Characters that the font in use cannot draw are still named in the report. The fonts are then chosen exactly as in earlier versions of the server."
 					},
 					"substitute": {
 						"type": "array",
@@ -6038,7 +6062,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"OCR\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"OCR\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"OCR\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"OCR\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts with which the \"OCR\" web service draws annotations and form fields without an appearance when it renders a document. The text of such an annotation or form field that the font of the document cannot display is drawn with a font of this folder that can.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"OCR\" web service only and does not change the fonts used by the other web services. The value is read when the server starts; a change takes effect after a restart. A configured font directory that cannot be used - it does not exist, cannot be read, or no fonts are found in it, in its subfolders or, as long as \"useUserFonts\" is not set to `false`, in the font directory of the user account - keeps the \"OCR\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"OCR\" web service starts nevertheless and writes a warning to the server log; an annotation or form field without an appearance whose text needs a replacement font then ends the request with an error (-1213)."
 					},
 					"instances": {
 						"type": "integer",
@@ -6077,6 +6101,11 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -6172,7 +6201,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Pdfa\" web service only and does not change the fonts used by the \"Converter\", \"Signature\", \"Toolbox\", \"OCR\" or \"Barcode\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Pdfa\" web service only and does not change the fonts used by the \"Converter\", \"Signature\", \"Toolbox\", \"OCR\" or \"Barcode\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -6211,6 +6240,11 @@
 						"format": "int32",
 						"default": 100,
 						"description": "Maximum number of waiting requests, before new requests are rejected. If there are more requests than free instances, they are placed in the queue. If this maximum value is reached, further requests are rejected directly. This setting only applies if `queueMode` is set to `MANUAL`."
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -6760,7 +6794,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts for the text of visual signatures.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Signature\" web service only, also when a conversion signs its result, and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Toolbox\", \"OCR\" or \"Barcode\" web service. A configured font directory that cannot be used - it does not exist, cannot be read or contains no fonts - keeps the \"Signature\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Signature\" web service starts nevertheless, writes a warning to the server log and draws the text of visual signatures with the PDF standard font \"Helvetica\"; a character outside the Windows Latin character set then ends a visual signature with an error."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve the fonts for the text of visual signatures.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Signature\" web service only, also when a conversion signs its result, and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Toolbox\", \"OCR\" or \"Barcode\" web service. A configured font directory that cannot be used - it does not exist, cannot be read, or no fonts are found in it, in its subfolders or, as long as \"useUserFonts\" is not set to `false`, in the font directory of the user account - keeps the \"Signature\" web service from starting. If no value is specified and no fonts can be read from the default font directories, the \"Signature\" web service starts nevertheless, writes a warning to the server log and draws the text of visual signatures with the PDF standard font \"Helvetica\"; a character outside the Windows Latin character set then ends a visual signature with an error."
 					},
 					"instances": {
 						"type": "integer",
@@ -6812,6 +6846,11 @@
 						"description": "Sets the default time zone of the \"Signature\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to every signature whose request sets no time zone (\"timeZone\" of the element `identifierElements` of the signature appearance, which describes where the time zone takes effect). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used. A signature that is part of a conversion uses the time zone of the conversion instead (see \"timeZone\" of the \"converter\" operation).\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Signature\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
 						"maxLength": 64,
 						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -6832,7 +6871,7 @@
 					"fontPath": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is always scanned in addition: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Toolbox\" web service only and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Signature\", \"OCR\" or \"Barcode\" web service."
+						"description": "Sets the base path (including subfolders) of the server from which to retrieve installed fonts.\n\nIf no value is specified, then the default font directories (including subfolders) of the respective operating system are used. Under Windows this is usually `C:\\Windows\\Fonts` and under Linux `/usr/share/fonts`.\n\n**Note:** The font directory of the user account under which the server is running is read in addition, including its subfolders: under Linux the folder `.fonts` below the directory named by the system property `user.home`, under Windows the folder `Microsoft\\Windows\\Fonts` below the directory named by the environment variable `LOCALAPPDATA`. If a value is specified, the font directory of the user account is read only as long as \"useUserFonts\" is not set to `false`.\n\n**Important:** Each web service that uses fonts is configured separately. This setting applies to the \"Toolbox\" web service only and does not change the fonts used by the \"Converter\", \"Pdfa\", \"Signature\", \"OCR\" or \"Barcode\" web service."
 					},
 					"instances": {
 						"type": "integer",
@@ -6878,6 +6917,11 @@
 						"description": "Sets the default time zone of the \"Toolbox\" web service, as an identifier such as \"Europe/Berlin\" or an offset such as \"+01:00\". It applies to the current date of a date format in a header or footer whose request sets no time zone (\"timeZone\" of the element `headerFooterContent` of the \"options\" operation). If no value is specified, the default time zone of the server (\"timeZone\" of \"webservices\") is used.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A value that is not a well-formed time zone identifier or offset prevents the configuration from being loaded, and the server does not start. A well-formed identifier that the Java runtime of the server does not know prevents the \"Toolbox\" web service from starting; the other web services start. In both cases the reason is written to the server log.",
 						"maxLength": 64,
 						"pattern": "^[ \\t\\n\\r]*(?:([A-Za-z][A-Za-z0-9_+\\-]*(/[A-Za-z0-9_+\\-]+){0,2}|[+\\-][0-9]{2}:[0-9]{2})?)[ \\t\\n\\r]*$"
+					},
+					"useUserFonts": {
+						"type": "boolean",
+						"default": true,
+						"description": "Only applies when \"fontPath\" is set: `true` also reads the font directory of the user account under which the server is running, including its subfolders; `false` reads only \"fontPath\" and its subfolders.\n\nWithout \"fontPath\", the font directories of the operating system and of the user account are always read.\n\nThe value is read when the server starts; a change takes effect after a restart."
 					}
 				}
 			},
@@ -10908,7 +10952,7 @@
 			},
 			"Operation_AppearanceAdd": {
 				"type": "object",
-				"description": "Used to define the signature's visual appearance.\n\nWithout this element the signature is invisible - unless the document prepares the signature field (`fieldName`) with a widget annotation whose rectangle can carry an appearance. webPDF then gives that field a visual signature itself, drawn like one without further settings: with the fonts, the locale and the time zone of the \"Signature\" web service. If its text does not fit into the field even at the smallest font size, the appearance has no text, and the signature is created all the same. A character that no font of the server can display ends the signature with an error, as for a requested appearance.",
+				"description": "Used to define the signature's visual appearance.\n\nWithout this element the signature is invisible - unless the document prepares the signature field (`fieldName`) with a widget annotation whose rectangle can carry an appearance. webPDF then gives that field a visual signature itself, drawn like one without further settings: with the fonts of the \"Signature\" web service and in the time zone of the operation - the one of the \"Signature\" web service, or for the signature of a conversion the one of the conversion; the signature time is written in the \"iso\" form. If its text does not fit into the field even at the smallest font size, the appearance has no text, and the signature is created all the same. A character that no font of the server can display ends the signature with an error, as for a requested appearance.",
 				"properties": {
 					"font": {
 						"$ref": "#/components/schemas/Operation_SignatureFont"
@@ -12382,7 +12426,7 @@
 					"monospaceFont": {
 						"type": "string",
 						"default": "",
-						"description": "Font family used for code. If empty, the built-in monospace base font is used."
+						"description": "Font family used for inline code and code blocks. If empty, the font family 'Courier New' is used; if it is not available, a substitute font (for example 'Liberation Mono') or the converter's default font is used instead."
 					}
 				}
 			},
@@ -12569,7 +12613,7 @@
 					"fontIsMissing": {
 						"type": "boolean",
 						"default": false,
-						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion. With the integrated converters, this applies to a font for which no substitute that covers the character set of the text is available either (see \"fontAliasUsage\"). They also count a font that was found but cannot be used, because its font file is damaged or its license does not permit embedding, and that was replaced by the default font, and, in spreadsheets, a symbol that no installed font can draw; its characters are not rendered. They also count characters of a text in a font that is not found which the delivered substitute cannot draw; these characters are not rendered and are named in the report."
+						"description": "If \"true\", then an error (ERR\\_CONVERTER\\_FONT\\_IS\\_MISSING) is triggered if a font was not found during conversion. With the integrated converters, this applies to a font for which no substitute that covers the character set of the text is available either (see \"fontAliasUsage\"). They also count a font that was found but cannot be used, because its font file is damaged or its license does not permit embedding, and that was replaced by the default font, and, in spreadsheets, a symbol that no installed font can draw. They also count characters of the text that the font they are drawn with - the requested font or its substitute - has no glyph for; these characters are drawn as the font's .notdef glyph (usually an empty box) where it has one, otherwise left out, and are named in the report."
 					}
 				}
 			},
