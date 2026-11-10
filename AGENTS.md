@@ -128,6 +128,20 @@ world-readable.
 - When adding a new configuration input, also add a placeholder entry to the
   relevant example/sample file and document it in `README.md`.
 
+## No Internal References In Published Text
+
+Everything written to this repository and its hosting is public. Never include
+references to the company's internal issue tracker:
+
+- no internal ticket keys (identifiers of the form `ABC-123`) and no links to the
+  internal issue tracker;
+- this applies to commit subjects and bodies, branch and tag names, release notes,
+  pull request and issue texts, code comments, and documentation.
+
+Describe the change itself instead, so that it is understandable without access to
+internal systems. Existing history that already carries such references stays as
+it is; do not rewrite published history to remove them.
+
 ## Local Processing Preference
 
 - Prefer local CLI tooling for document, archive, image, OCR, and metadata work.
@@ -160,3 +174,5 @@ world-readable.
 - Relevant tests run and pass; for generated-code changes, `yarn run build` and the
   codegen unit tests pass.
 - No secrets, credentials, or internal-only material were added to tracked files.
+- No internal ticket keys or issue-tracker links in the commit message, branch or
+  tag names, or any added text (see *No Internal References In Published Text*).
