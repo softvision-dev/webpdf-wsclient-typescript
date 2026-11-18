@@ -10,7 +10,7 @@
 			"url": "https://www.webpdf.de/en/license-agreement.html"
 		},
 		"title": "webPDF",
-		"version": "webPDF 10.0.8 (2026-11-09T10:03:22Z)"
+		"version": "webPDF 10.0.8 (2026-11-18T10:43:17Z)"
 	},
 	"servers": [
 		{
@@ -5594,7 +5594,7 @@
 					"signatureEditProfile": {
 						"type": "string",
 						"default": "adobeRestrictions",
-						"description": "Defines the profile whose rules web services have to check before they can come to execution. These profiles define a set of rules concerning the validity of signatures. A web service whose execution for a given signed document would violate the rule set selected here should instead abort with an appropriate error code.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed. (By doing this, you accept the possible invalidation of included signatures.)\n\n**Important:** You can find further explanations of these profiles in the chapter \"Signature Validation\".",
+						"description": "Defines the profile that web services check before they change a signed document. A change to a signed document invalidates its signatures, so the profile decides only whether the change may be executed at all; a web service whose change the selected profile does not allow aborts with an appropriate error code. The profile does not define the state of the result: it neither keeps the signatures valid nor promises that they are removed.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed. By choosing this profile, you accept that a change invalidates the included signatures; to perform the change, webPDF may remove signatures from the document.\n\n**Important:** You can find further explanations of these profiles in the chapter \"Signature Validation\".",
 						"enum": [
 							"adobeRestrictions",
 							"generalEditRestrictions",
@@ -5613,7 +5613,7 @@
 					"defaultFont": {
 						"type": "string",
 						"default": "",
-						"description": "Sets the first font of the text in visual signatures whose request names no font (`name` of the element `font` of the signature appearance): unless it is `Helvetica` (see below), a character that it cannot display is drawn with the next font of the font chain below that provides it. The fonts are embedded in the document as subsets that hold only the characters drawn.\n\nThe font chain of the server follows from the font directories of the \"Signature\" web service: first the first installed of \"Go Noto Current\", \"DejaVu Sans\" and \"Arial Unicode MS\", then \"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\" and \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. If the value is empty, the font chain alone is used.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions of webPDF. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories or cannot be used (it cannot be embedded or has no line metrics) is reported in the server log when the web service starts and is skipped. A character that no font of the chain can display ends the signature with an error; only a font that the request names (`name` of the element `font`) is binding."
+						"description": "Sets the first font of the text in visual signatures whose request names no font (`name` of the element `font` of the signature appearance): unless it is `Helvetica` (see below), a character that it cannot display is drawn with the next font of the font chain below that provides it. The fonts are embedded in the document as subsets that hold only the characters drawn.\n\nThe font chain of the server follows from the font directories of the \"Signature\" web service: first the first installed of \"Go Noto Current\", \"DejaVu Sans\" and \"Arial Unicode MS\", then \"Go Noto Current\", \"Go Noto CJKCore\", \"Go Noto CJKExt\", \"Go Noto Emoji\", \"DejaVu Sans\" and \"Arial Unicode MS\" (an optional font whose license the operator clarifies); under Windows \"Arial\" is used as a last resort. If the value is empty, the font chain alone is used.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions of webPDF. The value always selects this standard font, also if a font family named \"Helvetica\" is installed. As a PDF/A document needs embedded fonts, a visual signature with text on a PDF/A document whose request names no other font then ends with the error SIGNATURE\\_APPEARANCE\\_NOT\\_PDFA\\_CONFORMING (-340), and an appearance that webPDF gives a prepared signature field itself has no text.\n\n**Important:** The value is read when the server starts; a change takes effect after a restart. A font named here that is not found in the font directories or cannot be used (it cannot be embedded or has no line metrics) is reported in the server log when the web service starts and is skipped. A character that no font of the chain can display ends the signature with an error; only a font that the request names (`name` of the element `font`) is binding."
 					},
 					"enabled": {
 						"type": "boolean",
@@ -7175,7 +7175,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"line": {
 						"$ref": "#/components/schemas/Metadata_Line"
@@ -7334,13 +7334,13 @@
 			},
 			"Metadata_Attachment": {
 				"type": "object",
-				"description": "This type is used to describe an attachment, that has been embedded in a PDF file. The attachment itself may have connected document information, in that case the \"document\" element will be set.",
+				"description": "This type is used to describe an attachment, that has been embedded in a PDF file. The description is read from what the document declares about the attachment - its name, description, type and sizes; the attachment itself is not opened, so an attached PDF carries no document information and the \"document\" element is not set.",
 				"properties": {
 					"compressedSize": {
 						"type": "number",
 						"format": "double",
 						"default": 0,
-						"description": "The compressed byte size of the attachment.",
+						"description": "The compressed byte size of the attachment (the \"/Length\" of the embedded file stream).",
 						"minimum": 0
 					},
 					"description": {
@@ -7383,14 +7383,14 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "The page (if any), the attachment is placed on.",
+						"description": "The page (if any), the attachment is placed on; 0 for the document level. A listed attachment lies on the document level, a file attachment annotation on the page that lists it. A file that a part of the document only associates (\"/AF\") lies on the page it hangs on directly: the page itself, or a page that lists the annotation that associates it - the smallest such page if there are several. A file associated with any other part - the document, a form, an image, marked content, a structure element, a metadata stream, a document part - lies on the document level (0), even if that part is used on pages.",
 						"minimum": 0
 					},
 					"size": {
 						"type": "number",
 						"format": "double",
 						"default": 0,
-						"description": "The byte size of the attachment.",
+						"description": "The byte size of the attachment, as the document declares it (\"/Params /Size\" of the embedded file); 0 if the document declares none. The attachment is not unpacked to find it.",
 						"minimum": 0
 					},
 					"sort": {
@@ -7421,7 +7421,7 @@
 			},
 			"Metadata_AttachmentsDocument": {
 				"type": "object",
-				"description": "Lists the attachments embedded into this document.",
+				"description": "Lists the attachments embedded into this document: the entries of the attachment list, the file attachment annotations, and then the files that a part of the document only associates (\"/AF\") - one entry for every such file, at the page it hangs on directly (see the attribute \"page\"). A file that is listed or shown by a file attachment annotation is not listed again for its associations. The selection of the \"attachment\" operation meets a file at the page named here and, for a file that a form, an image, marked content or a similar part associates, in addition on the pages on which that part is used.",
 				"properties": {
 					"attachment": {
 						"type": "array",
@@ -8127,7 +8127,7 @@
 			},
 			"Metadata_Image": {
 				"type": "object",
-				"description": "Defines an image resource of a PDF document.",
+				"description": "Defines an image of a PDF document, as a page draws it.",
 				"properties": {
 					"bitsPerComponent": {
 						"type": "integer",
@@ -8140,7 +8140,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "The height of the image in points."
+						"description": "The height of the image in pixels (the entry \"Height\" of the image)."
 					},
 					"objectKey": {
 						"type": "string",
@@ -8151,7 +8151,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "The number of the page containing the image resource.",
+						"description": "The number of the page that draws the image.",
 						"minimum": 0
 					},
 					"suffix": {
@@ -8163,13 +8163,13 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "The width of the image in points."
+						"description": "The width of the image in pixels (the entry \"Width\" of the image)."
 					}
 				}
 			},
 			"Metadata_ImagesDocument": {
 				"type": "object",
-				"description": "Lists the image resources used in the document.",
+				"description": "Lists the images that the pages of the document draw: for every page the image XObjects its content draws, directly and in the form XObjects it draws, each image once per page and in the order of its first drawing. An image that is only part of the resources of a page and is not drawn is not listed. Content that cannot be read, or that exceeds the limits for content streams, is read only as far as it goes: the images found up to there are listed.",
 				"properties": {
 					"image": {
 						"type": "array",
@@ -8187,7 +8187,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 0,
-						"description": "The number of attachments contained in the document.",
+						"description": "The number of attachments contained in the document: the number of entries in \"attachments\", in which a file that a part of the document only associates counts once for every place.",
 						"minimum": 0
 					},
 					"description": {
@@ -9563,7 +9563,7 @@
 			},
 			"Operation_AddSignature": {
 				"type": "object",
-				"description": "Used to add a new signature to the PDF document.",
+				"description": "Used to add a new signature to the PDF document.\n\nOn a PDF/A document the PDF/A identification is kept: the edit profile `pdfaEditProfile` of the settings does not apply to this operation, `signatureEditProfile` applies as before. webPDF does not check the PDF/A conformance of the result as a whole, but it makes sure that what the signature adds fits the PDF/A level of the document, and adapts it where this is possible without a visible change: an image of the appearance is embedded in an ICC based color space, and on a PDF/A-2, PDF/A-3 or PDF/A-4 document without PDF/A output intent that is not signed yet, a transparent image gives the page of the signature field a blending color space. A signature that cannot be made to fit - for example transparency in a PDF/A-1 document, or no font that can be embedded - ends with the error SIGNATURE\\_APPEARANCE\\_NOT\\_PDFA\\_CONFORMING (-340), whose message names the reason and the way out, and no document is returned. A document without PDF/A identification is signed as before.",
 				"properties": {
 					"appearance": {
 						"$ref": "#/components/schemas/Operation_AppearanceAdd"
@@ -9754,7 +9754,7 @@
 			},
 			"Operation_AppearanceAdd": {
 				"type": "object",
-				"description": "Used to define the signature's visual appearance.\n\nWithout this element the signature is invisible - unless the document prepares the signature field (`fieldName`) with a widget annotation whose rectangle can carry an appearance. webPDF then gives that field a visual signature itself, drawn like one without further settings: with the fonts of the \"Signature\" web service and in the time zone of the operation - the one of the \"Signature\" web service, or for the signature of a conversion the one of the conversion; the signature time is written in the \"iso\" form. If the default font of the \"Signature\" web service is `Helvetica` (`webservices/signature/@defaultFont`), the text is drawn with the PDF standard font as described for `font/@name`. Otherwise, if the text does not fit into the field even at the smallest font size, the appearance has no text, and the signature is created all the same; a character that no font of the server can display ends the signature with an error, as for a requested appearance.",
+				"description": "Used to define the signature's visual appearance.\n\nWithout this element the signature is invisible - unless the document prepares the signature field (`fieldName`) with a widget annotation whose rectangle can carry an appearance. webPDF then gives that field a visual signature itself, drawn like one without further settings: with the fonts of the \"Signature\" web service and in the time zone of the operation - the one of the \"Signature\" web service, or for the signature of a conversion the one of the conversion; the signature time is written in the \"iso\" form. If the default font of the \"Signature\" web service is `Helvetica` (`webservices/signature/@defaultFont`), the text is drawn with the PDF standard font as described for `font/@name`. Otherwise, if the text does not fit into the field even at the smallest font size, the appearance has no text, and the signature is created all the same; a character that no font of the server can display ends the signature with an error, as for a requested appearance. In a PDF/A document the standard font cannot be used, as it is not embedded: if `Helvetica` selects it, or if no font of the server can be used, the appearance has no text, and the signature is created all the same.",
 				"properties": {
 					"font": {
 						"$ref": "#/components/schemas/Operation_SignatureFont"
@@ -10271,13 +10271,13 @@
 			},
 			"Operation_Blacken": {
 				"type": "object",
-				"description": "If this element is set, all redact annotations placed in the document will be converted into actual content redactions. Content obscured by such an annotation will be irretrievably removed from the page content.",
+				"description": "If this element is set, all redact annotations placed in the document will be converted into actual content redactions. Content obscured by such an annotation will be irretrievably removed from the page content. Comments obscured by a redaction will be removed together with their replies, form field widgets obscured by a redaction will be removed - a field together with its value once none of its widgets remains -, and text alternatives describing redacted content will be removed as well. All signatures will be removed from a redacted document, and the result will always be written completely, without the earlier revisions of the document. If content obscured by a redaction cannot be removed safely, the operation fails.",
 				"properties": {
 					"collisionRatio": {
 						"type": "integer",
 						"format": "int32",
 						"default": 30,
-						"description": "Specifies a percentage value by which a letter must be obscured at least to be considered blackened and thus removed.",
+						"description": "Specifies the percentage of a letter's box - its advance width times the ascent plus descent of its font - that the redaction area must cover for the letter to be removed. A letter that is covered less stays as text, even if a part of it lies below the area. With 0, every letter the area touches is removed.",
 						"maximum": 100,
 						"minimum": 0
 					},
@@ -10532,7 +10532,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -10600,12 +10600,12 @@
 			},
 			"Operation_ClearSignature": {
 				"type": "object",
-				"description": "Used to remove all existing signatures from the PDF document.\n\n**Important:** Be aware, that this will also remove probably set passwords and encryption from the document.",
+				"description": "Used to remove all existing signatures from the PDF document. The signature values are removed: a signed signature field of the form stays as an empty signature field. Empty signature fields and all other form fields stay unchanged.\n\nThe edit profiles of the settings (`signatureEditProfile`, `pdfaEditProfile`) do not apply to this operation, and it makes no difference between PDF and PDF/A documents. The PDF/A identification is kept; webPDF does not check the PDF/A conformance of the result.\n\n**Important:** Be aware, that this will also remove probably set passwords and encryption from the document.",
 				"properties": {
 					"flatten": {
 						"type": "boolean",
 						"default": false,
-						"description": "When set to \"true\", this will render all visible signatures to the page content.\n\n**Important:** The actual signatures will still be removed! The hereby generated visual representation is not verifyable or binding and can not serve/does not count as a valid digital signature."
+						"description": "When set to \"true\", the signed signature fields are removed from the form, and the visible ones are rendered to the page content before. Other form fields, empty signature fields included, are not rendered and stay unchanged.\n\n**Important:** The actual signatures will still be removed! The hereby generated visual representation is not verifyable or binding and can not serve/does not count as a valid digital signature."
 					}
 				}
 			},
@@ -11832,7 +11832,7 @@
 			},
 			"Operation_ExtractToolboxAttachment": {
 				"type": "object",
-				"description": "Used to extract one or more attachments from the document. If more than one file is defined with selection, the result is returned in the form of a ZIP document.",
+				"description": "Used to extract one or more attachments from the document. If more than one file is defined with selection, the result is returned in the form of a ZIP document.\n\nBesides the entries of the attachment list and the file attachment annotations, the files that a part of the document only associates (\"/AF\") are extracted as well. Such a file lies at the places of the parts that associate it: on the document level for the document itself, for the document information, for an annotation that no page lists, for a structure element without a page of its own and for a part that no page uses; otherwise on the pages the part belongs to - the page itself, every page that lists the annotation, the page of the structure element, every page whose content or annotation appearances use the part. A file on a part that has no page of its own - a form, an image, marked content, a structure element, the metadata of a page or a part of the document - lies on the document level as well; this is the place the document information reports for it.\n\nEvery selected place of a file is one entry of the result: at the top of the ZIP document for the document level, in the folder of the page for a page. A file on two selected pages lies in both folders.",
 				"properties": {
 					"folderNameTemplate": {
 						"type": "string",
@@ -12528,7 +12528,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"justification": {
 						"type": "string",
@@ -13620,7 +13620,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -13757,7 +13757,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -14509,12 +14509,12 @@
 			},
 			"Operation_PdfaSettings": {
 				"type": "object",
-				"description": "The `pdfa` element allows to make settings for automatic handling of PDF/A documents. Editing a PDF/A document will most likely render it invalid, thus the web service operation checks whether it´s execution is valid for a given PDF/A document according to these settings.",
+				"description": "The `pdfa` element allows to make settings for automatic handling of PDF/A documents. Before a web service changes a PDF/A document, it checks against the selected profile whether the change may be executed at all, because the change can break the PDF/A conformance. The profiles only allow or block the execution (removePdfaMetadata additionally removes the PDF/A identification); they do not make the result conform to PDF/A.",
 				"properties": {
 					"pdfaEditProfile": {
 						"type": "string",
 						"default": "removePdfaMetadata",
-						"description": "Defines the profile whose rules web services have to check before they can come to execution. These profiles define a set of rules concerning the validity of PDF/A documents. A web service whose execution for a given PDF/A document would violate the rule set selected here should instead abort with an appropriate error code.\n\n*   generalEditRestrictions = All changes to PDF/A documents are prohibited.\n*   removePdfaMetadata = All changes to PDF/A documents are allowed, but the PDF/A state of the document is revoked. (By removing the PDF/A metadata.)\n*   noEditRestrictions = All changes to PDF/A documents are allowed, without touching the PDF/A state of the document. (Risking the invalidation of the document.)",
+						"description": "Defines the profile that web services check before they change a PDF/A document. A change to a PDF/A document can break its PDF/A conformance, so the profile decides only whether the change may be executed at all; it does not make the result conform to PDF/A. A web service whose change the selected profile does not allow aborts with an appropriate error code. To obtain a PDF/A document again after a change, convert the result with the PDF/A web service. The operations `add` and `clear` of the Signature web service do not check this profile; they keep the PDF/A identification (see their documentation).\n\n*   generalEditRestrictions = All changes to PDF/A documents are prohibited.\n*   removePdfaMetadata = All changes to PDF/A documents are allowed; before the change, the PDF/A identification of the document is removed, so the result does not claim a PDF/A conformance it may have lost.\n*   noEditRestrictions = All changes to PDF/A documents are allowed and the PDF/A identification is kept. By choosing this profile, you accept that the result may no longer conform to PDF/A although it is still identified as PDF/A.",
 						"enum": [
 							"generalEditRestrictions",
 							"removePdfaMetadata",
@@ -14733,7 +14733,7 @@
 			},
 			"Operation_PortfolioRemove": {
 				"type": "object",
-				"description": "Removes one or more documents from the portfolio.",
+				"description": "Removes one or more documents from the portfolio.\n\nEvery selected file is removed completely, at all of its places: from the attachment list, from every association with a part of the document (\"/AF\"), and with every file attachment annotation that shows it, together with its pop-up and its replies. A file is its file specification together with every file specification that shares an embedded file with it.\n\nWhen a file is selected, the result is written completely: it carries no earlier revision of the document, so the file is not kept in one either. A signature that remains in the document is no longer valid afterwards.\n\nIf a part of the document that is not an attachment still uses a selected file afterwards, the operation fails with error code -5023, and no document is returned.",
 				"properties": {
 					"initialDocumentPath": {
 						"type": "string",
@@ -15342,7 +15342,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -15457,7 +15457,7 @@
 			},
 			"Operation_RemoveToolboxAttachment": {
 				"type": "object",
-				"description": "Used to remove one or more attachments from the document.",
+				"description": "Used to remove one or more attachments from the document.\n\nThe selections choose files. A file is chosen when one of its places meets a selection - an entry of the attachment list, a file attachment annotation on a page, or a place of a file that a part of the document only associates (see \"extract\"). A chosen file is removed completely, at every place, also outside the selected pages and levels: from the attachment list, from every association with a part of the document (\"/AF\"), and with every file attachment annotation that shows it, together with its pop-up and its replies. A file is its file specification together with every file specification that shares an embedded file with it; a file of the same name with objects of its own is another file and stays.\n\nWhen a file is chosen, the result is written completely: it carries no earlier revision of the document, so the file is not kept in one either. A signature that remains in the document is no longer valid afterwards.\n\nIf a part of the document that is not an attachment still uses a chosen file afterwards - its file specification, its embedded file or a related file, one of its file attachment annotations with pop-up and replies -, the operation fails with error code -5023, and no document is returned. Examples are an action that launches the file, a related file that the file shares with a file that stays, and a file attachment annotation on a page template.\n\nKnown consequence: if a tool merged identical files of a document into one object, a selection also chooses the places outside the selected area that use this object.",
 				"properties": {
 					"selection": {
 						"type": "array",
@@ -15713,7 +15713,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -15780,7 +15780,7 @@
 			},
 			"Operation_Sanitize": {
 				"type": "object",
-				"description": "Simplifies document structures, deletes metadata, and flattens page contents in order to remove confidential information that could be hidden in the document structure. Subelements can be used to exempt specific content from this operation or to configure how it will be handled in greater detail. If a subelement is not passed, the represented function will be considered to be enabled and configured with the corresponding default values.",
+				"description": "Simplifies document structures, deletes metadata, and flattens page contents in order to remove confidential information that could be hidden in the document structure. Subelements can be used to exempt specific content from this operation or to configure how it will be handled in greater detail. If a subelement is not passed, the represented function will be considered to be enabled and configured with the corresponding default values - with one exception: pages are only flattened if the \"pages\" element is passed. If content that a function shall remove cannot be removed safely, the operation fails instead of returning a document that still contains it. The result is always written completely, without the earlier revisions of the document.",
 				"properties": {
 					"actions": {
 						"$ref": "#/components/schemas/Operation_SanitizeActions"
@@ -15791,8 +15791,17 @@
 					"attachments": {
 						"$ref": "#/components/schemas/Operation_SanitizeAttachments"
 					},
+					"coveredImages": {
+						"$ref": "#/components/schemas/Operation_SanitizeCoveredImages"
+					},
+					"croppedContent": {
+						"$ref": "#/components/schemas/Operation_SanitizeCroppedContent"
+					},
 					"forms": {
 						"$ref": "#/components/schemas/Operation_SanitizeForms"
+					},
+					"hiddenText": {
+						"$ref": "#/components/schemas/Operation_SanitizeHiddenText"
 					},
 					"layers": {
 						"$ref": "#/components/schemas/Operation_SanitizeLayers"
@@ -15813,7 +15822,7 @@
 			},
 			"Operation_SanitizeActions": {
 				"type": "object",
-				"description": "If this element is set, all actions shall be removed from the document - including specifically links and javascript triggers, elements and definitions. This will severely impair the functionality of interactive features such as: Annotations, forms, outlines, etc.",
+				"description": "If this function is enabled, all actions shall be removed from the document, whatever their type - the actions of the document (when it is opened, closed, saved or printed), of its pages, of all annotations including links and form field widgets, of all form fields and of all bookmarks, also if another function keeps these parts in the document - including specifically javascript triggers, elements and definitions: the document-level scripts and the scripts of 3D content. The named renditions and alternate presentations of the document are removed as well, and so are the page templates (the template pages of the name dictionary) with everything only they use, because without scripts they can never be added to the document again; if the function is disabled, they remain. A form field widget on a removed page template leaves its field, and a field without any remaining widget is removed with its value; the structure tree keeps its elements, but no longer refers to a removed page template, to its content or to its annotations, and the elements that described such content lose their text alternatives. The destination of a link or a bookmark remains, and so does a destination the document opens at. Like the other functions, it is enabled if this element is not passed. This will severely impair the functionality of interactive features such as: Annotations, forms, outlines, etc. If any other reference would keep a removed action or a removed page template in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15824,7 +15833,7 @@
 			},
 			"Operation_SanitizeAnnotations": {
 				"type": "object",
-				"description": "If this function is enabled, all comments and annotations will be removed from the document.",
+				"description": "If this function is enabled, all comments and annotations will be removed from the document, together with their popups and replies - also annotations of an unknown type or without a type. Form field widgets are not removed by this function; they are flattened by the \"forms\" function. Redaction marks are removed like comments, without redacting the content beneath them: the content stays visible. To apply redaction marks, use the \"blacken\" element. If any other reference would keep a removed annotation in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15835,7 +15844,29 @@
 			},
 			"Operation_SanitizeAttachments": {
 				"type": "object",
-				"description": "If this function is enabled, all attachments will be removed from the document.",
+				"description": "If this function is enabled, all attachments will be removed from the document: the files of the attachment list, the file attachment annotations and every file associated with the document or with a part of it - for example the invoice XML of a ZUGFeRD, Factur-X or PDF/A-3 document. The part a file is associated with remains. A file attachment annotation is removed together with its popup and its replies, also if the \"annotations\" function is disabled. The media that rich media, 3D, screen, movie and sound annotations embed belong to these annotations and are removed by the \"annotations\" function. If the \"metadata\" function is disabled, the XMP metadata of the document may still name a removed file. If any other reference would keep a removed file in the document, the operation fails with error code -1501. To keep an electronic invoice, disable this function: the attachment list and every associated file then remain unchanged.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If set to \"false\", this sanitize operation shall not be applied."
+					}
+				}
+			},
+			"Operation_SanitizeCoveredImages": {
+				"type": "object",
+				"description": "If this function is enabled, images and inline images whose visible part within the crop box is covered completely by content drawn later, or that are clipped away completely, are removed from the page; an image that no other drawn use needs is removed from the document. Of an image that is covered in part, the pixels that are covered completely are replaced by the values of the nearest pixel of their row (or column, if no pixel of the row remains) that remains; pixels that are covered in part and pixels that are only clipped away remain. Only a fill or an image that is drawn directly onto the page with full opacity, the blend mode Normal, without soft mask, without overprint and not in the colorant None counts as covering; strokes, text, shadings, transparency groups, comments and annotations, and content in layers while the \"layers\" function is disabled never do. Vector content covered by other vector content remains; to remove it, flatten the page with the \"pages\" element. Removing a covered image or covered pixels does not change the appearance of the page; a reader that smooths the image may show the pixels along the edge of the cover minimally differently. Images that lie completely outside the crop box are handled by the \"croppedContent\" function. Images are always processed on their raw samples, independently of the server setting for blackening images. If an image cannot be read or rewritten, the operation fails with error code -1501. Like the other functions, it is enabled if this element is not passed; to switch it off, the client must know this element.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If set to \"false\", this sanitize operation shall not be applied."
+					}
+				}
+			},
+			"Operation_SanitizeCroppedContent": {
+				"type": "object",
+				"description": "If this function is enabled, content that lies completely outside the visible area of a page (its crop box) is removed: letters, paths (with the full extent of their strokes), paths filled with a pattern, shadings painted with the sh operator, form XObjects, images and inline images - including bleed, crop marks and everything else between the trim box or bleed box and the media box, as far as it lies outside the crop box. An object that reaches into the crop box remains as a whole, and so does a letter that adds to a clipping path something is drawn in afterwards; a form XObject without bounding box is drawn without being clipped to one and is judged by the clipping path it is drawn in; a letter is removed only if its drawn shape, including the width of its stroke, lies outside as well - for a font whose program is not embedded or cannot be used, also its advance width from the document and the font bounding box the document declares; of an image that lies across the edge of the crop box, only the pixels that lie completely outside are replaced by the values of the nearest pixel of their row (or column, if no pixel of the row remains) that remains, so that the visible area of the page does not change - a reader that smooths the image may show the pixels along the edge of the crop box minimally differently. The page boxes remain unchanged. Parts of an object that reaches into the crop box are removed with it if the \"hiddenText\" or \"coveredImages\" function removes the object as a whole. The viewer preferences ViewClip and PrintClip are not taken into account. Images are always processed on their raw samples, independently of the server setting for blackening images. If the extent of a letter cannot be determined and its origin lies outside the crop box (a Type 3 glyph without glyph box and without font bounding box), the operation fails with error code -1500; if content cannot be read, it fails with error code -1501. Like the other functions, it is enabled if this element is not passed; to switch it off, the client must know this element.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15846,7 +15877,18 @@
 			},
 			"Operation_SanitizeForms": {
 				"type": "object",
-				"description": "If this function is enabled, all the forms in the document will be flattened. (the appearance and the values entered will remain visible in the document, but will no longer be editable).",
+				"description": "If this function is enabled, all the forms in the document will be flattened. (the appearance and the values entered will remain visible in the document, but will no longer be editable). This also applies to form widgets that do not belong to any field of the form. Only what the screen shows is flattened: a form widget that is not shown on the screen - one that is only printed (NoView) or hidden - is removed instead, and a field left without a widget is removed together with its value; such a widget is then also missing in print. If the \"layers\" function is disabled, a form widget that belongs to a layer is flattened into that layer, so that it stays shown or hidden as before and the layer can still be switched; if the \"layers\" function is enabled, the widgets of hidden layers are removed together with their values and the others are flattened without a layer. A dynamic XFA form cannot be flattened; the operation fails for such a form.",
+				"properties": {
+					"enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "If set to \"false\", this sanitize operation shall not be applied."
+					}
+				}
+			},
+			"Operation_SanitizeHiddenText": {
+				"type": "object",
+				"description": "If this function is enabled, text of which nothing is to be seen in the screen view of a page is removed, letter by letter, without changing the position of any other letter: text in the invisible text rendering mode, text that only adds to a clipping path nothing is drawn in afterwards, text in the color of the background (for example white text on a white page), text that is covered completely by a later opaque fill or opaque image, and text that is clipped away completely. The OCR text layer of a scanned page is invisible text as well: it is removed, and the page can then no longer be searched or copied from. Removing such text does not change the appearance of the page. Only a fill or an image that is drawn directly onto the page with full opacity, the blend mode Normal, without soft mask, without overprint and not in the colorant None counts as covering; text, strokes, shadings, transparency groups, comments and annotations, and form fields flattened later by the \"forms\" function never do. Text whose appearance cannot be known reliably - a font that is not embedded or damaged, a letter without an outline such as a space - is removed only where the whole box of the letter lies on a background of exactly its color, or is covered completely; the box is taken from the document - the advance widths of the font and the font bounding box its font descriptor declares -, never from a substitute font of the platform. Text in a transparency group is removed only in the invisible text rendering mode or as an unused clipping path. Letters smaller than the resolution of the decision, text in patterns, soft masks, Type 3 glyphs and annotations, and text in layers while the \"layers\" function is disabled remain. Text that lies completely outside the crop box is handled by the \"croppedContent\" function only. The decision is made at a resolution of 150 dpi, lowered for very large pages so that it stays within a fixed memory bound, and is the same on every platform; detail of the background finer than that resolution is not taken into account. If a letter to be removed cannot be removed without moving other letters (for example a Type 3 glyph without a glyph box), the operation fails with error code -1500; if the page cannot be rendered, it fails with error code -1501. Like the other functions, it is enabled if this element is not passed; to switch it off, the client must know this element.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15857,7 +15899,7 @@
 			},
 			"Operation_SanitizeLayers": {
 				"type": "object",
-				"description": "If this function is enabled, all layers will be removed from the document.",
+				"description": "If this function is enabled, all layers will be removed from the document. Content that the default configuration of the layers hides from the screen view - including layers that are only printed - will be removed, together with the comments and annotations such a layer hides. The images, form XObjects, fonts, shadings, patterns, graphics states and named marked-content properties that only such removed content uses are removed from the document as well; whatever shown content also uses remains. Structure elements whose marked content was removed this way lose their text alternatives (ActualText, Alt, E), also if the \"tags\" function is disabled. Content that is shown remains visible and only loses its layer assignment. No layer definition remains in the document. If the visibility of a layer cannot be evaluated safely (for example a visibility expression, or a layer used inside a pattern), or if something that only removed content used is still referenced in a way that would keep it in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15868,7 +15910,7 @@
 			},
 			"Operation_SanitizeMetadata": {
 				"type": "object",
-				"description": "If this function is enabled, info structures and XMP metadata will be removed from the document.",
+				"description": "If this function is enabled, the document information and the XMP metadata of the document and of every part of it will be removed - of its pages, images, form XObjects and fonts, but also of its ICC color profiles (including those of the output intents), annotations, structure elements, file specifications and embedded files -, also if another function keeps these parts in the document. Also removed are the private application data (PieceInfo) of all parts of the document, the thumbnail images of all pages, the information of article threads (title, author, subject, keywords and date - the threads themselves remain) and the Web Capture data (the Web Capture information of the document, the content sets with their source URLs and the identifiers of the pages). The file identifier of the document and the page labels remain. The visible content of the document does not change. If any other reference would keep removed data in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15879,7 +15921,7 @@
 			},
 			"Operation_SanitizeOutlines": {
 				"type": "object",
-				"description": "If this function is enabled, the outline will be removed from the document.",
+				"description": "If this function is enabled, the outline (bookmarks) and the named destinations of the document will be removed - those of the name tree as well as those of the document catalog. A link or an action that jumps to a named destination by its name then no longer finds its target, and neither does a link from outside the document that opens it at a named destination (\"#nameddest=\"). If any other reference would keep a removed named destination in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15890,13 +15932,13 @@
 			},
 			"Operation_SanitizePages": {
 				"type": "object",
-				"description": "If this function is enabled, all the selected pages in the document will be flattened. When this is done, an image of the visible contents in the corresponding page will be generated and will be used to replace all the page contents. This will remove any complex content that may be hiding confidential data.",
+				"description": "If this element is passed and the function is enabled, all the selected pages in the document will be flattened. When this is done, an image of the visible area of the page (its crop box) is generated as the screen view shows it, and the page draws this image and nothing else: its fonts, images and other resources are removed from it, including those it inherited from the page tree. This will remove any complex content that may be hiding confidential data. The image shows the layers as the default configuration of the document shows them on the screen, whether the \"layers\" function is enabled or not. Comments, annotations and form fields that remain on the page are not drawn into the image; they stay on the page as they are. A flattened page also loses its thumbnail image, its private application data (PieceInfo) and its XMP metadata, and the structure elements describing its content lose their text alternatives (ActualText, Alt, E). If the visibility of a layer cannot be evaluated safely, or if removed content is still referenced in a way that would keep it in the document (for example by the structure tree, when the \"tags\" function is disabled), the operation fails with error code -1501. If this element is not passed, no page will be flattened.",
 				"properties": {
 					"dpi": {
 						"type": "integer",
 						"format": "int32",
 						"default": 72,
-						"description": "Used to specify the resolution for the image being generated. Higher resolutions will result in lower quality loss, but may also result in significantly larger document sizes.",
+						"description": "Used to specify the resolution for the image being generated. Higher resolutions will result in lower quality loss, but may also result in significantly larger document sizes. A resolution of 0, or a resolution at which the image of a selected page would take more than 1 GiB (its width times its height in pixels, times 4 bytes), cannot be used: the operation fails with error code -1503 before any page is flattened.",
 						"maximum": 9600,
 						"minimum": 0
 					},
@@ -15908,13 +15950,13 @@
 					"pages": {
 						"type": "string",
 						"default": "*",
-						"description": "Defines which page(s) should be flattened. The page number can be an individual page, a page range, or a list (separated with commas) (e.g., \"1,5-6,9\"). To specify \"all pages,\" use an asterisk (\"\\*\")."
+						"description": "Defines which page(s) should be flattened. The page number can be an individual page, a page range, or a list (separated with commas) (e.g., \"1,5-6,9\"). To specify \"all pages,\" use an asterisk (\"\\*\"). Invalid entries are ignored; if the selection does not select any page of the document, the operation fails with error code -661. A page that appears more than once in the document is flattened once, if any of its occurrences is selected."
 					}
 				}
 			},
 			"Operation_SanitizeTags": {
 				"type": "object",
-				"description": "If this function is enabled, all tags will be removed from the document.",
+				"description": "If this function is enabled, all tags will be removed from the document: the structure tree as well as the identifiers and text alternatives (ActualText, Alt, E) of the marked content of the pages and of the form XObjects, wherever a form XObject is drawn from - including soft masks, patterns, Type 3 fonts, template pages and named appearances. The marked content itself remains. References into the structure tree are removed with it, also if the \"outlines\" or the \"actions\" function is disabled: a bookmark loses its structure element and keeps its title and destination, a go-to action loses its structure destination. A go-to action without any other destination is removed, and the actions that follow it take its place. If any other reference would keep a part of the structure tree in the document, the operation fails with error code -1501.",
 				"properties": {
 					"enabled": {
 						"type": "boolean",
@@ -15978,7 +16020,7 @@
 			},
 			"Operation_SelectionAttachment": {
 				"type": "object",
-				"description": "Used to set an area from which attachments that meet the selection rules will be removed. You can use multiple selection elements.",
+				"description": "Used to set an area in which attachments that meet the selection rules are selected. You can use multiple selection elements; an attachment is selected when it meets one of them.\n\nThe selection chooses files: \"extract\" returns every selected place of a file, \"remove\" removes every chosen file at all of its places, also outside the area.",
 				"properties": {
 					"context": {
 						"type": "string",
@@ -15996,12 +16038,12 @@
 					"fileMask": {
 						"type": "string",
 						"default": "",
-						"description": "Filters by file name for the selection. \"\\*.xls\", for example, would result in all XLS attachments in the selection area being removed. Meanwhile, \"xyz.json\" would result in attachments named \"xyz.json\" being removed from the selection area."
+						"description": "Filters by file name for the selection. \"\\*.xls\", for example, would select all XLS attachments in the selection area. Meanwhile, \"xyz.json\" would select the attachments named \"xyz.json\" in the selection area."
 					},
 					"pages": {
 						"type": "string",
 						"default": "",
-						"description": "Page range to which the selection applies."
+						"description": "Page range to which the selection applies. A blank value or \\* selects all pages."
 					}
 				}
 			},
@@ -16135,7 +16177,7 @@
 			},
 			"Operation_SignatureFileData": {
 				"type": "object",
-				"description": "An image that will be placed in the field's background. The data will be passed in Base64. In order to ensure that the image will have the best possible appearance, it should be transparent (e.g., PNG).",
+				"description": "An image that will be placed in the field's background. The data will be passed in Base64. In order to ensure that the image will have the best possible appearance, it should be transparent (e.g., PNG). A PDF/A-1 document allows no transparency: there, an image with transparent pixels ends the signature with the error SIGNATURE\\_APPEARANCE\\_NOT\\_PDFA\\_CONFORMING (-340); use an image without transparency.",
 				"properties": {
 					"source": {
 						"type": "string",
@@ -16167,7 +16209,7 @@
 					"name": {
 						"type": "string",
 						"default": "",
-						"description": "Name of the font that is used for the text of the visual signature. The font is searched in the font directories of the \"Signature\" web service (`webservices/signature/@fontPath`), embedded in the document as a subset that holds only the characters drawn, and the text is fitted into the signature field.\n\nIf no value is specified, the default font of the \"Signature\" web service applies (`webservices/signature/@defaultFont`): if it is empty, the font chain of the server is used; a font name configured there is tried first, and a character that it cannot display is drawn with the next font of the font chain that provides it. The value `Helvetica` there selects the standard font as described below.\n\nBlanks around the name are ignored, and a name of blanks only names no font - as if no value were specified.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions. A PDF/A document whose conformance is kept when signing (`pdfaEditProfile` \"noEditRestrictions\") then no longer conforms to PDF/A. The value always selects this standard font, also if a font family named \"Helvetica\" is installed.\n\n**Important:** Unless the PDF standard font \"Helvetica\" is selected (here or as the default font), the following applies. A font named here is binding: if it is not found or cannot be embedded, or if it cannot display a character, the signature ends with an error. If the font named here is not installed, the replacement font configured for it (`webservices/fontSubstitution` in `application.xml`) is used instead, if it is installed; it is binding in the same way. Without a font named here, a character that no font of the server can display ends the signature with an error. A text that does not fit into the signature field even at the smallest font size ends it with an error as well. Characters of scripts that are written right to left or need contextual shaping (for example Arabic, Hebrew, Hindi or Thai) are drawn one by one, without shaping and in the order in which they are given."
+						"description": "Name of the font that is used for the text of the visual signature. The font is searched in the font directories of the \"Signature\" web service (`webservices/signature/@fontPath`), embedded in the document as a subset that holds only the characters drawn, and the text is fitted into the signature field.\n\nIf no value is specified, the default font of the \"Signature\" web service applies (`webservices/signature/@defaultFont`): if it is empty, the font chain of the server is used; a font name configured there is tried first, and a character that it cannot display is drawn with the next font of the font chain that provides it. The value `Helvetica` there selects the standard font as described below.\n\nBlanks around the name are ignored, and a name of blanks only names no font - as if no value were specified.\n\nThe value `Helvetica` selects the PDF standard font \"Helvetica\": it is not embedded, displays only characters of the Windows Latin character set, and the text is laid out as in earlier versions. The value always selects this standard font, also if a font family named \"Helvetica\" is installed. If no font of the server can be used, the text is drawn with this standard font as well. As a PDF/A document needs embedded fonts, a requested appearance with text on a PDF/A document then ends with the error SIGNATURE\\_APPEARANCE\\_NOT\\_PDFA\\_CONFORMING (-340) - whether `Helvetica` selects the standard font (here or as the default font) or no font of the server can be used -, and an appearance that webPDF gives a prepared signature field itself has no text. An appearance with an image only is not affected. When `Helvetica` selects the standard font, a further font in the font directories does not help: name another font here, or do not use `Helvetica` as the default font.\n\n**Important:** Unless the PDF standard font \"Helvetica\" is selected (here or as the default font), the following applies. A font named here is binding: if it is not found or cannot be embedded, or if it cannot display a character, the signature ends with an error. If the font named here is not installed, the replacement font configured for it (`webservices/fontSubstitution` in `application.xml`) is used instead, if it is installed; it is binding in the same way. Without a font named here, a character that no font of the server can display ends the signature with an error. A text that does not fit into the signature field even at the smallest font size ends it with an error as well. Characters of scripts that are written right to left or need contextual shaping (for example Arabic, Hebrew, Hindi or Thai) are drawn one by one, without shaping and in the order in which they are given."
 					}
 				}
 			},
@@ -16273,7 +16315,7 @@
 						"type": "integer",
 						"format": "int32",
 						"default": 50,
-						"description": "Opacity of image as a percentage value between 0 and 100.",
+						"description": "Opacity of image as a percentage value between 0 and 100.\n\nA value below 100 draws the image transparently. A PDF/A-1 document allows no transparency: there, a value below 100 - the default 50 included - ends the signature with the error SIGNATURE\\_APPEARANCE\\_NOT\\_PDFA\\_CONFORMING (-340); so does an already signed PDF/A-2, PDF/A-3 or PDF/A-4 document without PDF/A output intent whose page of the signature field has no blending color space. Set 100 for such documents.",
 						"maximum": 100,
 						"minimum": 0
 					},
@@ -16378,12 +16420,12 @@
 			},
 			"Operation_SignatureSettings": {
 				"type": "object",
-				"description": "The `signature` element allows to set settings for automatic signature handling and verification. All web services prioritize checking whether their execution is valid for a given signed document - according to these settings - or would risk invalidation of the existing signatures. (This is also defining profiles, that would allow signature invalidation).",
+				"description": "The `signature` element allows to set settings for automatic signature handling and verification. Before a web service changes a signed document, it checks against the selected profile whether the change may be executed at all, because the change invalidates the existing signatures. The profiles only allow or block the execution; they do not define the state of the result.",
 				"properties": {
 					"signatureEditProfile": {
 						"type": "string",
 						"default": "adobeRestrictions",
-						"description": "Defines the profile whose rules web services have to check before they can come to execution. These profiles define a set of rules concerning the validity of signatures. A web service whose execution for a given signed document would violate the ruleset selected here should instead abort with an appropriate error code.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed (by doing this, you accept that all signatures could potentially be removed from the document when necessary).",
+						"description": "Defines the profile that web services check before they change a signed document. A change to a signed document invalidates its signatures, so the profile decides only whether the change may be executed at all; a web service whose change the selected profile does not allow aborts with an appropriate error code. The profile does not define the state of the result: it neither keeps the signatures valid nor promises that they are removed.\n\n*   adobeRestrictions = Only those changes are allowed that are enabled by the included signatures. This follows the specifications given by Adobe.\n*   generalEditRestrictions = All changes to signed documents are prohibited, even those that might be allowed according to the included signatures.\n*   noEditRestrictions = Editing of signed documents is not restricted and all changes are allowed. By choosing this profile, you accept that a change invalidates the included signatures; to perform the change, webPDF may remove signatures from the document.",
 						"enum": [
 							"adobeRestrictions",
 							"generalEditRestrictions",
@@ -16566,7 +16608,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
@@ -17042,7 +17084,7 @@
 					"invisible": {
 						"type": "boolean",
 						"default": false,
-						"description": "If this value is set to true, the annotation will be visible on the page only when printed, and provided it is a PDF standard annotation."
+						"description": "If this value is set to true, the annotation is marked as invisible. The flag only applies to annotations of a type the viewer does not know, which it then neither shows nor prints; an annotation of a standard PDF type - as every annotation this operation creates - is shown and printed as without the flag (ISO 32000-1, table 165)."
 					},
 					"locked": {
 						"type": "boolean",
